@@ -1,9 +1,9 @@
-package com.example.service;
+package friendzone.elec3609.service;
 
 
 import java.util.List;
 
-import com.example.model.Person;
+import friendzone.elec3609.model.Person;
 
 public interface PersonService {
     

@@ -99,6 +99,7 @@
 <ul id="tab" class="nav nav-tabs">
   <li class="active"><a href="#eclipse-instructions" data-toggle="tab">Use Eclipse 3.7</a></li>
   <li><a href="#cli-instructions" data-toggle="tab">Use Command Line</a></li>
+  <li><a href="/registration/"><b> STUDENT REGISTRATION PAGE </b></a></li> 
 </ul>
 
 <div class="tab-content">

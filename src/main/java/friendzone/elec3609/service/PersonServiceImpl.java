@@ -1,9 +1,9 @@
-package com.example.service;
+package friendzone.elec3609.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.model.Person;
+import friendzone.elec3609.model.Person;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
