@@ -49,7 +49,7 @@
 
 	<body>
 		<div class="page-header">
-			<a href="index.jsp" class="appTitle"><h1>FriendZone</h1></a>
+			<a href="/" class="appTitle"><h1>FriendZone</h1></a>
 		</div>
 	
 		<div class="page-body">
