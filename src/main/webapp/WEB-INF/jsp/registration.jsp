@@ -6,61 +6,120 @@
 <html>
 	<head>
 		<title>	Friendzone - Registration </title>
+		<style type="text/css">
+			body {
+				margin-top: 0px;
+				margin-right: 0px;
+				margin-bottom: 0px;
+				margin-left: 0px
+			}
+			
+			.page-header {
+				FONT-FAMILY: 'Times New Roman';
+				TEXT-TRANSFORM: capitalize;
+				background: rgba(102, 153, 204, 1);
+				height: 10%;
+				width: 100%;
+			}
+			
+			.page-body {
+				background: rgba(238, 236, 225, 1);
+				height: 100;
+			}
+		</style>
 	</head>
 	<body>
-		<h1> Worst looking registration form ever </h1>
-		<form method="post" action="add/">
-			First name:							<input type="text" name="firstName"> 
-												<br>
-			Last name:							<input type="text" name="lastName"> 
-												<br>
-			SID:								<input type="text" name="sid"> 
-												<br>
-			Unikey:								<input type="text" name="unikey"> 
-												<br>
-			Study level:						<c:forEach items="${studyLevels}" var="option">
-													<input type="radio" name="studyLevel" value="${option}"> ${option}
-												</c:forEach> 
-												<br>
-			Degree:								<input type="text" name="course">
-												<br>
-			Mobile:								<input type="text" name="mobile"> 
-												<br>
-			Primary email:						<input type="text" name="primaryEmail"> 
-												<br>
-			Secondary email:					<input type="text" name"secondaryEmail"> 
-												<br>
-			Languages:							<br> 
-												<ul>
-													<c:forEach items="${programmingLanguages}" var="language">
-														<li>
-															<input type="checkbox" name="languages" value="${language}"> ${language} 
-															<br>
-														</li>
-													</c:forEach>
-												</ul>
-			Social Media 1:						<select name="socialMedia1Provider">
-													<c:forEach items="${socialMediaProviders}" var="option">
-			 												<option value="${option}"> ${option} </option>
-													</c:forEach>
-												</select>
-												<input type="text" name="socialMedia1Value">
-												<br>
-			Social Media 2:						<select name="socialMedia2Provider">
-													<c:forEach items="${socialMediaProviders}" var="option">
-														<option value="${option}"> ${option} </option>
-													</c:forEach>
-												</select>
-												<input type="text" name="socialMedia2Value"> <br>
-			Is English your first language?		<input type="radio" name="esl" value="false"> Yes
-												<input type="radio" name="esl" value="true"> No
-												<br>
-			Experience:			<br>
-								<textarea rows="4" cols="50" name="experience">Enter a brief description of your work and project experience (up to 200 characters).</textarea>
-								<br>
-			
-            <input type="submit" value="Submit registration" class="btn"/>
-			
-		</form>	
+		<div class="page-header">
+			<h1>FriendZone</h1>
+		</div>
+		<div class="page-body">
+			<h1>Registration Form </h1>
+			<form method="post" action="add/">
+				<table>
+					<tr>
+						<td>First name:</td>
+						<td><input type="text" name="firstName"> </td>
+					</tr>
+					<tr>
+						<td>Last name:</td>
+						<td><input type="text" name="lastName"> </td>
+					</tr>
+					<tr>
+						<td>SID:</td>
+						<td><input type="text" name="sid"> </td>
+					</tr>
+					<tr>
+						<td>Unikey:</td>
+						<td><input type="text" name="unikey"> </td>
+					</tr>
+					<tr>
+						<td>Study level:</td>
+						<td><c:forEach items="${studyLevels}" var="option">
+								<input type="radio" name="studyLevel" value="${option}"> ${option}
+							</c:forEach> 
+						</td>
+					</tr>
+					<tr>
+						<td>Degree:</td>
+						<td><input type="text" name="course"></td>
+					</tr>
+					<tr>
+						<td>Primary email:</td>
+						<td><input type="text" name="primaryEmail"></td>
+					</tr>
+					<tr>
+						<td>Secondary email:</td>
+						<td><input type="text" name"secondaryEmail"></td>
+					</tr>
+					<tr>
+						<td>Languages:</td>
+						<td><ul>
+								<c:forEach items="${programmingLanguages}" var="language">
+									<li>
+										<input type="checkbox" name="languages" value="${language}"> ${language} 
+										<br>
+									</li>
+								</c:forEach>
+							</ul>
+						</td>
+					</tr>
+					<tr>
+						<td>Social Media 1:</td>
+						<td><select name="socialMedia1Provider">
+								<c:forEach items="${socialMediaProviders}" var="option">
+									<option value="${option}"> ${option} </option>
+								</c:forEach>
+							</select>
+							<input type="text" name="socialMedia1Value">
+						</td>
+					</tr>
+					<tr>
+						<td>Social Media 2:</td>
+						<td><select name="socialMedia2Provider">
+								<c:forEach items="${socialMediaProviders}" var="option">
+									<option value="${option}"> ${option} </option>
+								</c:forEach>
+								<input type="text" name="socialMedia2Value"> 
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>Is English your first language?</td>
+						<td><input type="radio" name="esl" value="false"> Yes
+							<input type="radio" name="esl" value="true"> No
+						</td>
+					</tr>
+					<tr>
+						<td>Experience:</td>
+						<td><textarea rows="4" cols="50" name="experience">Enter a brief description of your work and project experience (up to 200 characters).</textarea> </td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><input type="submit" value="Submit registration" class="btn"/></td>
+					</tr>
+				</table>
+			</form>	
+		</div>
+		
 	</body>
 </html>
