@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>	Friendzone</title>
+		<title>Friendzone-Profile</title>
 		<style type="text/css">
 			body {
 				margin-top: 0px;
@@ -43,28 +43,7 @@
 			<a href="/"class="appTitle"><h1>FriendZone</h1></a>
 		</div>
 		<div class="page-body">
-			<form name="login" method="get" action="/profile/">
-				<table class="formTable" align="center">
-					<tr>
-						<td><h1>Login</h1></td>
-					</tr>
-					<tr>
-						<td>Username: </td>
-						<td><input type="text" name="username"> </td>
-					</tr>
-					<tr>
-						<td> Password: </td>
-						<td><input type="password" name="password"></td>
-					</tr>
-					<tr>
-						<td><input type="submit" value="Login" class="btn"/></td>
-					</tr>
-					<tr>
-						<td> Not a member? </td>
-						<td><a href="/registration/"class="appTitle"> Register</a> now </td>
-					</tr>
-				</table>
-			</form>	
+			<h1>Profile Page</h1>
 		</div>
 	</body>
 </html>

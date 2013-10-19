@@ -32,5 +32,5 @@
     <servlet-mapping>
         <servlet-name>spring</servlet-name>
         <url-pattern>/profile/*</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>    
 </web-app>
