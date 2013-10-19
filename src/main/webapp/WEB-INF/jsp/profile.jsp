@@ -40,7 +40,7 @@
 	</head>
 	<body>
 		<div class="page-header">
-			<a href="/"class="appTitle"><h1>FriendZone</h1></a>
+			<a href="/mainHome/"class="appTitle"><h1>FriendZone</h1></a>
 		</div>
 		<div class="page-body">
 			<h1>Profile Page</h1>

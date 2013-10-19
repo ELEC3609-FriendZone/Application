@@ -23,6 +23,10 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>spring</servlet-name>
+        <url-pattern>/profile/*</url-pattern>
+    </servlet-mapping> 
+    <servlet-mapping>
+        <servlet-name>spring</servlet-name>
         <url-pattern>/people/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -31,6 +35,22 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>spring</servlet-name>
-        <url-pattern>/profile/*</url-pattern>
-    </servlet-mapping>    
+        <url-pattern>/mainHome/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>spring</servlet-name>
+        <url-pattern>/group/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>spring</servlet-name>
+        <url-pattern>/availability/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>spring</servlet-name>
+        <url-pattern>/meeting/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>spring</servlet-name>
+        <url-pattern>/subject/*</url-pattern>
+    </servlet-mapping>   
 </web-app>
