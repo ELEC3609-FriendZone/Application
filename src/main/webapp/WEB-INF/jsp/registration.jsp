@@ -10,9 +10,9 @@
 		<div id="header-wrapper">
 			<img src="../images/title.png" alt="Friendzone">
 		</div>
-		<div id="form">
-			<h1 class="orange">Registration Form </h1>
-			<form method="post" action="add/">
+		<div id="form-registration">
+			<h1 class="title h2">Registration Form </h1>
+			<form class="form" method="post" action="add/">
 				<table class="formTable" align="center">
 					<tr>
 						<td>First name:</td>
@@ -47,7 +47,7 @@
 					</tr>
 					<tr>
 						<td>Secondary email:</td>
-						<td><input type="text" name"secondaryEmail"></td>
+						<td><input type="text" name="secondaryEmail"></td>
 					</tr>
 					<tr>
 						<td>Languages:</td>
@@ -77,8 +77,8 @@
 								<c:forEach items="${socialMediaProviders}" var="option">
 									<option value="${option}"> ${option} </option>
 								</c:forEach>
-								<input type="text" name="socialMedia2Value"> 
 							</select>
+							<input type="text" name="socialMedia2Value"> 
 						</td>
 					</tr>
 					<tr>

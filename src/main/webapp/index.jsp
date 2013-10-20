@@ -8,18 +8,18 @@
 		<img src="images/title.png" alt="Friendzone">
 	</div>
 	<div id="form-login">
-		<form class="textarea" name="login" method="get" action="/profile/">
+		<form class="form" name="login" method="get" action="/profile/">
 			<table align="center">
 				<tbody>
 					<tr>
 						<td colspan="2" rowspan="1">
-							<h1 class="title h2" align="center">Sign in</h1>
+							<h1 align="center">Sign in</h1>
 						</td>
 					</tr>
 					<tr>
 						<td>Username:</td>
 						<td>
-							<div class="form textarea">
+							<div class="form">
 								<input name="username" type="text">
 							</div>
 						</td>
@@ -27,7 +27,7 @@
 					<tr>
 						<td>Password:</td>
 						<td>
-							<div class="form textarea">
+							<div class="form"> 
 								<input name="password" type="password">
 							</div>
 						</td>
