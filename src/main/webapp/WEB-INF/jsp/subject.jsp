@@ -74,12 +74,12 @@
 				<td class="table-data-team">		
 					<div class="team-member-details">
 						<h3>Team members</h3>
-						$team
+						${team}
 					</div>
 				</td>
 				<td>
 					<div class="other-page-links">
-						<a href="/subject/">Details</a>
+						<a href="/subject/">Details</a> |
 						<a href="/meeting/">New Meeting</a> |
 						<a href="/meeting/">View Meeting</a> |
 						<a href="/availability/">My Availability</a> |
@@ -87,9 +87,9 @@
 					</div>		
 					<div class="page-body">
 						<h3>Subject Description</h3>
-						<p>$subject-description</p>
+						<p>${subject-description}</p>
 						<h3>Project Description</h3>
-						<p>$project-description</p>
+						<p>${project-description}</p>
 					</div>
 				</td>
 			</tr>

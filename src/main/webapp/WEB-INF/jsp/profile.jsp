@@ -78,9 +78,40 @@
 					</div>			
 					<div class="profile-details">
 						<h3>Details</h3>
-						${primaryEmail} <br>
-						${secondaryEmail}<br>
-						${mobile}
+						<table>
+							<tr>
+								<td>
+									<b>Unikey:</b> 
+								</td>
+								<td>
+									${unikey}
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<b>SID:</b> 
+								</td>
+								<td>
+									${SID}
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<b>Email:</b>
+								</td>
+								<td>
+									 ${primaryEmail}
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<b>Mobile:</b> 
+								</td>
+								<td>
+									${mobile}
+								</td>
+							</tr>
+						</table>
 					</div>
 				</td>
 				<td>
@@ -102,6 +133,11 @@
 							<c:forEach items="${languages}" var="language">
 								<li>${language}</li>
 							</c:forEach>
+						</ul>
+						<h3>Social Media</h3>
+						<ul>
+							<li>${firstSocialMedia}</li>
+							<li>${secondSocialMedia}</li>
 						</ul>
 					</div>
 				</td>
