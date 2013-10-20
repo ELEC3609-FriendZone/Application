@@ -13,7 +13,7 @@
 		<div id="form-registration">
 			<h1 class="title h2">Registration Form </h1>
 			<form class="form" method="post" action="add/">
-				<table class="formTable" align="center">
+				<table align="center">
 					<tr>
 						<td>First name:</td>
 						<td><input type="text" name="firstName"> </td>
