@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Friendzone-Profile</title>
+		<title>Friendzone-Meeting</title>
 		<style type="text/css">
 			body {
 				margin-top: 0px;
