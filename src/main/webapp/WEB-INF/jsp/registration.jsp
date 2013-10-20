@@ -4,49 +4,14 @@
 <html>
 	<head>
 		<title>	Friendzone - Registration </title>
-		<style type="text/css">
-			body {
-				margin-top: 0px;
-				margin-right: 0px;
-				margin-bottom: 0px;
-				margin-left: 0px;
-				background: rgba(238, 236, 225, 1);
-			}
-			
-			.page-header {
-				FONT-FAMILY: 'Times New Roman';
-				TEXT-TRANSFORM: capitalize;
-				background: rgba(102, 153, 204, 1);
-				height: 10%;
-				width: 100%;
-			}
-			
-			h1{
-				text-align:center;
-			}
-			
-			.appTitle{
-				color: rgba(0, 0, 0, 1);
-			}
-	
-			.page-body {
-				background: rgba(260,260, 260, 1);
-				margin-top:1%;
-				margin-left:10%;
-				margin-right:10%;
-			}
-			
-			.formTable{
-			
-			}
-		</style>
+		<link rel="stylesheet" type="text/css" href="../../styles/styles.css" />
 	</head>
 	<body>
-		<div class="page-header">
-			<a href="/"class="appTitle"><h1>FriendZone</h1></a>
+		<div id="header-wrapper">
+			<img src="../images/title.png" alt="Friendzone">
 		</div>
-		<div class="page-body">
-			<h1>Registration Form </h1>
+		<div id="form">
+			<h1 class="orange">Registration Form </h1>
 			<form method="post" action="add/">
 				<table class="formTable" align="center">
 					<tr>
@@ -127,8 +92,7 @@
 						<td><textarea rows="4" cols="50" name="experience">Enter a brief description of your work and project experience (up to 200 characters).</textarea> </td>
 					</tr>
 					<tr>
-						<td></td>
-						<td><input type="submit" value="Submit registration" class="btn"/></td>
+						<td colspan="2" rowspan="1" align="center"><input value="Submit registration" class="button-orange" type="submit"></td>
 					</tr>
 				</table>
 			</form>	

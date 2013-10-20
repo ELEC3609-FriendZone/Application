@@ -1,70 +1,45 @@
 <html>
-	<head>
-		<title>	Friendzone</title>
-		<style type="text/css">
-			body {
-				margin-top: 0px;
-				margin-right: 0px;
-				margin-bottom: 0px;
-				margin-left: 0px;
-				background: rgba(238, 236, 225, 1);
-			}
-			
-			.page-header {
-				FONT-FAMILY: 'Times New Roman';
-				TEXT-TRANSFORM: capitalize;
-				background: rgba(102, 153, 204, 1);
-				height: 10%;
-				width: 100%;
-			}
-			
-			h1{
-				text-align:center;
-			}
-			
-			.appTitle{
-				color: rgba(0, 0, 0, 1);
-			}
-	
-			.page-body {
-				background: rgba(260,260, 260, 1);
-				margin-top:1%;
-				margin-left:10%;
-				margin-right:10%;
-			}
-			
-			.formTable{
-			
-			}
-		</style>
-	</head>
-	<body>
-		<div class="page-header">
-			<a href="/"class="appTitle"><h1>FriendZone</h1></a>
-		</div>
-		<div class="page-body">
-			<form name="login" method="get" action="/profile/">
-				<table class="formTable" align="center">
+<head>
+<title>Friendzone</title>
+<link rel="stylesheet" type="text/css" href="/styles/styles.css">
+</head>
+<body>
+	<div id="header-wrapper">
+		<img src="images/title.png" alt="Friendzone">
+	</div>
+	<div id="form-login">
+		<form class="textarea" name="login" method="get" action="/profile/">
+			<table align="center">
+				<tbody>
 					<tr>
-						<td><h1>Login</h1></td>
+						<td colspan="2" rowspan="1">
+							<h1 class="title h2" align="center">Sign in</h1>
+						</td>
 					</tr>
 					<tr>
-						<td>Username: </td>
-						<td><input type="text" name="username"> </td>
+						<td>Username:</td>
+						<td>
+							<div class="form textarea">
+								<input name="username" type="text">
+							</div>
+						</td>
 					</tr>
 					<tr>
-						<td> Password: </td>
-						<td><input type="password" name="password"></td>
+						<td>Password:</td>
+						<td>
+							<div class="form textarea">
+								<input name="password" type="password">
+							</div>
+						</td>
 					</tr>
-					<tr>
-						<td><input type="submit" value="Login" class="btn"/></td>
+					<tr align="center">
+						<td align="center"><a class="button-green" href="/registration/"> Register </a></td>
+						<td><input class="button-orange" type="submit" value="log in"></td>
 					</tr>
-					<tr>
-						<td> Not a member? </td>
-						<td><a href="/registration/"class="appTitle"> Register</a> now </td>
-					</tr>
-				</table>
-			</form>	
-		</div>
-	</body>
+				</tbody>
+			</table>
+		</form>
+	</div>
+</body>
 </html>
+
