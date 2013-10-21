@@ -4,12 +4,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Array;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import friendzone.elec3609.model.*;
@@ -19,10 +24,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DatabaseHandler{
-	static Connection dbConnection;
+	Map<String, UnitOfStudy> uosMap = new HashMap<String, UnitOfStudy>();
+	Map<String, Student> studentMap = new HashMap<String, Student>();
+	Map<Integer, Team> teamMap = new HashMap<Integer, Team>();
+	Map<Integer, Project> projectMap = new HashMap<Integer, Project>();	
+	Map<Integer, Invitation> inviteMap = new HashMap<Integer, Invitation>();
+	Map<Integer, Meeting> meetingMap = new HashMap<Integer, Meeting>();
+	
+	Connection dbConnection;
 	
 	//Since the DatabaseHandler is marked as a service, it acts as a singleton and the constructor gets called automatically when the application starts
-	//We probably won't need this constructor at all when 
 	public DatabaseHandler(){
 		try {
 			dbConnection = getConnection();
@@ -59,130 +70,13 @@ public class DatabaseHandler{
 	    return DriverManager.getConnection(dbUrl, props); 
 	}
 	
-	public Student getStudent(String SID){
-		Student student = null;
-		String fetchQuery =
-					"	SELECT *"
-				+	"	FROM Student"
-				+	"	WHERE SID=?"
-				;
-		try{
-			PreparedStatement statement = dbConnection.prepareStatement(fetchQuery);
-			statement.setString(1, SID);
-			ResultSet rs = statement.executeQuery();
-			if (rs.next()){ // using if instead of while since there can only be 1 result
-				student = new Student	(rs.getString("SID"),
-										 rs.getString("UNIKEY"),
-										 rs.getString("FIRST_NAME"),
-										 rs.getString("LAST_NAME"),
-										 rs.getString("PRIMARY_EMAIL"),
-										 rs.getString("MOBILE"),
-										 StudyLevel.findMatch(rs.getString("STUDY_LEVEL")),
-										 rs.getBoolean("ESL"));
-				//The constructor takes all the "NOT NULL" values, but there are others that can exist
-				String[] socialMediaComponents = rs.getString("SOCIAL_MEDIA_1").split(":");
-				Provider provider = SocialMedia.Provider.findMatch(socialMediaComponents[0]);
-				String address = socialMediaComponents[1].trim();
-				student.setFirstSocialMedia(provider, address);
-				
-				socialMediaComponents = rs.getString("SOCIAL_MEDIA_2").split(":");
-				provider = SocialMedia.Provider.findMatch(socialMediaComponents[0]);
-				address = socialMediaComponents[1].trim();
-				student.setSecondSocialMedia(provider, address);
-				
-				String[] stringLanguages = rs.getString("LANGUAGES").split(",");
-				ProgrammingLanguage[] languages = new ProgrammingLanguage[stringLanguages.length];
-				for (int i = 0; i != languages.length; ++i){
-					languages[i] = ProgrammingLanguage.findMatch(stringLanguages[i].trim());
-				}
-				student.setLanguages(languages);
-				
-				Array availArray = rs.getArray("AVAILABILITY");
-				boolean[][] twoDimensionalAvail = new boolean[7][12];
-				Boolean[] oneDimensionalAvail = (Boolean[])availArray.getArray();
-				for (int i = 0; i != twoDimensionalAvail.length; ++i){
-					for (int j = 0; j != twoDimensionalAvail[i].length; ++j){
-						twoDimensionalAvail[i][j] = oneDimensionalAvail[i * twoDimensionalAvail.length + j];
-					}
-				}
-				student.setAvailability(twoDimensionalAvail);
-				
-				student.setCourse(rs.getString("COURSE"));
-				student.setSecondaryEmail(rs.getString("SECONDARY_EMAIL"));
-				student.setExperience(rs.getString("EXPERIENCE"));
-				student.setStudyLevel(StudyLevel.findMatch(rs.getString("STUDY_LEVEL")));
-				student.setPreferredRole(Role.findMatch(rs.getString("PREFERRED_ROLE")));
-			}
-		} catch (SQLException e){
-			e.printStackTrace();
-		}
-		return student;
-	}
-	
-	public void addStudent(Student newMember){
-		String insertQuery = 
-				"	INSERT INTO Student"
-			+	"	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-		try{
-			PreparedStatement statement = dbConnection.prepareStatement(insertQuery);
-				statement.setString(1, newMember.getSID());
-				statement.setString(2, newMember.getUnikey());
-				statement.setString(3, newMember.getFirstName());
-				statement.setString(4, newMember.getLastName());
-				statement.setString(5, newMember.getCourse());
-				statement.setString(6, newMember.getPrimaryEmail());
-				statement.setString(7, newMember.getSecondaryEmail());
-				statement.setString(8, newMember.getMobile());
-				
-				String firstSocialMedia = (newMember.getFirstSocialMedia() == null? null : newMember.getFirstSocialMedia().toString());
-				statement.setString(9, firstSocialMedia); 
-				
-				String secondSocialMedia = (newMember.getSecondSocialMedia() == null? null : newMember.getSecondSocialMedia().toString());
-				statement.setString(10, secondSocialMedia);
-				
-				String studyLevel = (newMember.getStudyLevel() == null? null : newMember.getStudyLevel().toString());
-				statement.setString(11, studyLevel);
-				
-				String preferredRole = (newMember.getPreferredRole() == null? null : newMember.getPreferredRole().toString());
-				statement.setString(12, preferredRole);
-				statement.setString(14, newMember.getExperience());
-				statement.setBoolean(15, newMember.getESL());
-				
-				String languageString = "";
-				boolean firstPassed = false;
-				for (ProgrammingLanguage language : newMember.getLanguages()){
-					if (!firstPassed){
-						firstPassed = true;
-					}
-					else{
-						languageString += ", ";
-					}
-					languageString += language.toString();
-				}
-				statement.setString(16, languageString);
-				
-				Boolean[] oneDimensionalAvail = new Boolean[84];
-				boolean[][] twoDimensionalAvail = newMember.getAvailability();
-				for (int i = 0; i != twoDimensionalAvail.length ; ++i){
-					for (int j = 0; j != twoDimensionalAvail[i].length; ++j){
-						oneDimensionalAvail[i * twoDimensionalAvail.length + j] = twoDimensionalAvail[i][j];
-					}
-				}
-				Array availArray = dbConnection.createArrayOf("boolean", oneDimensionalAvail);
-				
-				statement.setArray(17, null);
-				statement.execute();
-		} catch (SQLException e){
-			e.printStackTrace();
-		} 
-	}
-
 	public void resetDatabase(){
 		String createQuery = 
 				"DROP TABLE IF EXISTS Student CASCADE;"
 			+	"CREATE TABLE Student ("
 			+	"	SID					CHAR(9) 		NOT NULL,"
 			+ 	"	UNIKEY 				CHAR(8) 		NOT NULL,"
+			+	"	PASSWORD			CHAR(64)		NOT NULL,"
 			+	"	FIRST_NAME			VARCHAR(20)		NOT NULL,"
 			+	"	LAST_NAME			VARCHAR(20)		NOT NULL,"
 			+	"	COURSE				VARCHAR(50),"
@@ -197,15 +91,17 @@ public class DatabaseHandler{
 			+	"	EXPERIENCE			VARCHAR(200),"
 			+	"	ESL					BOOLEAN			NOT NULL,"
 			+	"	LANGUAGES			VARCHAR(50),"
-			+	"	AVAILABILITY		BOOLEAN[84],"		//	7 days x 12 hours (8am-8pm) 
+			+	"	AVAILABILITY		BOOLEAN[84],"					//	7 days x 12 hours (8am-8pm) 
+			+	"	LAST_MODIFIED		TIMESTAMP		DEFAULT NOW(),"
 			+	"	PRIMARY KEY			(SID)"
 			+ 	");"
 			+	"DROP TABLE IF EXISTS UnitOfStudy CASCADE;"
 			+	"CREATE TABLE UnitOfStudy ("
-			+	"	UOS_ID			CHAR(8)			NOT NULL,"
+			+	"	UOS_ID				CHAR(8)			NOT NULL,"
 			+	"	UOS_NAME			VARCHAR(50)		NOT NULL,"
-			+	"	UOS_DESCRIPTION	VARCHAR(100),"
+			+	"	UOS_DESCRIPTION		VARCHAR(100),"
 			+	"	NUM_STUDENTS		INTEGER		NOT NULL,"
+			+	"	LAST_MODIFIED		TIMESTAMP 	DEFAULT NOW(),"
 			+	"	PRIMARY KEY			(UOS_ID)"
 			+ 	");"
 			+	"DROP TABLE IF EXISTS Enrolment CASCADE;"
@@ -217,15 +113,16 @@ public class DatabaseHandler{
 			+	");"
 			+	"DROP TABLE IF EXISTS Project CASCADE;"
 			+	"CREATE TABLE Project ("
-			+	"	PROJECT_ID		INTEGER		NOT NULL,"
+			+	"	PROJECT_ID		SERIAL		NOT NULL,"
 			+	"	UOS_ID			CHAR(8)		REFERENCES UnitOfStudy(UOS_ID)		NOT NULL,"
 			+	"	DESCRIPTION		VARCHAR(100),"
 			+	"	DEADLINE		DATE		NOT NULL,"
+			+	"	LAST_MODIFIED	TIMESTAMP	DEFAULT NOW(),"
 			+	"	PRIMARY KEY		(PROJECT_ID)"
 			+	");"
 			+	"DROP TABLE IF EXISTS Team CASCADE;" //could not use the name "Group" since it's a reserved word in SQL
 			+	"CREATE TABLE Team ("
-			+	"	TEAM_ID			INTEGER		NOT NULL,"
+			+	"	TEAM_ID			SERIAL		NOT NULL,"
 			+	"	PROJECT_ID		INTEGER		REFERENCES Project(PROJECT_ID)		NOT NULL,"
 			+	"	PRIMARY KEY		(TEAM_ID)"
 			+	");"
@@ -235,6 +132,15 @@ public class DatabaseHandler{
 			+	"	TEAM		INTEGER		REFERENCES Team(TEAM_ID)	NOT NULL,"
 			+	"	PRIMARY KEY (STUDENT, TEAM)"
 			+	");"
+			+	"DROP TABLE IF EXISTS Meeting CASCADE;"
+			+	"CREATE TABLE Meeting("
+			+	"	MEETING_ID	SERIAL			NOT NULL,"
+			+	"	TEAM		INTEGER			REFERENCES Team(TEAM_ID)	NOT NULL,"
+			+	"	START		TIMESTAMP		NOT NULL,"
+			+	"	END			TIMESTAMP		NOT NULL,"
+			+	"	LOCATION	VARCHAR(20),"
+			+	"	PRIMARY KEY (MEETING_ID)"
+			+	");"
 			+ 	"DROP TABLE IF EXISTS Administrator CASCADE;"
 			+	"CREATE TABLE Administrator ("
 			+	"	STAFF_NUM		CHAR(9)		NOT NULL,"	//format of a USYD staff number?	
@@ -243,16 +149,48 @@ public class DatabaseHandler{
 			+	");"
 			+	"DROP TABLE IF EXISTS InstantMessage CASCADE;"
 			+	"CREATE TABLE InstantMessage ("
-			+	"	MESSAGE_ID	INTEGER			NOT NULL,"
+			+	"	MESSAGE_ID	SERIAL			NOT NULL,"
 			+	"	SENDER		CHAR(9)			REFERENCES Student(SID)		NOT NULL,"
 			+	"	TEAM		INTEGER			REFERENCES Team(TEAM_ID)	NOT NULL,"
 			+	"	MESSAGE		VARCHAR(200)	NOT NULL,"
 			+	"	PRIMARY KEY	(MESSAGE_ID)"
 			+	");"
+			+	"DROP TABLE IF EXISTS Invitation CASCADE;"
+			+	"CREATE TABLE Invitation ("
+			+	"	INVITE_ID	SERIAL			NOT NULL,"
+			+	"	MESSAGE		VARCHAR(100),"	
+			+	"	PROJECT		INTEGER			REFERENCES Project(PROJECT_ID)	NOT NULL,"
+			+	"	SENDER		CHAR(9)			REFERENCES Student(SID)			NOT NULL,"
+			+	"	RECIPIENT	CHAR(9)			REFERENCES Student(SID)			NOT NULL,"	
+			+	"	PRIMARY KEY	(INVITE_ID)"
+			+	");"
+			// Now that the tables are made, we define the triggers to make LAST_MODIFIED work
+			+	"DROP FUNCTION IF EXISTS UpdateLastModified();"
+			+	"CREATE FUNCTION UpdateLastModified() RETURNS trigger AS $$"
+			+	"	BEGIN"
+			+	"		NEW.LAST_MODIFIED := NOW();"	
+			+	"		RETURN NEW;"
+			+	"	END;" 
+			+	"$$ LANGUAGE PLPGSQL;"
+			+	"DROP TRIGGER IF EXISTS UpdateStudentLastModified ON Invitation;"
+			+	"CREATE TRIGGER UpdateStudentLastModified"
+			+	"	BEFORE UPDATE ON Student"
+			+	"	FOR EACH ROW"
+			+	"	EXECUTE PROCEDURE UpdateLastModified();"
+			+	"DROP TRIGGER IF EXISTS UpdateUnitOfStudyLastModified ON UnitOfStudy;"
+			+	"CREATE TRIGGER UpdateUnitOfStudyLastModified"
+			+	"	BEFORE UPDATE ON UnitOfStudy"
+			+	"	FOR EACH ROW"
+			+	"	EXECUTE PROCEDURE UpdateLastModified();"
+			+	"DROP TRIGGER IF EXISTS UpdateProjectModified ON UnitOfStudy;"
+			+	"CREATE TRIGGER UpdateProjectLastModified"
+			+	"	BEFORE UPDATE ON Project"
+			+	"	FOR EACH ROW"
+			+	"	EXECUTE PROCEDURE UpdateLastModified();"			
 		;
-		Statement stmt = null;
+
 		try{
-			stmt = dbConnection.createStatement();
+			Statement stmt = dbConnection.createStatement();
 			stmt.executeUpdate(createQuery);
 			stmt.close();
 		} catch (SQLException e) {
@@ -263,7 +201,831 @@ public class DatabaseHandler{
 		}
 	}
 	
-	// this is mainly used for testing, to ensure the resetDatabase() method worked
+	/**
+	 * Returns a Student object if the log-in was successful, otherwise returns null
+	 * @param unikey Unikey of the Student you wish to log on as
+	 * @param password Password of the Student you wish to log on as
+	 * @return The Student corresponding to the given uni-key and password
+	 */
+	public Student logIn(String SID, String password){
+		Student matchingStudent = null;
+		try{
+			String selectQuery = "SELECT PASSWORD"
+							+	" FROM Student"
+							+	" WHERE UNIKEY=?"
+							+	" AND PASSWORD=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setString(1, SID);
+			stmt.setString(2, password);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()){
+				matchingStudent = getStudent(SID);
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return matchingStudent;
+	}
+
+	//	--	--	--	--	--	THE FOLLOWING METHODS ARE FOR FETCHING MODELS USING THEIR ID 	--	--	--	--	--	--	--	--	
+	public Project getProject(int projectID){
+		Project matchingProject = projectMap.get(projectID);
+		try{
+			boolean needsUpdate = false;
+			if (matchingProject == null){
+				needsUpdate = true;
+			}
+			else{
+				String lastUpdateQuery = "SELECT LAST_MODIFIED"
+									+	" FROM Project"
+									+	" WHERE PROJECT_ID=?"
+									;
+				PreparedStatement lastUpdateStatement = dbConnection.prepareStatement(lastUpdateQuery);
+				lastUpdateStatement.setInt(1, projectID);
+				ResultSet lastUpdateRs = lastUpdateStatement.executeQuery();
+				Timestamp lastUpdate = (lastUpdateRs.next()? lastUpdateRs.getTimestamp(0) : null);
+				needsUpdate =  matchingProject.getLastViewed().before(lastUpdate);
+			}
+		
+			if (needsUpdate){
+				String uosQuery = "SELECT *"
+							+	 " FROM Project"
+							+	 " WHERE Project_ID=?"
+							;
+				PreparedStatement projectStatement = dbConnection.prepareStatement(uosQuery);
+				projectStatement.setInt(1, projectID);
+				ResultSet projectRs = projectStatement.executeQuery();
+				if (projectRs.next()){
+					matchingProject = new Project(projectID, projectRs.getString("UOS"), projectRs.getDate("DEADLINE"));
+					matchingProject.setDescription(projectRs.getString("DESCRIPTION"));
+					projectMap.put(projectID, matchingProject);
+					
+					if (projectMap.get(projectID) == null){
+						projectMap.put(projectID, matchingProject);
+					}
+					else{
+						projectMap.get(projectID).copyValues(matchingProject);
+					}
+				}
+			}
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		matchingProject.setLastViewed(new Timestamp(System.currentTimeMillis()));
+		return matchingProject;
+	}
+	
+	public Team getTeam(int teamID) {
+		Team matchingTeam = teamMap.get(teamID);
+		try{
+			String selectQuery = "SELECT *"
+						+	 " FROM TEAM"
+						+	 " WHERE TEAM_ID=?"
+						;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setInt(1, teamID);
+			ResultSet uosRs = stmt.executeQuery();
+			if (uosRs.next()){
+				matchingTeam = new Team(teamID, uosRs.getString("NAME"));
+				
+				if (teamMap.get(teamID) == null){
+					teamMap.put(teamID, matchingTeam);
+				}
+				else{
+					teamMap.get(teamID).copyValues(matchingTeam);
+				}
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return matchingTeam;
+	}
+	
+	public UnitOfStudy getUnitOfStudy(String unitCode){
+		UnitOfStudy matchingUOS = uosMap.get(unitCode);
+		try{
+			boolean needsUpdate = false;
+			if (matchingUOS == null){
+				needsUpdate = true;
+			}
+			else{
+				String lastUpdateQuery = "SELECT LAST_MODIFIED"
+									+	" FROM UnitOfStudy"
+									+	" WHERE UOS_ID=?"
+									;
+				PreparedStatement lastUpdateStatement = dbConnection.prepareStatement(lastUpdateQuery);
+				lastUpdateStatement.setString(1, unitCode);
+				ResultSet lastUpdateRs = lastUpdateStatement.executeQuery();
+				Timestamp lastUpdate = (lastUpdateRs.next()? lastUpdateRs.getTimestamp(0) : null);
+				needsUpdate =  matchingUOS.getLastViewed().before(lastUpdate);
+			}
+		
+			if (needsUpdate){
+				String uosQuery = "SELECT *"
+							+	 " FROM UnitOfStudy"
+							+	 " WHERE UOS_ID=?"
+							;
+				PreparedStatement uosStatement = dbConnection.prepareStatement(uosQuery);
+				uosStatement.setString(1, unitCode);
+				ResultSet uosRs = uosStatement.executeQuery();
+				if (uosRs.next()){
+					matchingUOS = new UnitOfStudy(unitCode, uosRs.getString("UOS_NAME"), uosRs.getInt("NUM_STUDENTS"));
+					matchingUOS.setDescription(uosRs.getString("UOS_DESCRIPTION"));
+
+					if (uosMap.get(unitCode) == null){
+						uosMap.put(unitCode, matchingUOS);
+					}
+					else{
+						uosMap.get(unitCode).copyValues(matchingUOS);
+					}
+				}
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		matchingUOS.setLastViewed(new Timestamp(System.currentTimeMillis()));
+		return matchingUOS;
+	}
+	
+	public Student getStudent(String SID){
+		Student matchingStudent = studentMap.get(SID);
+		try{
+			boolean needsUpdate = false;
+			if (matchingStudent == null){
+				needsUpdate = true;
+			}
+			else{
+				String lastUpdateQuery = "SELECT LAST_MODIFIED"
+									+	" FROM Student"
+									+	" WHERE SID=?"
+									;
+				PreparedStatement lastUpdateStatement = dbConnection.prepareStatement(lastUpdateQuery);
+				lastUpdateStatement.setString(1, SID);
+				ResultSet lastUpdateRs = lastUpdateStatement.executeQuery();
+				Timestamp lastUpdate = (lastUpdateRs.next()? lastUpdateRs.getTimestamp(0) : null);
+				needsUpdate =  matchingStudent.getLastViewed().before(lastUpdate);
+			}
+		
+			if (needsUpdate){
+				String fetchQuery =	"SELECT *"
+							+	"	FROM Student"
+							+	"	WHERE SID=?"
+							;
+				PreparedStatement statement = dbConnection.prepareStatement(fetchQuery);
+				statement.setString(1, SID);
+				ResultSet rs = statement.executeQuery();
+				if (rs.next()){ // using if instead of while since there can only be 1 result
+					String languageString = rs.getString("LANGUAGES");
+					String[] languageNames = languageString.split(",");
+					ProgrammingLanguage[] languages = new ProgrammingLanguage[languageNames.length];
+					for (int i=0; i < languages.length; ++i){
+						languages[i] = ProgrammingLanguage.findMatch(languageNames[i].trim());
+					}
+					
+					matchingStudent = new Student(SID,
+							 rs.getString("UNIKEY"),
+							 rs.getString("PASSWORD"),
+							 rs.getString("FIRST_NAME"),
+							 rs.getString("LAST_NAME"),
+							 rs.getString("PRIMARY_EMAIL"),
+							 rs.getString("MOBILE"),
+							 StudyLevel.findMatch(rs.getString("STUDY_LEVEL")),
+							 rs.getBoolean("ESL"),
+							 languages);
+					
+					if (studentMap.get(SID) == null){
+						studentMap.put(SID, matchingStudent);
+					}
+					else{
+						studentMap.get(SID).copyValues(matchingStudent);
+					}
+					
+					//The constructor takes all the "NOT NULL" values, but there are others that can exist
+					String[] socialMediaComponents = rs.getString("SOCIAL_MEDIA_1").split(":");
+					Provider provider = SocialMedia.Provider.findMatch(socialMediaComponents[0]);
+					String address = socialMediaComponents[1].trim();
+					matchingStudent.setFirstSocialMedia(provider, address);
+					
+					socialMediaComponents = rs.getString("SOCIAL_MEDIA_2").split(":");
+					provider = SocialMedia.Provider.findMatch(socialMediaComponents[0]);
+					address = socialMediaComponents[1].trim();
+					matchingStudent.setSecondSocialMedia(provider, address);
+					
+					Array availArray = rs.getArray("AVAILABILITY");
+					boolean[][] twoDimensionalAvail = new boolean[7][12];
+					Boolean[] oneDimensionalAvail = (Boolean[])availArray.getArray();
+					for (int i = 0; i != twoDimensionalAvail.length; ++i){
+						for (int j = 0; j != twoDimensionalAvail[i].length; ++j){
+							twoDimensionalAvail[i][j] = oneDimensionalAvail[i * twoDimensionalAvail.length + j];
+						}
+					}
+					matchingStudent.setAvailability(twoDimensionalAvail);
+					
+					matchingStudent.setCourse(rs.getString("COURSE"));
+					matchingStudent.setSecondaryEmail(rs.getString("SECONDARY_EMAIL"));
+					matchingStudent.setExperience(rs.getString("EXPERIENCE"));
+					matchingStudent.setStudyLevel(StudyLevel.findMatch(rs.getString("STUDY_LEVEL")));
+					matchingStudent.setPreferredRole(Role.findMatch(rs.getString("PREFERRED_ROLE")));
+				}
+			}
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		matchingStudent.setLastViewed(new Timestamp(System.currentTimeMillis()));
+		return matchingStudent;
+	}
+	
+	private Meeting getMeeting(int meetingID) {
+		Meeting meeting = meetingMap.get(meetingID);
+		try{
+			String selectQuery = "SELECT *"
+							+	" FROM Meeting"
+							+	" WHERE MEETING_ID=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setInt(1, meetingID);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()){
+				meeting = new Meeting(rs.getInt("MEETING_ID"),
+									  rs.getInt("TEAM"),
+									  rs.getTimestamp("START"),
+									  rs.getTimestamp("END"),
+									  rs.getString("LOCATION"));
+				if (meetingMap.get(meetingID) == null){
+					meetingMap.put(meetingID, meeting);
+				}
+				else{
+					meetingMap.get(meetingID).copyValues(meeting);
+				}
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return meeting;
+	}
+		
+	private Invitation getInvitation(int inviteID) {
+		Invitation invite = inviteMap.get(inviteMap);
+		try{
+			String selectQuery = "SELECT *"
+							+	" FROM Invitation"
+							+	" WHERE INVITE_ID=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setInt(1, inviteID);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()){
+				invite = new Invitation(inviteID, rs.getString("SENDER"), rs.getString("RECIPIENT"), rs.getInt("PROJECT"));
+				invite.setMessage(rs.getString("MESSAGE"));
+				
+				if (inviteMap.get(inviteID) == null){
+					inviteMap.put(inviteID, invite);
+				}
+				else{
+					inviteMap.get(inviteID).copyValues(invite);
+				}
+				
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return invite;
+	}
+	
+	// --	--	--	--	--	--	--	THE FOLLOWING METHODS ARE USED TO UPLOAD CHANGES MADE TO MODELS --	--	--	--	--	--	--	--	--
+	
+	public void addStudent(String SID, String unikey, String password,
+			String firstName, String lastName, String primaryEmail,
+			String mobile, StudyLevel studyLevel, boolean ESL, ProgrammingLanguage[] languages) {
+		
+		String insertQuery = "INSERT INTO Student"
+						+	" (SID, UNIKEY, PASSWORD, FIRST_NAME, LAST_NAME, PRIMARY_EMAIL, MOBILE, STUDY_LEVEL, ESL, LANGUAGES)"
+						+	" VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+		try{
+			PreparedStatement statement = dbConnection.prepareStatement(insertQuery);
+				statement.setString(1, SID);
+				statement.setString(2, unikey);
+				statement.setString(3, password);
+				statement.setString(4, firstName);
+				statement.setString(5, lastName);
+				statement.setString(6, primaryEmail);
+				statement.setString(7, mobile);
+				statement.setString(8, studyLevel.toString());
+				statement.setBoolean(9, ESL);
+				
+				String languageString = "";
+				boolean firstPassed = false;
+				for (ProgrammingLanguage language : languages){
+					if (!firstPassed){
+						firstPassed = true;
+					}
+					else{
+						languageString += ", ";
+					}
+					languageString += language.toString();
+				}
+				statement.setString(10, languageString);
+				statement.execute();
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void addUnitOfStudy(UnitOfStudy uos){
+		String insertQuery = "INSERT INTO UnitOfStudy"
+						+	" VALUES "
+						;
+	}
+	
+	public void addInvitatiin(Invitation invite){
+		
+	}
+	
+	public void addTeam(Team team){
+		
+	}
+	
+	public void addProject(Project project){
+		
+	}
+	
+	public void addMeeting(Meeting meeting){
+		
+	}
+	
+	public void update(String tableName, String identifier, String fieldName, String newValue){
+		try{
+			String updateQuery = "UPDATE ?"
+							+	" SET ?=?"
+							+	" WHERE ?=?"
+							;
+			String idName = "";
+			if (tableName.equals("Student")){
+				idName = "SID";
+			}
+			else if (tableName.equals("UnitOfStudy")){
+				idName = "UOS_ID";
+			}
+			
+			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
+			stmt.setString(1, tableName);
+			stmt.setString(2, fieldName);
+			stmt.setString(3, newValue);
+			stmt.setString(4, idName);
+			stmt.setString(5, identifier);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void update(String tableName, String identifier, String fieldName, boolean newValue){
+		try{
+			String updateQuery = "UPDATE ?"
+							+	" SET ?=?"
+							+	" WHERE ?=?"
+							;
+			String idName = "";
+			if (tableName.equals("Student")){
+				idName = "SID";
+			}
+			else if (tableName.equals("UnitOfStudy")){
+				idName = "UOS_ID";
+			}
+			
+			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
+			stmt.setString(1, tableName);
+			stmt.setString(2, fieldName);
+			stmt.setBoolean(3, newValue);
+			stmt.setString(4, idName);
+			stmt.setString(5, identifier);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void update(String tableName, int identifier, String fieldName, String newValue){
+		try{
+			String updateQuery = "UPDATE ?"
+							+	" SET ?=?"
+							+	" WHERE ?=?"
+							;
+			String idName = "";
+			if (tableName.equals("Student")){
+				idName = "SID";
+			}
+			else if (tableName.equals("UnitOfStudy")){
+				idName = "UOS_ID";
+			}
+			
+			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
+			stmt.setString(1, tableName);
+			stmt.setString(2, fieldName);
+			stmt.setString(3, newValue);
+			stmt.setString(4, idName);
+			stmt.setInt(5, identifier);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void update(String tableName, String identifier, String fieldName, int newValue){
+		try{
+			String updateQuery = "UPDATE ?"
+							+	" SET ?=?"
+							+	" WHERE ?=?"
+							;
+			String idName = "";
+			if (tableName.equals("Student")){
+				idName = "SID";
+			}
+			else if (tableName.equals("UnitOfStudy")){
+				idName = "UOS_ID";
+			}
+			
+			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
+			stmt.setString(1, tableName);
+			stmt.setString(2, fieldName);
+			stmt.setInt(3, newValue);
+			stmt.setString(4, idName);
+			stmt.setString(5, identifier);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void update(String tableName, int identifier, String fieldName, int newValue){
+		try{
+			String updateQuery = "UPDATE ?"
+							+	" SET ?=?"
+							+	" WHERE ?=?"
+							;
+			String idName = "";
+			if (tableName.equals("Student")){
+				idName = "SID";
+			}
+			else if (tableName.equals("UnitOfStudy")){
+				idName = "UOS_ID";
+			}
+			
+			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
+			stmt.setString(1, tableName);
+			stmt.setString(2, fieldName);
+			stmt.setInt(3, newValue);
+			stmt.setString(4, idName);
+			stmt.setInt(5, identifier);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void update(String tableName, String identifier, String fieldName, Date newValue){
+		try{
+			String updateQuery = "UPDATE ?"
+							+	" SET ?=?"
+							+	" WHERE ?=?"
+							;
+			String idName = "";
+			if (tableName.equals("Student")){
+				idName = "SID";
+			}
+			else if (tableName.equals("UnitOfStudy")){
+				idName = "UOS_ID";
+			}
+			
+			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
+			stmt.setString(1, tableName);
+			stmt.setString(2, fieldName);
+			stmt.setDate(3, newValue);
+			stmt.setString(4, idName);
+			stmt.setString(5, identifier);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void update(String tableName, int identifier, String fieldName, Date newValue){
+		try{
+			String updateQuery = "UPDATE ?"
+							+	" SET ?=?"
+							+	" WHERE ?=?"
+							;
+			String idName = "";
+			if (tableName.equals("Student")){
+				idName = "SID";
+			}
+			else if (tableName.equals("UnitOfStudy")){
+				idName = "UOS_ID";
+			}
+			
+			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
+			stmt.setString(1, tableName);
+			stmt.setString(2, fieldName);
+			stmt.setDate(3, newValue);
+			stmt.setString(4, idName);
+			stmt.setInt(5, identifier);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void update(String tableName, String identifier, String fieldName, Timestamp newValue){
+		try{
+			String updateQuery = "UPDATE ?"
+							+	" SET ?=?"
+							+	" WHERE ?=?"
+							;
+			String idName = "";
+			if (tableName.equals("Student")){
+				idName = "SID";
+			}
+			else if (tableName.equals("UnitOfStudy")){
+				idName = "UOS_ID";
+			}
+			
+			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
+			stmt.setString(1, tableName);
+			stmt.setString(2, fieldName);
+			stmt.setTimestamp(3, newValue);
+			stmt.setString(4, idName);
+			stmt.setString(5, identifier);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void update(String tableName, int identifier, String fieldName, Timestamp newValue){
+		try{
+			String updateQuery = "UPDATE ?"
+							+	" SET ?=?"
+							+	" WHERE ?=?"
+							;
+			String idName = "";
+			if (tableName.equals("Student")){
+				idName = "SID";
+			}
+			else if (tableName.equals("UnitOfStudy")){
+				idName = "UOS_ID";
+			}
+			
+			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
+			stmt.setString(1, tableName);
+			stmt.setString(2, fieldName);
+			stmt.setTimestamp(3, newValue);
+			stmt.setString(4, idName);
+			stmt.setInt(5, identifier);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void update(String tableName, String identifier, String fieldName, boolean[][] newValue){
+		try {
+			String updateQuery = "UPDATE ?"
+							+	" SET ?=?"
+							+	" WHERE ?=?"
+							;
+			String idName = "";
+			if (tableName.equals("Student")){
+				idName = "SID";
+			}
+			else if (tableName.equals("UnitOfStudy")){
+				idName = "UOS_ID";
+			}
+			
+			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
+			stmt.setString(1, tableName);
+			stmt.setString(2, fieldName);
+			Boolean[] oneDimensionalAvail = new Boolean[84];
+			boolean[][] twoDimensionalAvail = newValue;
+			for (int i = 0; i != twoDimensionalAvail.length ; ++i){
+				for (int j = 0; j != twoDimensionalAvail[i].length; ++j){
+					oneDimensionalAvail[i * twoDimensionalAvail.length + j] = twoDimensionalAvail[i][j];
+				}
+			}
+			Array availArray = dbConnection.createArrayOf("boolean", oneDimensionalAvail);
+			stmt.setArray(3, availArray);
+			stmt.setString(4, idName);
+			stmt.setString(5, identifier);
+			stmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+		
+	
+	// --	--	--	--	--	--	--	THE FOLLOWING METHODS ARE USED BY THE ACCESSOR METHODS OF OUR MODELS	--	--	--	--	--	--	--
+	public ArrayList<Invitation> getInvitations(String recipientSID){
+		ArrayList<Invitation> invitations = new ArrayList<Invitation>();
+		try{
+			String selectQuery = "SELECT INVITE_ID"
+							+	" FROM Invitation"
+							+	" WHERE RECIPIENT=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setString(1, recipientSID);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()){
+				int inviteID = rs.getInt(0);
+				Invitation invite = getInvitation(inviteID);
+				invitations.add(invite);
+			}
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		return invitations;
+	}
+	
+	public ArrayList<Meeting> getMeetings(String SID){
+		ArrayList<Meeting> meetings = new ArrayList<Meeting>();
+		try{
+			String selectQuery = "SELECT TEAM"
+							+	" FROM TeamMembership"
+							+	" WHERE STUDENT=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setString(1, SID);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()){
+				int teamID = rs.getInt(0);
+				String meetingQuery = "SELECT MEETING_ID"
+								+	" FROM Meeting"
+								+	" WHERE TEAM_ID=?"
+								;
+				PreparedStatement meetingStmt = dbConnection.prepareStatement(meetingQuery);
+				meetingStmt.setInt(1, teamID);
+				ResultSet meetingRs = meetingStmt.executeQuery();
+				while (meetingRs.next()){
+					Meeting meeting = getMeeting(meetingRs.getInt(0));
+					meetings.add(meeting);
+				}
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return meetings;
+	}
+
+	public ArrayList<Team> getTeams(int projectID) {
+		ArrayList<Team> teams = new ArrayList<Team>();
+		try{
+			String selectQuery = "SELECT TEAM_ID"
+							+	" FROM Team"
+							+	" WHERE PROJECT_ID=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setInt(1, projectID);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()){
+				int teamID = rs.getInt(0);
+				Team matchingTeam = getTeam(teamID);
+				teams.add(matchingTeam);
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return teams;
+	}
+
+	public ArrayList<Project> getProjects(String unitCode) {
+		ArrayList<Project> projects = new ArrayList<Project>();
+		
+		return projects;
+	}	
+	
+	public UnitOfStudy getUnitOfStudy(int projectID) {
+		UnitOfStudy matchingUOS = null;
+		try{
+			String selectQuery = "SELECT UOS"
+							+	" FROM Project"
+							+	" WHERE PROJECT_ID=?"
+							;
+			PreparedStatement selectStatement = dbConnection.prepareStatement(selectQuery);
+			selectStatement.setInt(1, projectID);
+			ResultSet selectRs = selectStatement.executeQuery();
+			if (selectRs.next()){
+				String unitCode = selectRs.getString(0);
+				matchingUOS = getUnitOfStudy(unitCode);
+			}
+		} 
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return matchingUOS;
+	}
+
+	public ArrayList<UnitOfStudy> getUnitsOfStudy(String SID) {
+		ArrayList<UnitOfStudy> subjects = new ArrayList<UnitOfStudy>();
+		try{
+			String selectQuery = "SELECT UOS"
+							+	" FROM Enrolment"
+							+	" WHERE STUDENT=?"
+							;
+			PreparedStatement selectStatement = dbConnection.prepareStatement(selectQuery);
+			selectStatement.setString(1, SID);
+			ResultSet selectRs = selectStatement.executeQuery();
+			while (selectRs.next()){
+				String unitCode = selectRs.getString(0);
+				UnitOfStudy matchingUOS = getUnitOfStudy(unitCode);
+				subjects.add(matchingUOS);
+			}
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		return subjects;
+	}
+	
+	public Project getParent(int teamID) {
+		Project matchingProject = null;
+		try{
+			String selectQuery = "SELECT PROJECT_ID"
+							+	" FROM TEAM"
+							+	" WHERE TEAM_ID=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setInt(1, teamID);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()){
+				int projectID = rs.getInt(0);
+				matchingProject = getProject(projectID);
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return matchingProject;
+	}
+	
+	public ArrayList<Student> getMembers(int teamID) {
+		ArrayList<Student> teamMembers = new ArrayList<Student>();
+		try{
+			String selectQuery = "SELECT STUDENT"
+							+ 	" FROM TeamMembership"
+							+	" WHERE TEAM=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setInt(1, teamID);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()){
+				String sid = rs.getString(0);
+				Student matchingStudent = getStudent(sid);
+				teamMembers.add(matchingStudent);
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}	
+		return teamMembers;
+	}
+
+	public ArrayList<Team> getTeams(String sid) {
+		ArrayList<Team> studentsTeams = new ArrayList<Team>();
+		try{
+			String selectQuery = "SELECT TEAM"
+							+	" FROM TeamMembership"
+							+	" WHERE STUDENT=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setString(1, sid);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()){
+				int teamID = rs.getInt(0);
+				Team matchingTeam = getTeam(teamID);
+				studentsTeams.add(matchingTeam);
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return studentsTeams;
+	}
+	
+	// --	--	--	--	--	--	--	THE FOLLOWING METHODS ARE ONLY USED FOR TESTING PURPOSES	--	--	--	--	--	--	--
 	public ArrayList<String> getTableNames(){
 		String selectQuery = 	
 						"	SELECT table_name"
@@ -301,5 +1063,4 @@ public class DatabaseHandler{
 		}
 		return columnNames;
 	}
-	
 }

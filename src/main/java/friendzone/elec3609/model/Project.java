@@ -1,20 +1,38 @@
 package friendzone.elec3609.model;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import friendzone.elec3609.service.DatabaseHandler;
 
 
 public class Project {
 	
-	int id;
-	Date deadline;
-	UnitOfStudy parent;
-	String description;
-	List<Team> teams;
+	@Autowired
+	DatabaseHandler dbHandler;
 	
-	public Project(UnitOfStudy parent, Date deadline){
-		setParent(parent);
+	int id;
+	String parent;
+	Date deadline;
+	String description;
+	Timestamp lastViewed;
+	
+	public Project(int id, String unitCode, Date deadline){
+		setID(id);
+		setParent(unitCode);
 		setDeadline(deadline);
+		lastViewed = new Timestamp(System.currentTimeMillis());
+	}
+	
+	public Timestamp getLastViewed(){
+		return lastViewed;
+	}
+	
+	public void setLastViewed(Timestamp lastViewed){
+		this.lastViewed = lastViewed;
 	}
 	
 	public int getID(){
@@ -26,15 +44,16 @@ public class Project {
 	}
 	
 	public UnitOfStudy getParent(){
-		return parent;
+		return dbHandler.getUnitOfStudy(parent);
+		
 	}
 	
 	public String getDescription(){
 		return description;
 	}
 	
-	public List<Team>getTeams(){
-		return teams;
+	public List<Team> getTeams(){
+		return dbHandler.getTeams(id);
 	}
 	
 	public void setID(int id){
@@ -47,7 +66,7 @@ public class Project {
 		this.deadline = deadline;
 	}
 	
-	public void setParent(UnitOfStudy parent) throws IllegalArgumentException{
+	public void setParent(String parent) throws IllegalArgumentException{
 		if (parent == null)
 			throw new IllegalArgumentException();
 		this.parent = parent;
@@ -55,5 +74,13 @@ public class Project {
 	
 	public void setDescription(String description){
 		this.description = description;
+	}
+
+	public void copyValues(Project project) {
+		this.id = project.id;
+		this.parent = project.parent;
+		this.deadline = project.deadline;
+		this.description = project.description;
+		this.lastViewed = project.lastViewed;
 	}
 }

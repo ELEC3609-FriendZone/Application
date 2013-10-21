@@ -1,20 +1,37 @@
 package friendzone.elec3609.model;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import friendzone.elec3609.service.DatabaseHandler;
+
 public class UnitOfStudy {
 
+	@Autowired
+	DatabaseHandler dbHandler;
+	
 	String unitCode;
 	String unitName;
 	String description;
 	int numStudents;
-	List<Project> projects = new ArrayList<Project>();
+	Timestamp lastViewed;
 	
 	public UnitOfStudy(String unitCode, String unitName, int numStudents){
 		setUnitCode(unitCode);
 		setUnitName(unitName);
 		setNumberOfStudents(numStudents);
+		lastViewed = new Timestamp(System.currentTimeMillis());
+	}
+	
+	public Timestamp getLastViewed(){
+		return lastViewed;
+	}
+	
+	public void setLastViewed(Timestamp lastViewed){
+		this.lastViewed = lastViewed;
 	}
 	
 	public String getUnitCode(){
@@ -34,7 +51,7 @@ public class UnitOfStudy {
 	}
 	
 	public List<Project> getProjects(){
-		return projects;
+		return dbHandler.getProjects(unitCode);
 	}
 	
 	public void setUnitCode(String unitCode) throws IllegalArgumentException{
@@ -55,5 +72,14 @@ public class UnitOfStudy {
 	
 	public void setNumberOfStudents(int numStudents){
 		this.numStudents = numStudents;
+	}
+
+	public void copyValues(UnitOfStudy uos) {
+		this.unitCode = uos.unitCode;
+		this.unitName = uos.unitName;
+		this.description = uos.description;
+		this.numStudents = uos.numStudents;
+		this.lastViewed = uos.lastViewed;
+		
 	}
 }
