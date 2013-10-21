@@ -2,7 +2,6 @@ package friendzone.elec3609.model;
 
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,7 @@ public class Student{
 	
 	String SID;
 	String unikey, firstName, lastName, course, primaryEmail, secondaryEmail, mobile, experience;
+	String password;
 	StudyLevel studyLevel;
 	Role preferredRole;
 	ProgrammingLanguage[] languages;
@@ -30,10 +30,19 @@ public class Student{
 	Timestamp lastViewed;
 	
 	public Student(String SID, String unikey, String password, String firstName, String lastName, String primaryEmail, String mobile, StudyLevel studyLevel, boolean ESL, ProgrammingLanguage[] languages){ //takes all the NOT NULL attributes as arguments
-		//add all the not-null data in the constructor, the rest can be done through setters
+		this.SID = SID;
+		this.unikey = unikey;
+		this.password = password;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.primaryEmail = primaryEmail;
+		this.mobile = mobile;
+		this.studyLevel = studyLevel;
+		this.ESL = ESL;
+		this.languages = languages;
 		dbHandler.addStudent(SID, unikey, password, firstName, lastName, primaryEmail, mobile, studyLevel, ESL, languages);
 	}
-
+	
 	public Timestamp getLastViewed(){
 		return lastViewed;
 	}
@@ -51,6 +60,10 @@ public class Student{
 		dbHandler.update(TABLE_NAME, SID, "ESL", ESL);
 	}
 
+	public void setSID(String SID){
+		
+	}
+	
 	public void setStudyLevel(StudyLevel studyLevel) throws IllegalArgumentException{
 		if (studyLevel == null)
 			throw new IllegalArgumentException();

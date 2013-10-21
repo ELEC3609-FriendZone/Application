@@ -23,15 +23,13 @@ public class ProfileController {
 	DatabaseHandler dbHandler;
 	
 	//New Dummy data just for testing
-	Student student = new Student("123456789", "abcd1234", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true);
+	Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[]{ProgrammingLanguage.C, ProgrammingLanguage.CPLUSPLUS});
 	
 
 	
 	@RequestMapping("/profile")
 	public String getEnums(Map<String, Object> map){
 		//More Dummy Data
-		ProgrammingLanguage[] planguages = new ProgrammingLanguage[]{ProgrammingLanguage.C, ProgrammingLanguage.CPLUSPLUS};
-		student.setLanguages( planguages );
 		student.setPreferredRole(Role.PROGRAMMER);
 		student.setExperience("I have experience in a lot of useful things");
 		student.setFirstSocialMedia(SocialMedia.Provider.FACEBOOK, "http://www.facebook.com/abcd1234");

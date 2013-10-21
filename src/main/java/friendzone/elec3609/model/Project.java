@@ -14,16 +14,25 @@ public class Project {
 	@Autowired
 	DatabaseHandler dbHandler;
 	
-	int id;
+	private final String TABLE_NAME = "Project";
+	
+	Integer id;
 	String parent;
 	Date deadline;
 	String description;
 	Timestamp lastViewed;
 	
+	public Project(String unitCode, Date deadline){
+		this.parent = unitCode;
+		this.deadline = deadline;
+		id = dbHandler.addProject(parent, deadline);
+		lastViewed = new Timestamp(System.currentTimeMillis());
+	}
+	
 	public Project(int id, String unitCode, Date deadline){
-		setID(id);
-		setParent(unitCode);
-		setDeadline(deadline);
+		this.parent = unitCode;
+		this.deadline = deadline;
+		this.id = id;
 		lastViewed = new Timestamp(System.currentTimeMillis());
 	}
 	
@@ -56,24 +65,23 @@ public class Project {
 		return dbHandler.getTeams(id);
 	}
 	
-	public void setID(int id){
-		this.id = id;
-	}
-	
 	public void setDeadline(Date deadline) throws IllegalArgumentException{
 		if (deadline == null)
 			throw new IllegalArgumentException();
 		this.deadline = deadline;
+		dbHandler.update(TABLE_NAME, id, "DEADLINE", deadline);
 	}
 	
-	public void setParent(String parent) throws IllegalArgumentException{
+	public void setParent(String unitCode) throws IllegalArgumentException{
 		if (parent == null)
 			throw new IllegalArgumentException();
-		this.parent = parent;
+		this.parent = unitCode;
+		dbHandler.update(TABLE_NAME, id, "DEADLINE", deadline);
 	}
 	
 	public void setDescription(String description){
 		this.description = description;
+		dbHandler.update(TABLE_NAME, id, "DESCRIPTION", description);
 	}
 
 	public void copyValues(Project project) {

@@ -21,8 +21,8 @@ public class SubjectController {
 	
 	//Dummy Data For now, so i can test the content on the page
 	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
-	Project project = new Project(uos,  new java.sql.Date(8099,10,15));
-	Team team = new Team(12345, project);
+	Project project = new Project(uos.getUnitCode(),  new java.sql.Date(8099,10,15));
+	Team team = new Team(project.getID(), "FriendZone");
 	
 	//Functions to be used for mapping
 	//Student stu;

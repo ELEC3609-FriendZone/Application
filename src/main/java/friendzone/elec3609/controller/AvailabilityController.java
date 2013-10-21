@@ -24,10 +24,10 @@ public class AvailabilityController {
 	DatabaseHandler dbHandler;
 	
 	//Dummy Data For now, so i can test the content on the page
-	Student student = new Student("123456789", "abcd1234", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true);
+	Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[] {ProgrammingLanguage.C, ProgrammingLanguage.JAVA});
 	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
-	Project project = new Project(uos,  new java.sql.Date(8099,10,15));
-	Team team = new Team(12345, project);
+	Project project = new Project(uos.getUnitCode(),  new java.sql.Date(8099,10,15));
+	Team team = new Team(project.getID(), "FriendZone");
 	
 	//Dummy boolean availability data
 	boolean[][] availability = new boolean[][]{{true, true, false, false, true, false, true, false, false, false, true, false},

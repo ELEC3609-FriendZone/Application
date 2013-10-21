@@ -17,15 +17,28 @@ public class Invitation {
 	private int projectID;
 	
 	 
-	 public Invitation(int inviteID, String senderSID, String recipientSID, int projectID) {
-		 this.id = inviteID;
-		 this.senderID = senderSID;
-		 this.recipientID = recipientSID;
-		 this.projectID = projectID;
+	public Invitation(String senderSID, String recipientSID, int projectID, String message) {
+		this.senderID = senderSID;
+		this.recipientID = recipientSID;
+		this.projectID = projectID;
+		id = dbHandler.addInvitation(projectID, senderID, recipientID);
+		setMessage(message);
+	 }
+	
+	public Invitation(int id, String senderSID, String recipientSID, int projectID, String message) {
+		this.senderID = senderSID;
+		this.recipientID = recipientSID;
+		this.projectID = projectID;
+		this.id = id;
+		setMessage(message);
+	 }
+	
+	 public int getID(){
+		 return id;
 	 }
 	 
 	 public String getMessage(){
-		 return message;
+		return message;
 	 }
 	 
 	 public void accept(){
@@ -53,7 +66,6 @@ public class Invitation {
 	 }
 	 
 	 public void copyValues(Invitation invite) {
-		 this.id = invite.id;
 		 this.senderID = invite.senderID;
 		 this.recipientID = invite.recipientID;
 		 this.message = invite.message;

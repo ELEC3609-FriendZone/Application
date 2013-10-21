@@ -70,6 +70,7 @@ public class DatabaseHandler{
 	    return DriverManager.getConnection(dbUrl, props); 
 	}
 	
+	
 	public void resetDatabase(){
 		String createQuery = 
 				"DROP TABLE IF EXISTS Student CASCADE;"
@@ -100,8 +101,8 @@ public class DatabaseHandler{
 			+	"	UOS_ID				CHAR(8)			NOT NULL,"
 			+	"	UOS_NAME			VARCHAR(50)		NOT NULL,"
 			+	"	UOS_DESCRIPTION		VARCHAR(100),"
-			+	"	NUM_STUDENTS		INTEGER		NOT NULL,"
-			+	"	LAST_MODIFIED		TIMESTAMP 	DEFAULT NOW(),"
+			+	"	NUM_STUDENTS		INTEGER			NOT NULL,"
+			+	"	LAST_MODIFIED		TIMESTAMP 		DEFAULT NOW(),"
 			+	"	PRIMARY KEY			(UOS_ID)"
 			+ 	");"
 			+	"DROP TABLE IF EXISTS Enrolment CASCADE;"
@@ -123,6 +124,7 @@ public class DatabaseHandler{
 			+	"DROP TABLE IF EXISTS Team CASCADE;" //could not use the name "Group" since it's a reserved word in SQL
 			+	"CREATE TABLE Team ("
 			+	"	TEAM_ID			SERIAL		NOT NULL,"
+			+	"	NAME			VARCHAR(20)	NOT NULL,"
 			+	"	PROJECT_ID		INTEGER		REFERENCES Project(PROJECT_ID)		NOT NULL,"
 			+	"	PRIMARY KEY		(TEAM_ID)"
 			+	");"
@@ -201,34 +203,31 @@ public class DatabaseHandler{
 		}
 	}
 	
-	/**
-	 * Returns a Student object if the log-in was successful, otherwise returns null
-	 * @param unikey Unikey of the Student you wish to log on as
-	 * @param password Password of the Student you wish to log on as
-	 * @return The Student corresponding to the given uni-key and password
-	 */
-	public Student logIn(String SID, String password){
-		Student matchingStudent = null;
-		try{
-			String selectQuery = "SELECT PASSWORD"
-							+	" FROM Student"
-							+	" WHERE UNIKEY=?"
-							+	" AND PASSWORD=?"
-							;
-			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
-			stmt.setString(1, SID);
-			stmt.setString(2, password);
-			ResultSet rs = stmt.executeQuery();
-			if (rs.next()){
-				matchingStudent = getStudent(SID);
-			}
-		}
-		catch (SQLException e){
-			e.printStackTrace();
-		}
-		return matchingStudent;
-	}
-
+	
+	/*
+	  * Takes login and returns a hashed pw of that login if the login exists.
+	  * Returns null if login doesn't exist.
+	  */
+	 public String getAuthentication(String unikey) {
+	  String password = null;
+	  String fetchQuery =
+	     " SELECT PASSWORD"
+	    + " FROM Student"
+	    + " WHERE UNIKEY=?" 
+	    ;
+	  try{
+	   PreparedStatement statement = dbConnection.prepareStatement(fetchQuery);
+	   statement.setString(1, unikey);
+	   ResultSet rs = statement.executeQuery();
+	   if (rs.next()){ // using if instead of while since there can only be 1 result
+		   password = rs.getString("PASSWORD");
+	   }
+	  } catch (SQLException e){
+	   e.printStackTrace();
+	  }
+	  return password;
+	 }
+	 
 	//	--	--	--	--	--	THE FOLLOWING METHODS ARE FOR FETCHING MODELS USING THEIR ID 	--	--	--	--	--	--	--	--	
 	public Project getProject(int projectID){
 		Project matchingProject = projectMap.get(projectID);
@@ -259,15 +258,14 @@ public class DatabaseHandler{
 				ResultSet projectRs = projectStatement.executeQuery();
 				if (projectRs.next()){
 					matchingProject = new Project(projectID, projectRs.getString("UOS"), projectRs.getDate("DEADLINE"));
-					matchingProject.setDescription(projectRs.getString("DESCRIPTION"));
-					projectMap.put(projectID, matchingProject);
-					
 					if (projectMap.get(projectID) == null){
 						projectMap.put(projectID, matchingProject);
 					}
 					else{
 						projectMap.get(projectID).copyValues(matchingProject);
 					}
+					matchingProject = projectMap.get(projectID);
+					matchingProject.setDescription(projectRs.getString("DESCRIPTION"));					
 				}
 			}
 		} catch (SQLException e){
@@ -281,21 +279,22 @@ public class DatabaseHandler{
 		Team matchingTeam = teamMap.get(teamID);
 		try{
 			String selectQuery = "SELECT *"
-						+	 " FROM TEAM"
-						+	 " WHERE TEAM_ID=?"
-						;
+							+	 " FROM TEAM"
+							+	 " WHERE TEAM_ID=?"
+							;
 			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
 			stmt.setInt(1, teamID);
 			ResultSet uosRs = stmt.executeQuery();
 			if (uosRs.next()){
-				matchingTeam = new Team(teamID, uosRs.getString("NAME"));
-				
+				matchingTeam = new Team(teamID, uosRs.getInt("PROJECT_ID"), uosRs.getString("NAME"));
+		
 				if (teamMap.get(teamID) == null){
 					teamMap.put(teamID, matchingTeam);
 				}
 				else{
 					teamMap.get(teamID).copyValues(matchingTeam);
 				}
+				matchingTeam = teamMap.get(teamID);
 			}
 		}
 		catch (SQLException e){
@@ -333,14 +332,16 @@ public class DatabaseHandler{
 				ResultSet uosRs = uosStatement.executeQuery();
 				if (uosRs.next()){
 					matchingUOS = new UnitOfStudy(unitCode, uosRs.getString("UOS_NAME"), uosRs.getInt("NUM_STUDENTS"));
-					matchingUOS.setDescription(uosRs.getString("UOS_DESCRIPTION"));
-
 					if (uosMap.get(unitCode) == null){
 						uosMap.put(unitCode, matchingUOS);
 					}
 					else{
 						uosMap.get(unitCode).copyValues(matchingUOS);
 					}
+					matchingUOS = uosMap.get(unitCode);
+					matchingUOS.setDescription(uosRs.getString("UOS_DESCRIPTION"));
+
+				
 				}
 			}
 		}
@@ -403,6 +404,7 @@ public class DatabaseHandler{
 					else{
 						studentMap.get(SID).copyValues(matchingStudent);
 					}
+					matchingStudent = studentMap.get(SID);
 					
 					//The constructor takes all the "NOT NULL" values, but there are others that can exist
 					String[] socialMediaComponents = rs.getString("SOCIAL_MEDIA_1").split(":");
@@ -450,7 +452,7 @@ public class DatabaseHandler{
 			stmt.setInt(1, meetingID);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()){
-				meeting = new Meeting(rs.getInt("MEETING_ID"),
+				meeting = new Meeting(meetingID,
 									  rs.getInt("TEAM"),
 									  rs.getTimestamp("START"),
 									  rs.getTimestamp("END"),
@@ -461,6 +463,7 @@ public class DatabaseHandler{
 				else{
 					meetingMap.get(meetingID).copyValues(meeting);
 				}
+				meeting = meetingMap.get(meetingID);
 			}
 		}
 		catch (SQLException e){
@@ -480,16 +483,14 @@ public class DatabaseHandler{
 			stmt.setInt(1, inviteID);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()){
-				invite = new Invitation(inviteID, rs.getString("SENDER"), rs.getString("RECIPIENT"), rs.getInt("PROJECT"));
-				invite.setMessage(rs.getString("MESSAGE"));
-				
+				invite = new Invitation(inviteID, rs.getString("SENDER"), rs.getString("RECIPIENT"), rs.getInt("PROJECT"), rs.getString("MESSAGE"));
 				if (inviteMap.get(inviteID) == null){
 					inviteMap.put(inviteID, invite);
 				}
 				else{
 					inviteMap.get(inviteID).copyValues(invite);
 				}
-				
+				invite = inviteMap.get(inviteID);
 			}
 		}
 		catch (SQLException e){
@@ -498,7 +499,7 @@ public class DatabaseHandler{
 		return invite;
 	}
 	
-	// --	--	--	--	--	--	--	THE FOLLOWING METHODS ARE USED TO UPLOAD CHANGES MADE TO MODELS --	--	--	--	--	--	--	--	--
+	// --	--	--	--	--	--	--	THE FOLLOWING METHODS ARE USED TO ADD MODELS TO THE DATABASE --	--	--	--	--	--	--	--	--
 	
 	public void addStudent(String SID, String unikey, String password,
 			String firstName, String lastName, String primaryEmail,
@@ -506,6 +507,7 @@ public class DatabaseHandler{
 		
 		String insertQuery = "INSERT INTO Student"
 						+	" (SID, UNIKEY, PASSWORD, FIRST_NAME, LAST_NAME, PRIMARY_EMAIL, MOBILE, STUDY_LEVEL, ESL, LANGUAGES)"
+						+	" WHERE NOT EXISTS (SELECT 1 FROM Student WHERE SID=?)"
 						+	" VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 		try{
 			PreparedStatement statement = dbConnection.prepareStatement(insertQuery);
@@ -531,48 +533,238 @@ public class DatabaseHandler{
 					languageString += language.toString();
 				}
 				statement.setString(10, languageString);
+				statement.setString(11, SID);
 				statement.execute();
 		} catch (SQLException e){
 			e.printStackTrace();
 		}
 	}
 	
-	public void addUnitOfStudy(UnitOfStudy uos){
-		String insertQuery = "INSERT INTO UnitOfStudy"
-						+	" VALUES "
-						;
+	public void addUnitOfStudy(String unitCode, String unitName, int num_students){
+		try {
+			String insertQuery = "INSERT INTO UnitOfStudy"
+							+	" (UOS_ID, UOS_NAME, NUM_STUDENTS)"
+							+	" VALUES (?,?,?)"
+							+	" WHERE NOT EXISTS (SELECT 1 FROM UnitOfStudy WHERE UOS_ID=?)"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
+			stmt.setString(1, unitCode);
+			stmt.setString(2, unitName);
+			stmt.setInt(3, num_students);
+			stmt.setString(4, unitCode);
+			stmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public void addInvitatiin(Invitation invite){
-		
+	public int addInvitation(int projectID, String senderSID, String recipientSID){
+		Integer id = null;
+		try{
+			String insertQuery = "INSERT INTO Invitation"
+							+	" (PROJECT, SENDER, RECIPIENT)"
+							+	" VALUES (?,?,?)"
+							+ 	" RETURNING INVITE_ID"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
+			stmt.setInt(1, projectID);
+			stmt.setString(2, senderSID);
+			stmt.setString(3, recipientSID);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) 
+				id = rs.getInt(0);
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return id;
 	}
 	
-	public void addTeam(Team team){
-		
+	public int addTeam(int projectID, String name){
+		Integer id = null;
+		try{
+			String insertQuery = "INSERT INTO Team"
+					+	" (PROJECT_ID, NAME)"
+					+	" VALUES (?,?)"
+					+	" RETURNING TEAM_ID"
+					;
+			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
+			stmt.setInt(1, projectID);
+			stmt.setString(2, name);
+			stmt.setInt(3, projectID);
+			stmt.setString(4, name);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next())
+				id = rs.getInt(0);
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return id;
 	}
 	
-	public void addProject(Project project){
-		
+	public int addProject(String unitCode, Date deadline){
+		Integer id = null;
+		try{
+			String insertQuery = "INSERT INTO Project"
+							+	" (UOS_ID, DEADLINE)"
+							+	" VALUES (?,?)"
+							+	" RETURNING PROJECT_ID"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
+			stmt.setString(1, unitCode);
+			stmt.setDate(2, deadline);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next())
+				id = rs.getInt(0);
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return id;
 	}
 	
-	public void addMeeting(Meeting meeting){
-		
+	public int addMeeting(int teamID, Timestamp start, Timestamp end){
+		Integer id = null;
+		try{
+			String insertQuery = "INSERT INTO Meeting"
+							+	" (TEAM, START, END)"
+							+	" VALUES (?,?,?)"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
+			stmt.setInt(1, teamID);
+			stmt.setTimestamp(2, start);
+			stmt.setTimestamp(3, end);
+			stmt.setInt(4, teamID);
+			stmt.setTimestamp(5, start);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next())
+				id = rs.getInt(0);
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return id;
 	}
 	
+	public void addTeamMembership(String SID, int teamID){
+		try{
+			String insertQuery = "INSERT INTO TeamMembership"
+							+	" (STUDENT, TEAM)"
+							+	" WHERE NOT EXISTS (SELECT 1 FROM TeamMembership WHERE STUDENT=? AND TEAM=?)" //allows re-enrolling when already enrolled to occur without error
+							+	" VALUES (?,?)"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
+			stmt.setString(1, SID);
+			stmt.setInt(2, teamID);
+			stmt.setString(3, SID);
+			stmt.setInt(4, teamID);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public int addInstantMessage(String senderID, int teamID, String message){
+		Integer id = null;
+		try{
+			String insertQuery = "INSERT INTO InstantMessage"
+							+	" (SENDER, TEAM, MESSAGE)"
+							+	" VALUES (?,?,?)"
+							+	" RETURNING MESSAGE_ID"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
+			stmt.setString(1, senderID);
+			stmt.setInt(2, teamID);
+			stmt.setString(3, message);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next())
+				id = rs.getInt(0);
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return id;
+	}
+	
+	public void addAdministrator(String staffID, String unitCode){
+		try{
+			String insertQuery = "INSERT INTO Administrator"
+							+	" (STAFF_NUM, UOS)"
+							+	" WHERE NOT EXISTS (SELECT 1 FROM Administrator WHERE STAFF_NUM=? AND UOS=?)" //allows re-applying as administrator when already admin without error
+							+	" VALUES (?,?)"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
+			stmt.setString(1, staffID);
+			stmt.setString(2, unitCode);
+			stmt.setString(3, staffID);
+			stmt.setString(4, unitCode);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void addEnrolment(String unitCode, String SID, int tutorialNum){
+		try{
+			String insertQuery = "INSERT INTO Enrolment"
+							+	" (UOS, STUDENT, TUTORIAL_NUM)"
+							+	" WHERE NOT EXISTS (SELECT 1 FROM Enrolment WHERE UOS=? AND STUDENT=?)" //allows re-enrolment without throwing an error
+							+	" VALUES (?,?,?)"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
+			stmt.setString(1, unitCode);
+			stmt.setString(2, SID);
+			stmt.setString(3, unitCode);
+			stmt.setString(4, SID);
+			stmt.setInt(5, tutorialNum);
+			
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	private String getIDFieldName(String tableName){
+		String idName = "";
+		if (tableName.equals("Student")){
+			idName = "SID";
+		}
+		else if (tableName.equals("UnitOfStudy")){
+			idName = "UOS_ID";
+		}
+		else if (tableName.equals("Administrator")){
+			idName = "STAFF_NUM";
+		}
+		else if (tableName.equals("Project")){
+			idName = "PROJECT_ID";
+		}
+		else if (tableName.equals("Team")){
+			idName = "TEAM_ID";
+		}
+		else if (tableName.equals("Meeting")){
+			idName = "MEETING_ID";
+		}
+		else if (tableName.equals("InstantMessage")){
+			idName = "MESSAGE_ID";
+		}
+		else if (tableName.equals("Invitation")){
+			idName = "INVITE_ID";
+		}
+		return idName;
+	}
+	
+	//	--	--	--	--	--	--	--	--	--	THE FOLLOWING METHODS ARE USED TO UPDATE ENTRIES IN THE DATABASE --	--	--	--	--	--	--	--
 	public void update(String tableName, String identifier, String fieldName, String newValue){
 		try{
 			String updateQuery = "UPDATE ?"
 							+	" SET ?=?"
 							+	" WHERE ?=?"
 							;
-			String idName = "";
-			if (tableName.equals("Student")){
-				idName = "SID";
-			}
-			else if (tableName.equals("UnitOfStudy")){
-				idName = "UOS_ID";
-			}
-			
+			String idName = getIDFieldName(tableName);
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
 			stmt.setString(1, tableName);
 			stmt.setString(2, fieldName);
@@ -592,14 +784,7 @@ public class DatabaseHandler{
 							+	" SET ?=?"
 							+	" WHERE ?=?"
 							;
-			String idName = "";
-			if (tableName.equals("Student")){
-				idName = "SID";
-			}
-			else if (tableName.equals("UnitOfStudy")){
-				idName = "UOS_ID";
-			}
-			
+			String idName = getIDFieldName(tableName);
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
 			stmt.setString(1, tableName);
 			stmt.setString(2, fieldName);
@@ -619,14 +804,7 @@ public class DatabaseHandler{
 							+	" SET ?=?"
 							+	" WHERE ?=?"
 							;
-			String idName = "";
-			if (tableName.equals("Student")){
-				idName = "SID";
-			}
-			else if (tableName.equals("UnitOfStudy")){
-				idName = "UOS_ID";
-			}
-			
+			String idName = getIDFieldName(tableName);
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
 			stmt.setString(1, tableName);
 			stmt.setString(2, fieldName);
@@ -646,14 +824,7 @@ public class DatabaseHandler{
 							+	" SET ?=?"
 							+	" WHERE ?=?"
 							;
-			String idName = "";
-			if (tableName.equals("Student")){
-				idName = "SID";
-			}
-			else if (tableName.equals("UnitOfStudy")){
-				idName = "UOS_ID";
-			}
-			
+			String idName = getIDFieldName(tableName);
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
 			stmt.setString(1, tableName);
 			stmt.setString(2, fieldName);
@@ -673,14 +844,8 @@ public class DatabaseHandler{
 							+	" SET ?=?"
 							+	" WHERE ?=?"
 							;
-			String idName = "";
-			if (tableName.equals("Student")){
-				idName = "SID";
-			}
-			else if (tableName.equals("UnitOfStudy")){
-				idName = "UOS_ID";
-			}
-			
+
+			String idName = getIDFieldName(tableName);
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
 			stmt.setString(1, tableName);
 			stmt.setString(2, fieldName);
@@ -700,14 +865,8 @@ public class DatabaseHandler{
 							+	" SET ?=?"
 							+	" WHERE ?=?"
 							;
-			String idName = "";
-			if (tableName.equals("Student")){
-				idName = "SID";
-			}
-			else if (tableName.equals("UnitOfStudy")){
-				idName = "UOS_ID";
-			}
-			
+
+			String idName = getIDFieldName(tableName);
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
 			stmt.setString(1, tableName);
 			stmt.setString(2, fieldName);
@@ -727,14 +886,8 @@ public class DatabaseHandler{
 							+	" SET ?=?"
 							+	" WHERE ?=?"
 							;
-			String idName = "";
-			if (tableName.equals("Student")){
-				idName = "SID";
-			}
-			else if (tableName.equals("UnitOfStudy")){
-				idName = "UOS_ID";
-			}
-			
+
+			String idName = getIDFieldName(tableName);
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
 			stmt.setString(1, tableName);
 			stmt.setString(2, fieldName);
@@ -754,14 +907,8 @@ public class DatabaseHandler{
 							+	" SET ?=?"
 							+	" WHERE ?=?"
 							;
-			String idName = "";
-			if (tableName.equals("Student")){
-				idName = "SID";
-			}
-			else if (tableName.equals("UnitOfStudy")){
-				idName = "UOS_ID";
-			}
-			
+
+			String idName = getIDFieldName(tableName);
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
 			stmt.setString(1, tableName);
 			stmt.setString(2, fieldName);
@@ -781,14 +928,8 @@ public class DatabaseHandler{
 							+	" SET ?=?"
 							+	" WHERE ?=?"
 							;
-			String idName = "";
-			if (tableName.equals("Student")){
-				idName = "SID";
-			}
-			else if (tableName.equals("UnitOfStudy")){
-				idName = "UOS_ID";
-			}
-			
+
+			String idName = getIDFieldName(tableName);
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
 			stmt.setString(1, tableName);
 			stmt.setString(2, fieldName);
@@ -808,14 +949,8 @@ public class DatabaseHandler{
 							+	" SET ?=?"
 							+	" WHERE ?=?"
 							;
-			String idName = "";
-			if (tableName.equals("Student")){
-				idName = "SID";
-			}
-			else if (tableName.equals("UnitOfStudy")){
-				idName = "UOS_ID";
-			}
-			
+
+			String idName = getIDFieldName(tableName);
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
 			stmt.setString(1, tableName);
 			stmt.setString(2, fieldName);

@@ -2,7 +2,6 @@ package friendzone.elec3609.model;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,13 +13,24 @@ public class Team {
 	@Autowired
 	DatabaseHandler dbHandler;
 	
+	private final String TABLE_NAME = "Team";
+	
 	int id;
+	int projectID;
 	String name;
 	Date lastViewed;
 	
-	public Team(int id, String name){
-		this.id = id;
+	public Team(int projectID, String name){
 		this.name = name;
+		this.projectID = projectID;
+		id = dbHandler.addTeam(projectID, name);
+		lastViewed = new Date(System.currentTimeMillis());
+	}
+	
+	public Team(int id, int projectID, String name){
+		this.name = name;
+		this.projectID = projectID;
+		this.id = id;
 		lastViewed = new Date(System.currentTimeMillis());
 	}
 	
@@ -34,6 +44,7 @@ public class Team {
 	
 	public void setName(String name){
 		this.name = name;
+		dbHandler.update(TABLE_NAME, id, "NAME", name);
 	}
 	
 	public ArrayList<Student> getMembers(){
@@ -47,6 +58,7 @@ public class Team {
 	public void copyValues(Team team) {
 		this.id = team.id;
 		this.name = team.name;
+		this.projectID = team.projectID;
 		this.lastViewed = team.lastViewed;
 	}
 	

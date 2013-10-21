@@ -12,18 +12,33 @@ public class Meeting {
 	@Autowired
 	DatabaseHandler dbHandler;
 	
+	private final String TABLE_NAME = "Meeting";
+	
 	int id;
 	int teamID;
 	Timestamp start, end;
 	String location;
 	
-	public Meeting(int meetingID, int teamID, Timestamp start, Timestamp end, String location){
-		this.id = meetingID;
+	public Meeting(int teamID, Timestamp start, Timestamp end, String location){
 		this.teamID = teamID;
 		this.start = start;
 		this.end = end;
+		id = dbHandler.addMeeting(teamID, start, end);
+		setLocation(location);
+	}
+	
+	public Meeting(int id, int teamID, Timestamp start, Timestamp end, String location){
+		this.teamID = teamID;
+		this.start = start;
+		this.end = end;
+		this.id = id;
+		setLocation(location);
+	}
+	
+	
+	public void setLocation(String location){
 		this.location = location;
-		//insert into db
+		dbHandler.update(TABLE_NAME, teamID, "LOCATION", location);
 	}
 	
 	public ArrayList<Student> getAttendees(){

@@ -1,7 +1,6 @@
 package friendzone.elec3609.model;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,8 @@ public class UnitOfStudy {
 	@Autowired
 	DatabaseHandler dbHandler;
 	
+	private final String TABLE_NAME = "UnitOfStudy";
+	
 	String unitCode;
 	String unitName;
 	String description;
@@ -20,9 +21,10 @@ public class UnitOfStudy {
 	Timestamp lastViewed;
 	
 	public UnitOfStudy(String unitCode, String unitName, int numStudents){
-		setUnitCode(unitCode);
-		setUnitName(unitName);
-		setNumberOfStudents(numStudents);
+		this.unitCode = unitCode;
+		this.unitName = unitName;
+		this.numStudents = numStudents;
+		dbHandler.addUnitOfStudy(unitCode, unitName, numStudents);
 		lastViewed = new Timestamp(System.currentTimeMillis());
 	}
 	
@@ -54,20 +56,16 @@ public class UnitOfStudy {
 		return dbHandler.getProjects(unitCode);
 	}
 	
-	public void setUnitCode(String unitCode) throws IllegalArgumentException{
-		if (unitCode == null)
-			throw new IllegalArgumentException();
-		this.unitCode = unitCode;
-	}
-	
 	public void setUnitName(String unitName) throws IllegalArgumentException{
 		if (unitName == null)
 			throw new IllegalArgumentException();
 		this.unitName = unitName;
+		dbHandler.update(TABLE_NAME, unitCode, "UOS_NAME", unitName);
 	}
 	
 	public void setDescription(String description){
 		this.description = description;
+		dbHandler.update(TABLE_NAME, unitCode, "UOS_DESCRIPTION", description);
 	}
 	
 	public void setNumberOfStudents(int numStudents){
