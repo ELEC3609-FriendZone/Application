@@ -7,7 +7,7 @@
 		<div id="header-wrapper">
 			<img src="../images/title.png" alt="Friendzone">
 		</div>
-		<div class="group-display">
+		<div id="centre">
 			<ul class="group-grid">
 				<li class="group-box"><h2> Group 1 </h2></li>
 				<li class="group-box"><h2> Group 2 </h2></li>
