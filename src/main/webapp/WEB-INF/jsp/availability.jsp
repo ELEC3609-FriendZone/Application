@@ -1,5 +1,4 @@
 <html>
-<<<<<<< HEAD
 <head>
 <title>Friendzone-Availability</title>
 <link rel="stylesheet" type="text/css" href="../../styles/styles.css">
@@ -59,7 +58,7 @@
 								<tr>
 									<td class="table-heading">Monday</td>
 									<c:forEach items="${availabilityMonday}" var="aMonday">
-										<!-- td>
+										<td>
 											<c:choose>
 												<c:when test="${aMonday=='true'}">
 													<input type="checkbox" name="vehicle" value="${aMonday}" checked="true">
@@ -68,7 +67,7 @@
 													<input type="checkbox" name="vehicle" value="${aMonday}">
 												</c:otherwise>
 											</c:choose>
-										</td-->
+										</td>
 										<c:choose>
 											<c:when test="${aMonday=='true'}">
 												<td class="table-available"></td>

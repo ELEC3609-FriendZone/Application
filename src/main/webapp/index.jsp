@@ -1,5 +1,4 @@
 <html>
-<<<<<<< HEAD
 <head>
 <title>Friendzone</title>
 <link rel="stylesheet" type="text/css" href="/styles/styles.css">
