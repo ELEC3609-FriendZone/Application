@@ -1,7 +1,5 @@
 package friendzone.elec3609.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,25 +10,24 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.RequestScope;
 
-import friendzone.elec3609.model.ProgrammingLanguage;
-import friendzone.elec3609.model.Project;
-import friendzone.elec3609.model.Student;
-import friendzone.elec3609.model.StudyLevel;
-import friendzone.elec3609.model.Team;
-import friendzone.elec3609.model.UnitOfStudy;
 import friendzone.elec3609.service.DatabaseHandler;
 
 @Controller
 public class AvailabilityController {
 
 	@Autowired
-	DatabaseHandler dbHandler;
+	//DatabaseHandler dbHandler;
 	//Student student = dbHandler.getStudent(//StudentID);
+
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
+
 	//Dummy Data For now, so i can test the content on the page
-	Student student = new Student("123456789", "abcd1234", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true);
+
+/**
+	Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[] {ProgrammingLanguage.C, ProgrammingLanguage.JAVA});
 	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
-	Project project = new Project(uos,  new java.sql.Date(8099,10,15));
-	Team team = new Team(12345, project);
+	Project project = new Project(uos.getUnitCode(),  new java.sql.Date(8099,10,15));
+	Team team = new Team(project.getID(), "FriendZone");
 	
 	//Dummy boolean availability data
 	boolean[][] availability = new boolean[][]{{true, true, false, false, true, false, true, false, false, false, true, false},
@@ -39,15 +36,15 @@ public class AvailabilityController {
 												{false, true, false, true, true, false, true, true, false, false, true, false},
 												{true, false, false, true, false, false, false, true, true, false, true, false},
 												{false, true, false, false, true, false, true, false, false, false, true, false},
-												{true, true, false, true, false, false, true, true, false, false, true, false}};
-										
-
+												{true, true, false, true, false, false, true, true, false, false, true, false}};									
+*/
 	
 	@RequestMapping("/availability")
 	public String getEnums(Map<String, Object> map){
 		//storing the data of availability
 		//availability information
-		//student.setAvailability(availability);
+/**
+		student.setAvailability(availability);
 
 		
 		//Converts the given 2d Boolean array into strings
@@ -90,14 +87,15 @@ public class AvailabilityController {
 		map.put("availabilitySaturday", availSaturdayStrings);
 		map.put("availabilitySunday", availSundayStrings);
 		
-		//return page
+		//return page		 
+*/
 		return "availability";
 	}
 	
 	@RequestMapping("/availability/change")
 	public String changeAvailability(HttpServletRequest request){
 		//New 2D boolean array for the availability
-		boolean[][] newAvailability = new boolean[7][12];
+		/**boolean[][] newAvailability = new boolean[7][12];
 		String s;
 		
 		//Checks if the parameter exists
@@ -119,6 +117,7 @@ public class AvailabilityController {
 
 		//Sets the students availability to the new availability
 		student.setAvailability(newAvailability);
+		*/
 		return "redirect:/availability/"; //return to index page
 	}
 

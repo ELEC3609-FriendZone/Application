@@ -12,8 +12,7 @@ import friendzone.elec3609.service.DatabaseHandler;
 @Controller
 public class GroupController {
 
-	@Autowired
-	DatabaseHandler dbHandler;
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	@RequestMapping("/group")
 	public String getEnums(Map<String, Object> map){
