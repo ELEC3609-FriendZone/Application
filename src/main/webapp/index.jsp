@@ -8,7 +8,7 @@
 		<img src="images/title.png" alt="Friendzone">
 	</div>
 	<div id="form-login">
-		<form class="form" name="login" method="get" action="/profile/">
+		<form class="form" name="login" method="post" action="/mainHome/">
 			<table align="center">
 				<tbody>
 					<tr>
@@ -34,8 +34,7 @@
 					</tr>
 					<tr align="center">
 						<td align="center"><a class="button-green" href="/registration/"> Register </a></td>
-						<td align="center"><a class="button-orange" href="/mainHome"> Log in </a></td>
-						<!-- <td><input class="button-orange" type="submit" value="log in"></td> -->
+						<td><input class="button-orange" type="submit" value="log in"></td>
 					</tr>
 			</table>
 		</form>

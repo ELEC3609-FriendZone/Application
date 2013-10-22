@@ -27,7 +27,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td style="vertical-align: top;">
+					<td style="vertical-align: top">
 						<ul>
 							<li class="left-panel">
 								<h4>Group Members</h4> <br> ${team}
@@ -264,7 +264,7 @@
 								   </tr>
 								</c:forEach>
 							</table>
-							<p align="right"><input type="submit" value="Change Availability" class="btn"/></p>
+							<p align="right"><input type="submit" value="Change Availability" class="button-orange"/></p>
 						</form>
 							</li>
 						</ul>
