@@ -1,7 +1,8 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html>
-<head>
+	<head>
 		<title>Friendzone-Availability</title>
 		<style type="text/css">
 			body {
@@ -55,6 +56,11 @@
 				vertical-align:top;
 				width:20%;
 			}
+			.table-heading{
+				background: rgba(102, 153, 204, 1);
+				text-align:center;
+				color: rgba(260,260, 260, 1);
+			}
 
 		</style>
 	</head>
@@ -88,96 +94,134 @@
 						<a href="/subject/">Chat</a>
 					</div>		
 					<div class="page-body">
-						<h3>Availability</h3>
-						
-						<table>
-							<tr>
-								<td>Day</td>
-								<td>9am</td>
-								<td>10am</td>
-								<td>11am</td>
-								<td>12pm</td>
-								<td>1pm</td>
-								<td>2pm</td>
-								<td>3pm</td>
-								<td>4pm</td>
-								<td>5pm</td>
-								<td>6pm</td>
-								<td>7pm</td>
-								<td>8pm</td>
-							</tr>
-							<tr>
-								<td>Monday</td>
-								<c:forEach items="${availabilityMonday}" var="aMonday">
-									<td>
-										<c:if test="${aMonday=='true'}">
-										 X
-										</c:if>
-									</td>
-									
-								</c:forEach>
-							</tr>
-							<tr>
-								<td>Tuesday</td>
-								<c:forEach items="${availabilityTuesday}" var="aTuesday">
-									<td>
-										<c:if test="${aTuesday=='true'}">
-										 X
-										</c:if>
-									</td>
-								</c:forEach>
-							</tr>
-							<tr>
-								<td>Wednesday</td>
-								<c:forEach items="${availabilityWednesday}" var="aWednesday">
-									<td>
-										<c:if test="${aWednesday=='true'}">
-										 X
-										</c:if>
-									</td>
-								</c:forEach>
-							</tr>
-							<tr>
-								<td>Thursday</td>
-								<c:forEach items="${availabilityThursday}" var="aThursday">
-									<td>
-										<c:if test="${aThursday=='true'}">
-										 X
-										</c:if>
-									</td>
-								</c:forEach>
-							</tr>
-							<tr>
-								<td>Friday</td>
-								<c:forEach items="${availabilityFriday}" var="aFriday">
-									<td>
-										<c:if test="${aFriday=='true'}">
-										 X
-										</c:if>
-									</td>
-								</c:forEach>
-							</tr>
-							<tr>
-								<td>Saturday</td>
-								<c:forEach items="${availabilitySaturday}" var="aSaturday">
-									<td>
-										<c:if test="${aSaturday=='true'}">
-										 X
-										</c:if>
-									</td>
-								</c:forEach>
-							</tr>
-							<tr>
-								<td>Sunday</td>
-								<c:forEach items="${availabilitySunday}" var="aSunday">
-									<td>
-										<c:if test="${aSunday=='true'}">
-										 X
-										</c:if>
-									</td>
-								</c:forEach>
-							</tr>
-						</table>
+						<br>
+						<h2>Availability</h2>
+						<form method="post" action="change/">
+							<table>
+								<tr class="table-heading">
+									<td>Day</td>
+									<td>8am</td>
+									<td>9am</td>
+									<td>10am</td>
+									<td>11am</td>
+									<td>12pm</td>
+									<td>1pm</td>
+									<td>2pm</td>
+									<td>3pm</td>
+									<td>4pm</td>
+									<td>5pm</td>
+									<td>6pm</td>
+									<td>7pm</td>
+								</tr>
+								<tr>
+									<td class="table-heading">Monday</td>
+									<c:forEach items="${availabilityMonday}" var="aMonday">
+										<td>
+											<c:choose>
+												<c:when test="${aMonday=='true'}">
+													<input type="checkbox" name="vehicle" value="${aMonday}" checked="true">
+												</c:when>
+												<c:otherwise>
+													<input type="checkbox" name="vehicle" value="${aMonday}">
+												</c:otherwise>
+											</c:choose>
+										</td>
+										
+									</c:forEach>
+								</tr>
+								<tr>
+									<td class="table-heading">Tuesday</td>
+									<c:forEach items="${availabilityTuesday}" var="aTuesday">
+										<td>
+											<c:choose>
+												<c:when test="${aTuesday=='true'}">
+													<input type="checkbox" name="vehicle" value="${aTuesday}" checked="true">
+												</c:when>
+												<c:otherwise>
+													<input type="checkbox" name="vehicle" value="${aTuesday}">
+												</c:otherwise>
+											</c:choose>
+										</td>
+									</c:forEach>
+								</tr>
+								<tr>
+									<td class="table-heading">Wednesday</td>
+									<c:forEach items="${availabilityWednesday}" var="aWednesday">
+										<td>
+											<c:choose>
+												<c:when test="${aWednesday=='true'}">
+													<input type="checkbox" name="vehicle" value="${aWednesday}" checked="true">
+												</c:when>
+												<c:otherwise>
+													<input type="checkbox" name="vehicle" value="${aWednesday}">
+												</c:otherwise>
+											</c:choose>
+										</td>
+									</c:forEach>
+								</tr>
+								<tr>
+									<td class="table-heading">Thursday</td>
+									<c:forEach items="${availabilityThursday}" var="aThursday">
+										<td>
+											<c:choose>
+												<c:when test="${aThursday=='true'}">
+													<input type="checkbox" name="vehicle" value="${aThursday}" checked="true">
+												</c:when>
+												<c:otherwise>
+													<input type="checkbox" name="vehicle" value="${aThursday}">
+												</c:otherwise>
+											</c:choose>
+										</td>
+									</c:forEach>
+								</tr>
+								<tr>
+									<td class="table-heading">Friday</td>
+									<c:forEach items="${availabilityFriday}" var="aFriday">
+										<td>
+											<c:choose>
+												<c:when test="${aFriday=='true'}">
+													<input type="checkbox" name="vehicle" value="${aFriday}" checked="true">
+												</c:when>
+												<c:otherwise>
+													<input type="checkbox" name="vehicle" value="${aFriday}">
+												</c:otherwise>
+											</c:choose>
+										</td>
+									</c:forEach>
+								</tr>
+								<tr>
+									<td class="table-heading">Saturday</td>
+									<c:forEach items="${availabilitySaturday}" var="aSaturday">
+										<td>
+											<c:choose>
+												<c:when test="${aSaturday=='true'}">
+													<input type="checkbox" name="vehicle" value="${aSaturday}" checked="true">
+												</c:when>
+												<c:otherwise>
+													<input type="checkbox" name="vehicle" value="${aSaturday}">
+												</c:otherwise>
+											</c:choose>
+										</td>
+									</c:forEach>
+								</tr>
+								<tr>
+									<td class="table-heading">Sunday</td>
+									<c:forEach items="${availabilitySunday}" var="aSunday">
+										<td>
+											<c:choose>
+												<c:when test="${aSunday=='true'}">
+													<input type="checkbox" name="vehicle" value="${aSunday}" checked="true">
+												</c:when>
+												<c:otherwise>
+													<input type="checkbox" name="vehicle" value="${aSunday}">
+												</c:otherwise>
+											</c:choose>
+										</td>
+									</c:forEach>
+								</tr>
+							</table>
+							<p align="right"><input type="submit" value="Change" class="btn"/></p>
+						</form>
 					</div>
 				</td>
 			</tr>

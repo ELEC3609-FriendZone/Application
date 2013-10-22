@@ -2,6 +2,8 @@ package friendzone.elec3609.controller;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -40,6 +42,8 @@ public class AvailabilityController {
 		student.setAvailability(availability);
 
 		
+		//Converts the given 2d Boolean array into strings
+		//Corresponding to their respective days
 		List<String> availMondayStrings = new ArrayList<String>();
 		List<String> availTuesdayStrings = new ArrayList<String>();
 		List<String> availWednesdayStrings = new ArrayList<String>();
@@ -69,7 +73,7 @@ public class AvailabilityController {
 		map.put("team", team.getMembers());
 		
 		//The availability Stuff for the body information
-		//map.put("availability", student.getAvailability());
+		//Corresponding to their respective days
 		map.put("availabilityMonday", availMondayStrings);
 		map.put("availabilityTuesday", availTuesdayStrings);
 		map.put("availabilityWednesday", availWednesdayStrings);
@@ -83,5 +87,11 @@ public class AvailabilityController {
 		return "availability";
 	}
 	
+	@RequestMapping("/availability/change")
+	public String changeAvailability(HttpServletRequest request){
+
+		
+		return "redirect:/availability/"; //return to index page
+	}
 
 }
