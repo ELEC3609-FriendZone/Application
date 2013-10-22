@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.RequestScope;
 
 import friendzone.elec3609.model.ProgrammingLanguage;
 import friendzone.elec3609.model.Project;
@@ -24,7 +25,7 @@ public class AvailabilityController {
 
 	@Autowired
 	DatabaseHandler dbHandler;
-	
+	//Student student = dbHandler.getStudent(//StudentID);
 	//Dummy Data For now, so i can test the content on the page
 	Student student = new Student("123456789", "abcd1234", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true);
 	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
@@ -46,7 +47,7 @@ public class AvailabilityController {
 	public String getEnums(Map<String, Object> map){
 		//storing the data of availability
 		//availability information
-		student.setAvailability(availability);
+		//student.setAvailability(availability);
 
 		
 		//Converts the given 2d Boolean array into strings
@@ -95,8 +96,29 @@ public class AvailabilityController {
 	
 	@RequestMapping("/availability/change")
 	public String changeAvailability(HttpServletRequest request){
-
+		//New 2D boolean array for the availability
+		boolean[][] newAvailability = new boolean[7][12];
+		String s;
 		
+		//Checks if the parameter exists
+		//If it exists it will make it true
+		//else false
+		for (int i=0; i<7; i++){
+		   for (int j=0; j < 12; j++){
+			   s = ("avail" + i + j);
+			   if(request.getParameterMap().containsKey(s))
+			   {
+				   newAvailability[i][j] = true;
+			   }
+			   else
+			   {
+				   newAvailability[i][j] = false;
+			   }
+		   }
+		}
+
+		//Sets the students availability to the new availability
+		student.setAvailability(newAvailability);
 		return "redirect:/availability/"; //return to index page
 	}
 
