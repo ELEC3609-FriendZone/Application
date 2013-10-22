@@ -13,8 +13,6 @@ import friendzone.elec3609.service.DatabaseHandler;
 @Controller
 public class AvailabilityController {
 
-	@Autowired
-	//DatabaseHandler dbHandler;
 	//Student student = dbHandler.getStudent(//StudentID);
 
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
