@@ -43,7 +43,7 @@
 			<a href="/"class="appTitle"><h1>FriendZone</h1></a>
 		</div>
 		<div class="page-body">
-			<form name="login" method="get" action="/mainHome/">
+			<form name="login" method="post" action="/mainHome/">
 				<table class="formTable" align="center">
 					<tr>
 						<td><h1>Login</h1></td>
