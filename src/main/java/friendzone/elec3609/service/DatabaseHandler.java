@@ -221,9 +221,8 @@ public class DatabaseHandler{
 	public void populate(){
 		final int STUDENT_AMOUNT = 1000;
 		final int UOS_AMOUNT = 10;
-		final int PROJECT_AMOUNT = 3; // per UOS
-		final int TEAM_AMOUNT = 5; // per Project
-		final int TEAM_SIZE = 5; // students per team
+		final int MAX_PROJECTS = 3; // per UOS
+		final int MAX_MEMBERS = 5; // students per team
 		
 		String[] firstNames = new String[]{"Oliver", "Lucas", "Ethan", "Tom", "Noah", "Cooper", "James", "Jackson", "Liam", "Xavier",
 											"Lily", "Isabella", "Emily", "Chloe", "Charlotte", "Zoe", "Isabelle", "Olivia", "Sophie", "Amelia"};
@@ -254,7 +253,7 @@ public class DatabaseHandler{
 			
 			String password = "password";
 
-			System.out.println("Adding student " + i + "/" + STUDENT_AMOUNT + " (unikey " + unikey + ", password " + password + ")");
+			System.out.println("Adding student " + (i+1) + "/" + STUDENT_AMOUNT + " (unikey " + unikey + ", password " + password + ")");
 			
 			String primaryEmail = unikey + "@uni.sydney.edu.au";
 			String mobile = String.valueOf(041) + String.valueOf(100000 + (int)(Math.random() * 900000)); 
@@ -281,54 +280,85 @@ public class DatabaseHandler{
 		
 		// populate UoS table
 		for (int i=0; i != UOS_AMOUNT; ++i){
-			ArrayList<Student> uosStudents = new ArrayList<Student>();
 			
 			String unitCode = null;
 			do{
 				unitCode = unitCodes[(int)(Math.random() * unitCodes.length)] + String.valueOf(1000 + (int)(Math.random() * 3000));
 			} while (usedUnitCodes.contains(unitCode));
 			usedUnitCodes.add(unitCode);
-
-			System.out.println("Adding Unit of Study " + i + "/" + UOS_AMOUNT + "(unitCode " + unitCode + ")");
+		
+			System.out.println("Adding Unit of Study " + (i+1) + "/" + UOS_AMOUNT + "(unitCode " + unitCode + ")");
 			
 			String unitName = "<unit name for " + unitCode + ">";
 			int numStudents = (int)(Math.random() * STUDENT_AMOUNT); 
 			UnitOfStudy newUOS = new UnitOfStudy(unitCode, unitName, numStudents);
-		
 			
 			// enrol students to the UOS
+			ArrayList<Student> uosStudents = new ArrayList<Student>();
 			HashSet<Student> enrolledStudents = new HashSet<Student>();
 			for (int j=0; j != numStudents; j++){
 				Student student = null;
 				do{
 					student = students.get((int)(Math.random() * students.size()));
 				} while (enrolledStudents.contains(student));
+				System.out.println("Enrolling student " + student.getSID() + " to unit of study " + unitCode + " " + (j+1) + "/" + numStudents);
 				student.enrolTo(unitCode);
+				enrolledStudents.add(student);
 				uosStudents.add(student);
 			}
 			
-
-			
-			// create projects for this UOS
-			for (int j=0; j != PROJECT_AMOUNT; ++j){
-				Date deadline = new Date(System.currentTimeMillis() + (long)(Math.random() * 1000000000));
+			// add projects to this UoS
+			int numProjects = (int)(Math.random() * (MAX_PROJECTS+1));
+			for (int j=0; j != numProjects; j++){
+				Date deadline = new Date(System.currentTimeMillis() + (long)(Math.random() * 31556926000L)); //current date + up to 1 year in milliseconds
+				System.out.println("Adding Project to unit of study " + unitCode + " " + (j+1) + "/" + numProjects + "(deadline " + deadline.toGMTString() + ")");
 				Project newProject = new Project(unitCode, unitCode + " project " + j, deadline);
 				
-				//create teams for this project
-				for (int k = 0; k != TEAM_AMOUNT; ++k){
-					Team newTeam = new Team(newProject.getID(), "TEAM" + k);
+				// create teams for this project
+				int numTeams = (numStudents / MAX_MEMBERS);
+				int projectID = newProject.getID();
+				for (int k = 0; k != numTeams; ++k){
+					System.out.println("Adding team to project " + projectID + (k+1) + "/" + numTeams);
+					Team newTeam = new Team(projectID, "TEAM" + k);
 					
-					//fill the team with students in the UOS
-					for (int l=0; l != TEAM_SIZE; ++l){
-						if (uosStudents.size() == 0){
-							break;
-						}
-						Student teamMember = uosStudents.remove((int)(Math.random() * uosStudents.size()));
+					// add students to this team
+					for (int l = 0; l != MAX_MEMBERS; l++){
+						int teamID = newTeam.getID();
+						int index = (int)(Math.random() * uosStudents.size());
+						Student selectedStudent = uosStudents.remove(index);
+						System.out.println("Putting student " + selectedStudent.getUnikey() + " in team " + teamID + " for project " + projectID + " " + (l+1) + "/" + MAX_MEMBERS);
 					}
 				}
 			}
-		}
+		}	
 	}
+
+			
+//			//create teams for this project
+//			for (int k = 0; k != TEAM_AMOUNT; ++k){
+//				Team newTeam = new Team(newProject.getID(), "TEAM" + k);
+//			
+//			}
+//			
+//			//fill the team with students in the UOS
+//			for (int l=0; l != TEAM_SIZE; ++l){
+//				if (uosStudents.size() == 0){
+//					break;
+//				}
+//				Student teamMember = uosStudents.remove((int)(Math.random() * uosStudents.size()));
+//			}
+//			
+//			// enrol students to the UOS
+//			HashSet<Student> enrolledStudents = new HashSet<Student>();
+//			for (int j=0; j != numStudents; j++){
+//				Student student = null;
+//				do{
+//					student = students.get((int)(Math.random() * students.size()));
+//				} while (enrolledStudents.contains(student));
+//				student.enrolTo(unitCode);
+//				uosStudents.add(student);
+//			}
+
 	
 	public boolean checkExists(String SID){
 		try{
@@ -751,10 +781,10 @@ public class DatabaseHandler{
 		Integer id = null;
 		try{
 			String insertQuery = "INSERT INTO Team"
-					+	" (PROJECT_ID, NAME)"
-					+	" VALUES (?,?)"
-					+	" RETURNING TEAM_ID"
-					;
+							+	" (PROJECT_ID, NAME)"
+							+	" VALUES (?,?)"
+							+	" RETURNING TEAM_ID"
+							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setInt(1, projectID);
 			stmt.setString(2, name);
