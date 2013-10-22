@@ -73,7 +73,6 @@
 		margin: 0px auto;
 		width: 1200px;
 	}
-	
 	.center
 	{
 		text-align: center;
@@ -82,7 +81,12 @@
 	.left 
 	{
 		text-align: left;
-		margin-left: 10%;
+		margin-left: 1em;
+	}
+	.right 
+	{
+		text-align: right;
+		margin-right: 1em;
 	}
 
 /*********************************************************************************/
