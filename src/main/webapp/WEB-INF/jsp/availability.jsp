@@ -1,122 +1,44 @@
-<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html>
-	<head>
-		<title>Friendzone-Availability</title>
-		<style type="text/css">
-			body {
-				margin-top: 0px;
-				margin-right: 0px;
-				margin-bottom: 0px;
-				margin-left: 0px;
-				background: rgba(238, 236, 225, 1);
-			}
-			
-			.page-header {
-				FONT-FAMILY: 'Times New Roman';
-				TEXT-TRANSFORM: capitalize;
-				background: rgba(102, 153, 204, 1);
-				height: 10%;
-				width: 100%;
-			}
-			
-			h1{
-				text-align:center;
-			}
-			
-			.appTitle{
-				color: rgba(0, 0, 0, 1);
-			}
-	
-			.page-body {
-				background: rgba(260,260, 260, 1);
-				margin-top:1%;
-				margin-left:2%;
-				margin-right:10%;
-			}
-			.team-member-details {
-				background: rgba(260,260, 260, 1);
-				margin-top:1%;
-				margin-left:10%;
-				margin-right:2%;
-			}
-			.other-page-links {
-				text-align: right;
-				margin-right:10%;
-			}
-			table{
-				width:100%;
-			}
-			.subject-details {
-				margin-top:1%;
-				margin-left:10%;
-			}
-			.table-data-team{
-				vertical-align:top;
-				width:20%;
-			}
-			.table-heading{
-				background: rgba(102, 153, 204, 1);
-				text-align:center;
-				color: rgba(260,260, 260, 1);
-			}
-			.table-available{
-				background: rgba(0, 255, 0, 1);
-			}
-			.table-unavailable{
-				background: rgba(255, 0, 0, 1);
-			}
-			.legend{
-				width: 100%;
-			}
-
-		</style>
-	</head>
-	<body>
-		<div class="page-header">
-			<a href="/mainHome/"class="appTitle"><h1>FriendZone</h1></a>
-		</div>
+<head>
+<title>Friendzone-Availability</title>
+<link rel="stylesheet" type="text/css" href="../../styles/styles.css">
+</head>
+<body>
+	<div id="header-wrapper">
+		<img href="/mainHome" src="../images/title.png" alt="Friendzone">
+	</div>
+	<div id="left" class="Subject Description">
+		<h1>${unitcode}</h1>
+		<h3>${unitname}</h3>
+	</div>
+	<div id="center" class="page-content">
 		<table>
-			<tr>
-				<td>
-					<div class="subject-details">
-						<h2>${unitcode}</h2>
-						<i><h3>${unitname}</h3></i>
-					</div>
-				</td>
-				<td></td>
-			</tr>
-			<tr>
-				<td class="table-data-team">		
-					<div class="team-member-details">
-						<h3>Team members</h3>
-						${team}
-					</div>
-				</td>
-				<td>
-					<div class="other-page-links">
-						<a href="/subject/">Details</a> |
-						<a href="/meeting/">New Meeting</a> |
-						<a href="/meeting/">View Meeting</a> |
-						<a href="/availability/">My Availability</a> |
-						<a href="/subject/">Chat</a>
-					</div>		
-					<div class="page-body">
-						<br>
-						<h2>Availability</h2>
-						<table class="legend">
-							<tr>
-								<td class="table-available"></td>
-								<td> Available</td>
-							</tr>
-							<tr>
-								<td class="table-unavailable"></td>
-								<td> Un-Available</td>
-							</tr>
-						</table>
-						<br>
-						<form method="post" action="change/">
+			<tbody>
+				<tr>
+					<td><br></td>
+					<td style="vertical-align: bottom; text-align: right;">
+						<div class="other-page-links">
+							<div style="text-align: right;">
+								<a href="/subject/">Details</a> | <a href="/meeting/">New
+									Meeting</a> | <a href="/meeting/">View Meeting</a> | <a
+									href="/availability/">My Availability</a> | <a href="/subject/">Chat</a>
+							</div>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td style="vertical-align: top">
+						<ul>
+							<li class="left-panel">
+								<h4>Group Members</h4> <br> ${team}
+							</li>
+						</ul>
+					</td>
+					<td style="vertical-align: top;">
+						<ul>
+							<li class="right-panel">
+								<h4>Availability</h4>
+								<form method="post" action="change/">
 							<table>
 								<tr class="table-heading">
 									<td>Day</td>
@@ -136,7 +58,7 @@
 								<tr>
 									<td class="table-heading">Monday</td>
 									<c:forEach items="${availabilityMonday}" var="aMonday">
-										<!-- td>
+										<td>
 											<c:choose>
 												<c:when test="${aMonday=='true'}">
 													<input type="checkbox" name="vehicle" value="${aMonday}" checked="true">
@@ -145,7 +67,7 @@
 													<input type="checkbox" name="vehicle" value="${aMonday}">
 												</c:otherwise>
 											</c:choose>
-										</td-->
+										</td>
 										<c:choose>
 											<c:when test="${aMonday=='true'}">
 												<td class="table-available"></td>
@@ -342,11 +264,15 @@
 								   </tr>
 								</c:forEach>
 							</table>
-							<p align="right"><input type="submit" value="Change Availability" class="btn"/></p>
+							<p align="right"><input type="submit" value="Change Availability" class="button-orange"/></p>
 						</form>
-					</div>
-				</td>
-			</tr>
-		</table>
-	</body>
+							</li>
+						</ul>
+					</td>
+				</tr>
+			</tbody>
+			</table>	
+	</div>
+</body>
 </html>
+

@@ -17,7 +17,7 @@ import friendzone.elec3609.model.Student;
 import friendzone.elec3609.service.DatabaseHandler;
 
 @Controller
-@SessionAttributes("student")
+@SessionAttributes({"student", "dbHandler"})
 public class GroupController {
 
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
