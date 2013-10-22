@@ -27,7 +27,7 @@ public class Meeting {
 	}
 	
 	/**
-	 * This constructor is used by the DatabaseHandler - it does not perform an insert into the database, instead it creates a local Meeting object that will send updates to the meeting in the database with MEETING_ID = id
+	 * This constructor is used by the DatabaseHandler - it does not perform an insert into the database.instead it creates a local Meeting object that will send updates to the meeting in the database with MEETING_ID = id
 	 */
 	public Meeting(int id, int teamID, Timestamp start, Timestamp end, String location){
 		this.teamID = teamID;
