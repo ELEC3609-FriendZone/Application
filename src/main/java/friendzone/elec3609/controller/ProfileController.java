@@ -60,6 +60,21 @@ public class ProfileController {
 		map.put("firstSocialMedia", student.getFirstSocialMedia());
 		map.put("secondSocialMedia", student.getSecondSocialMedia());
 */		
+		System.out.println("LOOK HERE");
+		System.out.println("LOOK HERE");
+		System.out.println("LOOK HERE");
+		System.out.println("LOOK HERE");
+		System.out.println("LOOK HERE");
+		System.out.println("LOOK HERE");
+		System.out.println("LOOK HERE");
+		System.out.println(dbHandler.getSID("akel6619"));
+		
+//		System.out.println("LOOK HERE");
+//		if(dbHandler.getStudent(dbHandler.getSID("akel6619")).getFirstName().toString().equals(null))
+//		{
+//			System.out.println("THIS DOESNT EXIST"); 
+//		}
+		
 		return "profile";
 	}
 	
