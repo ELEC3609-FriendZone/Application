@@ -9,8 +9,7 @@ import friendzone.elec3609.service.DatabaseHandler;
 
 public class UnitOfStudy {
 
-	@Autowired
-	DatabaseHandler dbHandler;
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	private final String TABLE_NAME = "UnitOfStudy";
 	

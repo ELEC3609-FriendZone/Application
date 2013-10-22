@@ -1,14 +1,12 @@
 package friendzone.elec3609.model;
 
-import org.springframework.beans.factory.annotation.Autowired;
 
 import friendzone.elec3609.service.DatabaseHandler;
 
 
 public class Invitation {
 	 
-	@Autowired
-	DatabaseHandler dbHandler;
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	int id;
 	private String senderID;

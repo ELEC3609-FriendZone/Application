@@ -11,8 +11,7 @@ import friendzone.elec3609.service.DatabaseHandler;
 
 public class Project {
 	
-	@Autowired
-	DatabaseHandler dbHandler;
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	private final String TABLE_NAME = "Project";
 	
@@ -22,10 +21,10 @@ public class Project {
 	String description;
 	Timestamp lastViewed;
 	
-	public Project(String unitCode, Date deadline){
+	public Project(String unitCode, String projectName, Date deadline){
 		this.parent = unitCode;
 		this.deadline = deadline;
-		id = dbHandler.addProject(parent, deadline);
+		id = dbHandler.addProject(parent, projectName, deadline);
 		lastViewed = new Timestamp(System.currentTimeMillis());
 	}
 	

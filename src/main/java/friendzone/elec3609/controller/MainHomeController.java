@@ -12,8 +12,7 @@ import friendzone.elec3609.service.DatabaseHandler;
 @Controller
 public class MainHomeController {
 
-	@Autowired
-	DatabaseHandler dbHandler;
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	@RequestMapping("/mainHome")
 	public String getEnums(Map<String, Object> map){

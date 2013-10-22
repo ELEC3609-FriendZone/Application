@@ -1,7 +1,5 @@
 package friendzone.elec3609.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 
@@ -9,21 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import friendzone.elec3609.model.ProgrammingLanguage;
-import friendzone.elec3609.model.Project;
-import friendzone.elec3609.model.Student;
-import friendzone.elec3609.model.StudyLevel;
-import friendzone.elec3609.model.Team;
-import friendzone.elec3609.model.UnitOfStudy;
 import friendzone.elec3609.service.DatabaseHandler;
 
 @Controller
 public class AvailabilityController {
 
-	@Autowired
-	DatabaseHandler dbHandler;
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	//Dummy Data For now, so i can test the content on the page
+
+/**
 	Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[] {ProgrammingLanguage.C, ProgrammingLanguage.JAVA});
 	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
 	Project project = new Project(uos.getUnitCode(),  new java.sql.Date(8099,10,15));
@@ -36,14 +29,14 @@ public class AvailabilityController {
 												{false, true, false, true, true, false, true, true, false, false, true, false},
 												{true, false, false, true, false, false, false, true, true, false, true, false},
 												{false, true, false, false, true, false, true, false, false, false, true, false},
-												{true, true, false, true, false, false, true, true, false, false, true, false}};
-										
-
+												{true, true, false, true, false, false, true, true, false, false, true, false}};									
+*/
 	
 	@RequestMapping("/availability")
 	public String getEnums(Map<String, Object> map){
 		//storing the data of availability
 		//availability information
+/**
 		student.setAvailability(availability);
 
 		
@@ -85,7 +78,8 @@ public class AvailabilityController {
 		map.put("availabilitySaturday", availSaturdayStrings);
 		map.put("availabilitySunday", availSundayStrings);
 		
-		//return page
+		//return page		 
+*/
 		return "availability";
 	}
 	

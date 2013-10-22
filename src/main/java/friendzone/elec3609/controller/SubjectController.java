@@ -16,13 +16,14 @@ import friendzone.elec3609.model.Team;
 @Controller
 public class SubjectController {
 
-	@Autowired
-	DatabaseHandler dbHandler;
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	//Dummy Data For now, so i can test the content on the page
+/**
 	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
 	Project project = new Project(uos.getUnitCode(),  new java.sql.Date(8099,10,15));
 	Team team = new Team(project.getID(), "FriendZone");
+*/	
 	
 	//Functions to be used for mapping
 	//Student stu;
@@ -35,6 +36,7 @@ public class SubjectController {
 	@RequestMapping("/subject")
 	public String getEnums(Map<String, Object> map){
 		//The heading of the page will include the Unit Of Study Details
+/**		
 		map.put("unitcode", uos.getUnitCode());
 		map.put("unitname", uos.getUnitName());
 		
@@ -46,6 +48,7 @@ public class SubjectController {
 		map.put("subject-description", uos.getDescription());
 		
 		//return page
+*/
 		return "subject";
 	}
 

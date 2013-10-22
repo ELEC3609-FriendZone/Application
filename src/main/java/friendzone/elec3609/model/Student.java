@@ -4,6 +4,9 @@ package friendzone.elec3609.model;
 import java.sql.Timestamp;
 import java.util.List;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -11,9 +14,8 @@ import friendzone.elec3609.model.SocialMedia.Provider;
 import friendzone.elec3609.service.DatabaseHandler;
 
 public class Student{
-	
-	@Autowired
-	DatabaseHandler dbHandler;
+
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	private final int MAX_SOCIAL_MEDIA = 2;
 	private final String TABLE_NAME = "Student";
@@ -231,5 +233,17 @@ public class Student{
 		this.ESL = student.ESL;
 		this.availability = student.availability;
 		this.lastViewed = student.lastViewed;
+	}
+
+	public void enrolTo(String unitCode) {
+		dbHandler.addEnrolment(unitCode, SID, (int)(Math.random() * 10));
+	}
+	
+	public void joinTeam(int teamID){
+		dbHandler.addTeamMembership(SID, teamID);
+	}
+	
+	public int getTutorialNum(String unitCode){
+		return dbHandler.getTutorialNum(SID, unitCode);
 	}
 }

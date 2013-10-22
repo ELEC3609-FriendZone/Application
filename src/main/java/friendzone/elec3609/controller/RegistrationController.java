@@ -21,8 +21,7 @@ import friendzone.elec3609.service.DatabaseHandler;
 @Controller
 public class RegistrationController {
 
-	@Autowired
-	DatabaseHandler dbHandler;
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	@RequestMapping("/registration")
 	public String getEnums(Map<String, Object> map){

@@ -13,16 +13,15 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 
 import friendzone.elec3609.model.*;
 import friendzone.elec3609.model.SocialMedia.Provider;
 
-import org.springframework.stereotype.Service;
-
-@Service
 public class DatabaseHandler{
 	Map<String, UnitOfStudy> uosMap = new HashMap<String, UnitOfStudy>();
 	Map<String, Student> studentMap = new HashMap<String, Student>();
@@ -32,12 +31,26 @@ public class DatabaseHandler{
 	Map<Integer, Meeting> meetingMap = new HashMap<Integer, Meeting>();
 	
 	Connection dbConnection;
+	static DatabaseHandler instance;
+	
+	public static DatabaseHandler getInstance(){
+		if (instance == null){
+			instance = new DatabaseHandler();
+			
+			//reset and populate!
+			if (instance != null){
+				instance.resetDatabase();
+				instance.populate();
+			}
+		}
+		return instance;
+	}
+	
 	
 	//Since the DatabaseHandler is marked as a service, it acts as a singleton and the constructor gets called automatically when the application starts
-	public DatabaseHandler(){
+	private DatabaseHandler(){
 		try {
 			dbConnection = getConnection();
-			resetDatabase();
 			System.out.println("Database has the following tables:");
 			for (String table : getTableNames()){
 				System.out.println("\t" + table);
@@ -76,7 +89,7 @@ public class DatabaseHandler{
 				"DROP TABLE IF EXISTS Student CASCADE;"
 			+	"CREATE TABLE Student ("
 			+	"	SID					CHAR(9) 		NOT NULL,"
-			+ 	"	UNIKEY 				CHAR(8) 		NOT NULL,"
+			+ 	"	UNIKEY 				CHAR(8) 		UNIQUE NOT NULL,"
 			+	"	PASSWORD			CHAR(64)		NOT NULL,"
 			+	"	FIRST_NAME			VARCHAR(20)		NOT NULL,"
 			+	"	LAST_NAME			VARCHAR(20)		NOT NULL,"
@@ -116,6 +129,7 @@ public class DatabaseHandler{
 			+	"CREATE TABLE Project ("
 			+	"	PROJECT_ID		SERIAL		NOT NULL,"
 			+	"	UOS_ID			CHAR(8)		REFERENCES UnitOfStudy(UOS_ID)		NOT NULL,"
+			+	"	NAME			VARCHAR(20)	NOT NULL,"
 			+	"	DESCRIPTION		VARCHAR(100),"
 			+	"	DEADLINE		DATE		NOT NULL,"
 			+	"	LAST_MODIFIED	TIMESTAMP	DEFAULT NOW(),"
@@ -132,14 +146,15 @@ public class DatabaseHandler{
 			+	"CREATE TABLE TeamMembership ("
 			+	"	STUDENT		CHAR(9)		REFERENCES Student(SID)		NOT NULL,"
 			+	"	TEAM		INTEGER		REFERENCES Team(TEAM_ID)	NOT NULL,"
+			// should enforce exists ENROLMENT with STUDENT=STUDENT, UOS= TEAM -> PROJECT_ID -> UOS_ID
 			+	"	PRIMARY KEY (STUDENT, TEAM)"
 			+	");"
 			+	"DROP TABLE IF EXISTS Meeting CASCADE;"
 			+	"CREATE TABLE Meeting("
 			+	"	MEETING_ID	SERIAL			NOT NULL,"
 			+	"	TEAM		INTEGER			REFERENCES Team(TEAM_ID)	NOT NULL,"
-			+	"	START		TIMESTAMP		NOT NULL,"
-			+	"	END			TIMESTAMP		NOT NULL,"
+			+	"	START_TIME	TIMESTAMP		NOT NULL,"
+			+	"	END_TIME	TIMESTAMP		NOT NULL,"
 			+	"	LOCATION	VARCHAR(20),"
 			+	"	PRIMARY KEY (MEETING_ID)"
 			+	");"
@@ -203,6 +218,135 @@ public class DatabaseHandler{
 		}
 	}
 	
+	public void populate(){
+		final int STUDENT_AMOUNT = 1000;
+		final int UOS_AMOUNT = 10;
+		final int PROJECT_AMOUNT = 3; // per UOS
+		final int TEAM_AMOUNT = 5; // per Project
+		final int TEAM_SIZE = 5; // students per team
+		
+		String[] firstNames = new String[]{"Oliver", "Lucas", "Ethan", "Tom", "Noah", "Cooper", "James", "Jackson", "Liam", "Xavier",
+											"Lily", "Isabella", "Emily", "Chloe", "Charlotte", "Zoe", "Isabelle", "Olivia", "Sophie", "Amelia"};
+		String[] lastNames = new String[]{"Smith", "Jones", "Williams", "Brown", "Wilson", "Taylor", "Morton", "White", "Martin", "Anderson",
+											"Thompson", "Nguyen", "Thomas", "Walker", "Harris", "Lee", "Ryan", "Robinson", "Kelly", "King"};
+		String[] unitCodes = new String[]{"ELEC", "INFO", "COMP", "ISYS"};
+		
+		HashSet<String> usedUnitCodes = new HashSet<String>();
+		HashSet<String> usedSIDs = new HashSet<String>();
+		HashSet<String> usedUnikeys = new HashSet<String>();
+		ArrayList<Student> students = new ArrayList<Student>();
+		// populate student table
+		for (int i=0; i != STUDENT_AMOUNT; ++i){
+			String SID = null;
+			do{
+				SID = String.valueOf(300000000 + (int)(Math.random() * 100000000));
+			} while (usedSIDs.contains(SID));
+			usedSIDs.add(SID);
+			
+			String firstName = firstNames[(int)(Math.random() * firstNames.length)];
+			String lastName = lastNames[(int)(Math.random() * firstNames.length)];
+			
+			String unikey = null;
+			do{
+				unikey = (firstName.charAt(1) + lastName.substring(0, 3) + String.valueOf(1000 + (int)(Math.random() * 9000))).toLowerCase(); 
+			} while (usedUnikeys.contains(unikey));
+			usedUnikeys.add(unikey);
+			
+			String password = "password";
+
+			System.out.println("Adding student " + i + "/" + STUDENT_AMOUNT + " (unikey " + unikey + ", password " + password + ")");
+			
+			String primaryEmail = unikey + "@uni.sydney.edu.au";
+			String mobile = String.valueOf(041) + String.valueOf(100000 + (int)(Math.random() * 900000)); 
+			StudyLevel studyLevel = StudyLevel.values()[(int)(Math.random() * StudyLevel.values().length)];
+			boolean ESL = ((int)(Math.random()) == (int)(Math.random()));
+			ProgrammingLanguage languages[] = new ProgrammingLanguage[(int)(Math.random() * ProgrammingLanguage.values().length)];
+			
+			HashSet<ProgrammingLanguage> usedLangs = new HashSet<ProgrammingLanguage>();
+			for (int j=0; j != languages.length; ++j){
+				ProgrammingLanguage newLanguage = null;
+				do{
+					newLanguage = ProgrammingLanguage.values()[(int)(Math.random() * ProgrammingLanguage.values().length)];
+
+				} while (usedLangs.contains(newLanguage));
+				usedLangs.add(newLanguage);
+				languages[j] = newLanguage;
+			}
+
+			Student newStudent = new Student(SID, unikey, password, firstName, lastName, primaryEmail, mobile, studyLevel, ESL, languages);
+
+			students.add(newStudent);
+		}
+		
+		
+		// populate UoS table
+		for (int i=0; i != UOS_AMOUNT; ++i){
+			ArrayList<Student> uosStudents = new ArrayList<Student>();
+			
+			String unitCode = null;
+			do{
+				unitCode = unitCodes[(int)(Math.random() * unitCodes.length)] + String.valueOf(1000 + (int)(Math.random() * 3000));
+			} while (usedUnitCodes.contains(unitCode));
+			usedUnitCodes.add(unitCode);
+
+			System.out.println("Adding Unit of Study " + i + "/" + UOS_AMOUNT + "(unitCode " + unitCode + ")");
+			
+			String unitName = "<unit name for " + unitCode + ">";
+			int numStudents = (int)(Math.random() * STUDENT_AMOUNT); 
+			UnitOfStudy newUOS = new UnitOfStudy(unitCode, unitName, numStudents);
+		
+			
+			// enrol students to the UOS
+			HashSet<Student> enrolledStudents = new HashSet<Student>();
+			for (int j=0; j != numStudents; j++){
+				Student student = null;
+				do{
+					student = students.get((int)(Math.random() * students.size()));
+				} while (enrolledStudents.contains(student));
+				student.enrolTo(unitCode);
+				uosStudents.add(student);
+			}
+			
+
+			
+			// create projects for this UOS
+			for (int j=0; j != PROJECT_AMOUNT; ++j){
+				Date deadline = new Date(System.currentTimeMillis() + (long)(Math.random() * 1000000000));
+				Project newProject = new Project(unitCode, unitCode + " project " + j, deadline);
+				
+				//create teams for this project
+				for (int k = 0; k != TEAM_AMOUNT; ++k){
+					Team newTeam = new Team(newProject.getID(), "TEAM" + k);
+					
+					//fill the team with students in the UOS
+					for (int l=0; l != TEAM_SIZE; ++l){
+						if (uosStudents.size() == 0){
+							break;
+						}
+						Student teamMember = uosStudents.remove((int)(Math.random() * uosStudents.size()));
+					}
+				}
+			}
+		}
+	}
+	
+	public boolean checkExists(String SID){
+		try{
+			String selectQuery = "SELECT 1"
+							+	" FROM Student"
+							+	" WHERE SID=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setString(1 , SID);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next())
+				return true;
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return false;
+	}
 	
 	/*
 	  * Takes login and returns a hashed pw of that login if the login exists.
@@ -228,6 +372,27 @@ public class DatabaseHandler{
 	  return password;
 	 }
 	 
+	 public String getSID(String unikey){
+		 String SID = null;
+		 try{
+			 String selectQuery = "SELECT SID"
+					 		+	 " FROM Student"
+					 		+	 " WHERE UNIKEY=?"
+					 		;
+			 PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			 stmt.setString(1, unikey);
+			 ResultSet rs = stmt.executeQuery();
+			 if (rs.next()){
+				 SID = rs.getString(1);
+			 }
+			 
+		 }
+		 catch (SQLException e){
+			 e.printStackTrace();
+		 }
+		 return SID;
+	 }
+	 
 	//	--	--	--	--	--	THE FOLLOWING METHODS ARE FOR FETCHING MODELS USING THEIR ID 	--	--	--	--	--	--	--	--	
 	public Project getProject(int projectID){
 		Project matchingProject = projectMap.get(projectID);
@@ -244,7 +409,7 @@ public class DatabaseHandler{
 				PreparedStatement lastUpdateStatement = dbConnection.prepareStatement(lastUpdateQuery);
 				lastUpdateStatement.setInt(1, projectID);
 				ResultSet lastUpdateRs = lastUpdateStatement.executeQuery();
-				Timestamp lastUpdate = (lastUpdateRs.next()? lastUpdateRs.getTimestamp(0) : null);
+				Timestamp lastUpdate = (lastUpdateRs.next()? lastUpdateRs.getTimestamp(1) : null);
 				needsUpdate =  matchingProject.getLastViewed().before(lastUpdate);
 			}
 		
@@ -318,7 +483,7 @@ public class DatabaseHandler{
 				PreparedStatement lastUpdateStatement = dbConnection.prepareStatement(lastUpdateQuery);
 				lastUpdateStatement.setString(1, unitCode);
 				ResultSet lastUpdateRs = lastUpdateStatement.executeQuery();
-				Timestamp lastUpdate = (lastUpdateRs.next()? lastUpdateRs.getTimestamp(0) : null);
+				Timestamp lastUpdate = (lastUpdateRs.next()? lastUpdateRs.getTimestamp(1) : null);
 				needsUpdate =  matchingUOS.getLastViewed().before(lastUpdate);
 			}
 		
@@ -367,7 +532,7 @@ public class DatabaseHandler{
 				PreparedStatement lastUpdateStatement = dbConnection.prepareStatement(lastUpdateQuery);
 				lastUpdateStatement.setString(1, SID);
 				ResultSet lastUpdateRs = lastUpdateStatement.executeQuery();
-				Timestamp lastUpdate = (lastUpdateRs.next()? lastUpdateRs.getTimestamp(0) : null);
+				Timestamp lastUpdate = (lastUpdateRs.next()? lastUpdateRs.getTimestamp(1) : null);
 				needsUpdate =  matchingStudent.getLastViewed().before(lastUpdate);
 			}
 		
@@ -454,8 +619,8 @@ public class DatabaseHandler{
 			if (rs.next()){
 				meeting = new Meeting(meetingID,
 									  rs.getInt("TEAM"),
-									  rs.getTimestamp("START"),
-									  rs.getTimestamp("END"),
+									  rs.getTimestamp("START_TIME"),
+									  rs.getTimestamp("END_TIME"),
 									  rs.getString("LOCATION"));
 				if (meetingMap.get(meetingID) == null){
 					meetingMap.put(meetingID, meeting);
@@ -507,8 +672,9 @@ public class DatabaseHandler{
 		
 		String insertQuery = "INSERT INTO Student"
 						+	" (SID, UNIKEY, PASSWORD, FIRST_NAME, LAST_NAME, PRIMARY_EMAIL, MOBILE, STUDY_LEVEL, ESL, LANGUAGES)"
-						+	" WHERE NOT EXISTS (SELECT 1 FROM Student WHERE SID=?)"
-						+	" VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+						+	" SELECT ?,?,?,?,?,?,?,?,?,?"
+						+	" WHERE NOT EXISTS (SELECT 1 FROM Student WHERE SID=?)";
+						
 		try{
 			PreparedStatement statement = dbConnection.prepareStatement(insertQuery);
 				statement.setString(1, SID);
@@ -532,10 +698,11 @@ public class DatabaseHandler{
 					}
 					languageString += language.toString();
 				}
+
 				statement.setString(10, languageString);
 				statement.setString(11, SID);
 				statement.execute();
-		} catch (SQLException e){
+			} catch (SQLException e){
 			e.printStackTrace();
 		}
 	}
@@ -544,7 +711,7 @@ public class DatabaseHandler{
 		try {
 			String insertQuery = "INSERT INTO UnitOfStudy"
 							+	" (UOS_ID, UOS_NAME, NUM_STUDENTS)"
-							+	" VALUES (?,?,?)"
+							+	" SELECT ?,?,?"
 							+	" WHERE NOT EXISTS (SELECT 1 FROM UnitOfStudy WHERE UOS_ID=?)"
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
@@ -572,7 +739,7 @@ public class DatabaseHandler{
 			stmt.setString(3, recipientSID);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) 
-				id = rs.getInt(0);
+				id = rs.getInt(1);
 		}
 		catch (SQLException e){
 			e.printStackTrace();
@@ -595,7 +762,7 @@ public class DatabaseHandler{
 			stmt.setString(4, name);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next())
-				id = rs.getInt(0);
+				id = rs.getInt(1);
 		}
 		catch (SQLException e){
 			e.printStackTrace();
@@ -603,20 +770,21 @@ public class DatabaseHandler{
 		return id;
 	}
 	
-	public int addProject(String unitCode, Date deadline){
+	public int addProject(String unitCode, String projectName, Date deadline){
 		Integer id = null;
 		try{
 			String insertQuery = "INSERT INTO Project"
-							+	" (UOS_ID, DEADLINE)"
-							+	" VALUES (?,?)"
+							+	" (UOS_ID, NAME, DEADLINE)"
+							+	" VALUES (?,?,?)"
 							+	" RETURNING PROJECT_ID"
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setString(1, unitCode);
-			stmt.setDate(2, deadline);
+			stmt.setString(2, projectName);
+			stmt.setDate(3, deadline);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next())
-				id = rs.getInt(0);
+				id = rs.getInt(1);
 		}
 		catch (SQLException e){
 			e.printStackTrace();
@@ -628,7 +796,7 @@ public class DatabaseHandler{
 		Integer id = null;
 		try{
 			String insertQuery = "INSERT INTO Meeting"
-							+	" (TEAM, START, END)"
+							+	" (TEAM, START_TIME, END_TIME)"
 							+	" VALUES (?,?,?)"
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
@@ -639,7 +807,7 @@ public class DatabaseHandler{
 			stmt.setTimestamp(5, start);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next())
-				id = rs.getInt(0);
+				id = rs.getInt(1);
 		}
 		catch (SQLException e){
 			e.printStackTrace();
@@ -651,8 +819,9 @@ public class DatabaseHandler{
 		try{
 			String insertQuery = "INSERT INTO TeamMembership"
 							+	" (STUDENT, TEAM)"
+							+	" SELECT ?,?"
 							+	" WHERE NOT EXISTS (SELECT 1 FROM TeamMembership WHERE STUDENT=? AND TEAM=?)" //allows re-enrolling when already enrolled to occur without error
-							+	" VALUES (?,?)"
+							
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setString(1, SID);
@@ -680,7 +849,7 @@ public class DatabaseHandler{
 			stmt.setString(3, message);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next())
-				id = rs.getInt(0);
+				id = rs.getInt(1);
 		}
 		catch (SQLException e){
 			e.printStackTrace();
@@ -692,8 +861,9 @@ public class DatabaseHandler{
 		try{
 			String insertQuery = "INSERT INTO Administrator"
 							+	" (STAFF_NUM, UOS)"
+							+	" SELECT ?,?"
 							+	" WHERE NOT EXISTS (SELECT 1 FROM Administrator WHERE STAFF_NUM=? AND UOS=?)" //allows re-applying as administrator when already admin without error
-							+	" VALUES (?,?)"
+							
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setString(1, staffID);
@@ -711,15 +881,15 @@ public class DatabaseHandler{
 		try{
 			String insertQuery = "INSERT INTO Enrolment"
 							+	" (UOS, STUDENT, TUTORIAL_NUM)"
+							+	" SELECT ?,?,?"
 							+	" WHERE NOT EXISTS (SELECT 1 FROM Enrolment WHERE UOS=? AND STUDENT=?)" //allows re-enrolment without throwing an error
-							+	" VALUES (?,?,?)"
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setString(1, unitCode);
 			stmt.setString(2, SID);
-			stmt.setString(3, unitCode);
-			stmt.setString(4, SID);
-			stmt.setInt(5, tutorialNum);
+			stmt.setInt(3, tutorialNum);
+			stmt.setString(4, unitCode);
+			stmt.setString(5, SID);
 			
 			stmt.execute();
 		}
@@ -727,7 +897,7 @@ public class DatabaseHandler{
 			e.printStackTrace();
 		}
 	}
-	
+
 	private String getIDFieldName(String tableName){
 		String idName = "";
 		if (tableName.equals("Student")){
@@ -984,7 +1154,7 @@ public class DatabaseHandler{
 			stmt.setString(1, recipientSID);
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()){
-				int inviteID = rs.getInt(0);
+				int inviteID = rs.getInt(1);
 				Invitation invite = getInvitation(inviteID);
 				invitations.add(invite);
 			}
@@ -992,6 +1162,27 @@ public class DatabaseHandler{
 			e.printStackTrace();
 		}
 		return invitations;
+	}
+	
+	public Integer getTutorialNum(String SID, String unitCode) {
+		Integer tutNum = null;
+		try{
+			String selectQuery = "SELECT TUTORIAL_NUM"
+		
+						+	" FROM Enrolment"
+						+	" WHERE STUDENT=? AND UOS=?"
+						;
+		PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+		stmt.setString(1, SID);
+		stmt.setString(2, unitCode);
+		ResultSet rs = stmt.executeQuery();
+		if (rs.next())
+			tutNum = rs.getInt(1);
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return tutNum;
 	}
 	
 	public ArrayList<Meeting> getMeetings(String SID){
@@ -1005,7 +1196,7 @@ public class DatabaseHandler{
 			stmt.setString(1, SID);
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()){
-				int teamID = rs.getInt(0);
+				int teamID = rs.getInt(1);
 				String meetingQuery = "SELECT MEETING_ID"
 								+	" FROM Meeting"
 								+	" WHERE TEAM_ID=?"
@@ -1014,7 +1205,7 @@ public class DatabaseHandler{
 				meetingStmt.setInt(1, teamID);
 				ResultSet meetingRs = meetingStmt.executeQuery();
 				while (meetingRs.next()){
-					Meeting meeting = getMeeting(meetingRs.getInt(0));
+					Meeting meeting = getMeeting(meetingRs.getInt(1));
 					meetings.add(meeting);
 				}
 			}
@@ -1036,7 +1227,7 @@ public class DatabaseHandler{
 			stmt.setInt(1, projectID);
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()){
-				int teamID = rs.getInt(0);
+				int teamID = rs.getInt(1);
 				Team matchingTeam = getTeam(teamID);
 				teams.add(matchingTeam);
 			}
@@ -1064,7 +1255,7 @@ public class DatabaseHandler{
 			selectStatement.setInt(1, projectID);
 			ResultSet selectRs = selectStatement.executeQuery();
 			if (selectRs.next()){
-				String unitCode = selectRs.getString(0);
+				String unitCode = selectRs.getString(1);
 				matchingUOS = getUnitOfStudy(unitCode);
 			}
 		} 
@@ -1085,7 +1276,7 @@ public class DatabaseHandler{
 			selectStatement.setString(1, SID);
 			ResultSet selectRs = selectStatement.executeQuery();
 			while (selectRs.next()){
-				String unitCode = selectRs.getString(0);
+				String unitCode = selectRs.getString(1);
 				UnitOfStudy matchingUOS = getUnitOfStudy(unitCode);
 				subjects.add(matchingUOS);
 			}
@@ -1106,7 +1297,7 @@ public class DatabaseHandler{
 			stmt.setInt(1, teamID);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()){
-				int projectID = rs.getInt(0);
+				int projectID = rs.getInt(1);
 				matchingProject = getProject(projectID);
 			}
 		}
@@ -1127,7 +1318,7 @@ public class DatabaseHandler{
 			stmt.setInt(1, teamID);
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()){
-				String sid = rs.getString(0);
+				String sid = rs.getString(1);
 				Student matchingStudent = getStudent(sid);
 				teamMembers.add(matchingStudent);
 			}
@@ -1149,7 +1340,7 @@ public class DatabaseHandler{
 			stmt.setString(1, sid);
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()){
-				int teamID = rs.getInt(0);
+				int teamID = rs.getInt(1);
 				Team matchingTeam = getTeam(teamID);
 				studentsTeams.add(matchingTeam);
 			}
@@ -1198,4 +1389,5 @@ public class DatabaseHandler{
 		}
 		return columnNames;
 	}
+
 }

@@ -9,8 +9,7 @@ import friendzone.elec3609.service.DatabaseHandler;
 
 public class Meeting {
 	
-	@Autowired
-	DatabaseHandler dbHandler;
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	private final String TABLE_NAME = "Meeting";
 	
@@ -27,6 +26,9 @@ public class Meeting {
 		setLocation(location);
 	}
 	
+	/**
+	 * This constructor is used by the DatabaseHandler - it does not perform an insert into the database, instead it creates a local Meeting object that will send updates to the meeting in the database with MEETING_ID = id
+	 */
 	public Meeting(int id, int teamID, Timestamp start, Timestamp end, String location){
 		this.teamID = teamID;
 		this.start = start;

@@ -10,8 +10,7 @@ import friendzone.elec3609.service.DatabaseHandler;
 
 public class Team {
 
-	@Autowired
-	DatabaseHandler dbHandler;
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	private final String TABLE_NAME = "Team";
 	
