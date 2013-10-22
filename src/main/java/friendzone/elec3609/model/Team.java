@@ -2,47 +2,63 @@ package friendzone.elec3609.model;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import friendzone.elec3609.service.DatabaseHandler;
 
 
 public class Team {
 
-	//Variables
-	int id;
-	Project parent;
-	List<Student> members = new ArrayList<Student>();
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
-	//Constructor
-	public Team(int id, Project parent){
-		setProject(parent);
-		setID(id);
+	private final String TABLE_NAME = "Team";
+	
+	int id;
+	int projectID;
+	String name;
+	Date lastViewed;
+	
+	public Team(int projectID, String name){
+		this.name = name;
+		this.projectID = projectID;
+		id = dbHandler.addTeam(projectID, name);
+		lastViewed = new Date(System.currentTimeMillis());
 	}
 	
-	//Get Variable Functions
+	public Team(int id, int projectID, String name){
+		this.name = name;
+		this.projectID = projectID;
+		this.id = id;
+		lastViewed = new Date(System.currentTimeMillis());
+	}
+	
 	public int getID(){
 		return id;
 	}
 	
+	public String getName(){
+		return name;
+	}
+	
+	public void setName(String name){
+		this.name = name;
+		dbHandler.update(TABLE_NAME, id, "NAME", name);
+	}
+	
+	public ArrayList<Student> getMembers(){
+		return dbHandler.getMembers(id);
+	}
+	
 	public Project getProject(){
-		return parent;
+		return dbHandler.getParent(id);
+	}
+
+	public void copyValues(Team team) {
+		this.id = team.id;
+		this.name = team.name;
+		this.projectID = team.projectID;
+		this.lastViewed = team.lastViewed;
 	}
 	
-	public List<Student> getMembers(){
-		return members;
-	}
-	
-	//Set Variable Functions
-	public void setID(int id){
-		this.id = id;
-	}
-	
-	public void setProject(Project parent)throws IllegalArgumentException{
-		if (parent == null)
-			throw new IllegalArgumentException();
-		this.parent = parent;
-	}
-	
-	public void setMembers(List<Student> members){
-		this.members = members;
-	}
 }

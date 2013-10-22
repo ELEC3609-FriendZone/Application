@@ -21,13 +21,12 @@ import friendzone.elec3609.service.DatabaseHandler;
 @Controller
 public class RegistrationController {
 
-	@Autowired
-	DatabaseHandler dbHandler;
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	@RequestMapping("/registration")
 	public String getEnums(Map<String, Object> map){
 		map.put("programmingLanguages", ProgrammingLanguage.getNames());
-		map.put("roles", Role.getNames());
+		map.put("roles", Role.getNames());	
 		map.put("socialMediaProviders", SocialMedia.Provider.getNames());
 		map.put("studyLevels", StudyLevel.getNames());
 		return "registration";
@@ -35,27 +34,27 @@ public class RegistrationController {
 	
 	@RequestMapping("/registration/add")
 	public String addStudent(HttpServletRequest request){
-		Student student = new Student(
-										request.getParameter("sid"),
-										request.getParameter("unikey"),
-										request.getParameter("firstName"),
-										request.getParameter("lastName"),
-										request.getParameter("primaryEmail"),
-										request.getParameter("mobile"),
-										StudyLevel.findMatch(request.getParameter("studyLevel")),
-										Boolean.parseBoolean(request.getParameter("esl"))
-									 );
-		student.setExperience(request.getParameter("experience"));
-		student.setCourse(request.getParameter("course"));
-		student.setSecondaryEmail(request.getParameter("secondaryEmail"));
 		
 		String[] languageStrings = request.getParameterValues("languages");
 		ProgrammingLanguage[] languages = new ProgrammingLanguage[languageStrings.length];
 		for (int i = 0; i != languageStrings.length; ++i){
 			languages[i] = ProgrammingLanguage.findMatch(languageStrings[i]);
 		}
-		student.setLanguages(languages);
-		dbHandler.addStudent(student);
+		Student student = new Student(
+										request.getParameter("sid"),
+										request.getParameter("unikey"),
+										request.getParameter("password"),
+										request.getParameter("firstName"),
+										request.getParameter("lastName"),
+										request.getParameter("primaryEmail"),
+										request.getParameter("mobile"),
+										StudyLevel.findMatch(request.getParameter("studyLevel")),
+										Boolean.parseBoolean(request.getParameter("esl")), 
+										languages
+									 );
+		student.setExperience(request.getParameter("experience"));
+		student.setCourse(request.getParameter("course"));
+		student.setSecondaryEmail(request.getParameter("secondaryEmail"));
 		return "redirect:/"; //return to index page
 	}
 }
