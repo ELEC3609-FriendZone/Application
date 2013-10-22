@@ -565,7 +565,6 @@ public class DatabaseHandler{
 				Timestamp lastUpdate = (lastUpdateRs.next()? lastUpdateRs.getTimestamp(1) : null);
 				needsUpdate =  matchingStudent.getLastViewed().before(lastUpdate);
 			}
-		
 			if (needsUpdate){
 				String fetchQuery =	"SELECT *"
 							+	"	FROM Student"
@@ -575,6 +574,7 @@ public class DatabaseHandler{
 				statement.setString(1, SID);
 				ResultSet rs = statement.executeQuery();
 				if (rs.next()){ // using if instead of while since there can only be 1 result
+					System.out.println("Student exists!");
 					String languageString = rs.getString("LANGUAGES");
 					String[] languageNames = languageString.split(",");
 					ProgrammingLanguage[] languages = new ProgrammingLanguage[languageNames.length];
@@ -593,6 +593,11 @@ public class DatabaseHandler{
 							 rs.getBoolean("ESL"),
 							 languages);
 					
+					System.out.println("Unikey: " + matchingStudent.getUnikey()
+									+  "First Name: " + matchingStudent.getFirstName()
+									+  "Last Name: " + matchingStudent.getLastName()
+									+  "Mobile: " + matchingStudent.getMobile());
+
 					if (studentMap.get(SID) == null){
 						studentMap.put(SID, matchingStudent);
 					}
@@ -602,22 +607,34 @@ public class DatabaseHandler{
 					matchingStudent = studentMap.get(SID);
 					
 					//The constructor takes all the "NOT NULL" values, but there are others that can exist
-					String[] socialMediaComponents = rs.getString("SOCIAL_MEDIA_1").split(":");
-					Provider provider = SocialMedia.Provider.findMatch(socialMediaComponents[0]);
-					String address = socialMediaComponents[1].trim();
-					matchingStudent.setFirstSocialMedia(provider, address);
+					if (rs.getString("SOCIAL_MEDIA_1") != null){
+						String[] socialMediaComponents = rs.getString("SOCIAL_MEDIA_1").split(":");
+						Provider provider = SocialMedia.Provider.findMatch(socialMediaComponents[0]);
+						String address = socialMediaComponents[1].trim();
+						matchingStudent.setFirstSocialMedia(provider, address);
+					}
+					else{
+						matchingStudent.setFirstSocialMedia(null, null);
+					}
 					
-					socialMediaComponents = rs.getString("SOCIAL_MEDIA_2").split(":");
-					provider = SocialMedia.Provider.findMatch(socialMediaComponents[0]);
-					address = socialMediaComponents[1].trim();
-					matchingStudent.setSecondSocialMedia(provider, address);
+					if (rs.getString("SOCIAL_MEDIA_2") != null){
+						String[] socialMediaComponents = rs.getString("SOCIAL_MEDIA_2").split(":");
+						Provider provider = SocialMedia.Provider.findMatch(socialMediaComponents[0]);
+						String address = socialMediaComponents[1].trim();
+						matchingStudent.setSecondSocialMedia(provider, address);
+					}
+					else{
+						matchingStudent.setSecondSocialMedia(null, null);
+					}
 					
-					Array availArray = rs.getArray("AVAILABILITY");
 					boolean[][] twoDimensionalAvail = new boolean[7][12];
-					Boolean[] oneDimensionalAvail = (Boolean[])availArray.getArray();
-					for (int i = 0; i != twoDimensionalAvail.length; ++i){
-						for (int j = 0; j != twoDimensionalAvail[i].length; ++j){
-							twoDimensionalAvail[i][j] = oneDimensionalAvail[i * twoDimensionalAvail.length + j];
+					if (rs.getArray("AVAILABILITY") != null){
+						Array availArray = rs.getArray("AVAILABILITY");
+						Boolean[] oneDimensionalAvail = (Boolean[])availArray.getArray();
+						for (int i = 0; i != twoDimensionalAvail.length; ++i){
+							for (int j = 0; j != twoDimensionalAvail[i].length; ++j){
+								twoDimensionalAvail[i][j] = oneDimensionalAvail[i * twoDimensionalAvail.length + j];
+							}
 						}
 					}
 					matchingStudent.setAvailability(twoDimensionalAvail);
@@ -625,8 +642,7 @@ public class DatabaseHandler{
 					matchingStudent.setCourse(rs.getString("COURSE"));
 					matchingStudent.setSecondaryEmail(rs.getString("SECONDARY_EMAIL"));
 					matchingStudent.setExperience(rs.getString("EXPERIENCE"));
-					matchingStudent.setStudyLevel(StudyLevel.findMatch(rs.getString("STUDY_LEVEL")));
-					matchingStudent.setPreferredRole(Role.findMatch(rs.getString("PREFERRED_ROLE")));
+					matchingStudent.setPreferredRole(Role.findMatch((rs.getString("PREFERRED_ROLE") == null? null : rs.getString("PREFERRED_ROLE"))));
 				}
 			}
 		} catch (SQLException e){
@@ -960,17 +976,15 @@ public class DatabaseHandler{
 	//	--	--	--	--	--	--	--	--	--	THE FOLLOWING METHODS ARE USED TO UPDATE ENTRIES IN THE DATABASE --	--	--	--	--	--	--	--
 	public void update(String tableName, String identifier, String fieldName, String newValue){
 		try{
-			String updateQuery = "UPDATE ?"
-							+	" SET ?=?"
-							+	" WHERE ?=?"
-							;
 			String idName = getIDFieldName(tableName);
+			String updateQuery = "UPDATE " + tableName 
+							+	" SET " + fieldName + "=?"
+							+	" WHERE " + idName + "=?"
+							;
+			
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
-			stmt.setString(1, tableName);
-			stmt.setString(2, fieldName);
-			stmt.setString(3, newValue);
-			stmt.setString(4, idName);
-			stmt.setString(5, identifier);
+			stmt.setString(1, newValue);
+			stmt.setString(2, identifier);
 			stmt.execute();
 		}
 		catch (SQLException e){
@@ -980,17 +994,15 @@ public class DatabaseHandler{
 	
 	public void update(String tableName, String identifier, String fieldName, boolean newValue){
 		try{
-			String updateQuery = "UPDATE ?"
-							+	" SET ?=?"
-							+	" WHERE ?=?"
-							;
 			String idName = getIDFieldName(tableName);
+			String updateQuery = "UPDATE " + tableName 
+							+	" SET " + fieldName + "=?"
+							+	" WHERE " + idName + "=?"
+							;
+			
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
-			stmt.setString(1, tableName);
-			stmt.setString(2, fieldName);
-			stmt.setBoolean(3, newValue);
-			stmt.setString(4, idName);
-			stmt.setString(5, identifier);
+			stmt.setBoolean(1, newValue);
+			stmt.setString(2, identifier);
 			stmt.execute();
 		}
 		catch (SQLException e){
@@ -1000,17 +1012,15 @@ public class DatabaseHandler{
 	
 	public void update(String tableName, int identifier, String fieldName, String newValue){
 		try{
-			String updateQuery = "UPDATE ?"
-							+	" SET ?=?"
-							+	" WHERE ?=?"
-							;
 			String idName = getIDFieldName(tableName);
+			String updateQuery = "UPDATE " + tableName 
+							+	" SET " + fieldName + "=?"
+							+	" WHERE " + idName + "=?"
+							;
+			
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
-			stmt.setString(1, tableName);
-			stmt.setString(2, fieldName);
-			stmt.setString(3, newValue);
-			stmt.setString(4, idName);
-			stmt.setInt(5, identifier);
+			stmt.setString(1, newValue);
+			stmt.setInt(2, identifier);
 			stmt.execute();
 		}
 		catch (SQLException e){
@@ -1020,17 +1030,15 @@ public class DatabaseHandler{
 	
 	public void update(String tableName, String identifier, String fieldName, int newValue){
 		try{
-			String updateQuery = "UPDATE ?"
-							+	" SET ?=?"
-							+	" WHERE ?=?"
-							;
 			String idName = getIDFieldName(tableName);
+			String updateQuery = "UPDATE " + tableName 
+							+	" SET " + fieldName + "=?"
+							+	" WHERE " + idName + "=?"
+							;
+			
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
-			stmt.setString(1, tableName);
-			stmt.setString(2, fieldName);
-			stmt.setInt(3, newValue);
-			stmt.setString(4, idName);
-			stmt.setString(5, identifier);
+			stmt.setInt(1, newValue);
+			stmt.setString(2, identifier);
 			stmt.execute();
 		}
 		catch (SQLException e){
@@ -1040,18 +1048,15 @@ public class DatabaseHandler{
 	
 	public void update(String tableName, int identifier, String fieldName, int newValue){
 		try{
-			String updateQuery = "UPDATE ?"
-							+	" SET ?=?"
-							+	" WHERE ?=?"
-							;
-
 			String idName = getIDFieldName(tableName);
+			String updateQuery = "UPDATE " + tableName 
+							+	" SET " + fieldName + "=?"
+							+	" WHERE " + idName + "=?"
+							;
+			
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
-			stmt.setString(1, tableName);
-			stmt.setString(2, fieldName);
-			stmt.setInt(3, newValue);
-			stmt.setString(4, idName);
-			stmt.setInt(5, identifier);
+			stmt.setInt(1, newValue);
+			stmt.setInt(2, identifier);
 			stmt.execute();
 		}
 		catch (SQLException e){
@@ -1061,18 +1066,15 @@ public class DatabaseHandler{
 	
 	public void update(String tableName, String identifier, String fieldName, Date newValue){
 		try{
-			String updateQuery = "UPDATE ?"
-							+	" SET ?=?"
-							+	" WHERE ?=?"
-							;
-
 			String idName = getIDFieldName(tableName);
+			String updateQuery = "UPDATE " + tableName 
+							+	" SET " + fieldName + "=?"
+							+	" WHERE " + idName + "=?"
+							;
+			
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
-			stmt.setString(1, tableName);
-			stmt.setString(2, fieldName);
-			stmt.setDate(3, newValue);
-			stmt.setString(4, idName);
-			stmt.setString(5, identifier);
+			stmt.setDate(1, newValue);
+			stmt.setString(2, identifier);
 			stmt.execute();
 		}
 		catch (SQLException e){
@@ -1082,18 +1084,15 @@ public class DatabaseHandler{
 	
 	public void update(String tableName, int identifier, String fieldName, Date newValue){
 		try{
-			String updateQuery = "UPDATE ?"
-							+	" SET ?=?"
-							+	" WHERE ?=?"
-							;
-
 			String idName = getIDFieldName(tableName);
+			String updateQuery = "UPDATE " + tableName 
+							+	" SET " + fieldName + "=?"
+							+	" WHERE " + idName + "=?"
+							;
+			
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
-			stmt.setString(1, tableName);
-			stmt.setString(2, fieldName);
-			stmt.setDate(3, newValue);
-			stmt.setString(4, idName);
-			stmt.setInt(5, identifier);
+			stmt.setDate(1, newValue);
+			stmt.setInt(2, identifier);
 			stmt.execute();
 		}
 		catch (SQLException e){
@@ -1103,18 +1102,15 @@ public class DatabaseHandler{
 	
 	public void update(String tableName, String identifier, String fieldName, Timestamp newValue){
 		try{
-			String updateQuery = "UPDATE ?"
-							+	" SET ?=?"
-							+	" WHERE ?=?"
-							;
-
 			String idName = getIDFieldName(tableName);
+			String updateQuery = "UPDATE " + tableName 
+							+	" SET " + fieldName + "=?"
+							+	" WHERE " + idName + "=?"
+							;
+			
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
-			stmt.setString(1, tableName);
-			stmt.setString(2, fieldName);
-			stmt.setTimestamp(3, newValue);
-			stmt.setString(4, idName);
-			stmt.setString(5, identifier);
+			stmt.setTimestamp(1, newValue);
+			stmt.setString(2, identifier);
 			stmt.execute();
 		}
 		catch (SQLException e){
@@ -1124,18 +1120,15 @@ public class DatabaseHandler{
 	
 	public void update(String tableName, int identifier, String fieldName, Timestamp newValue){
 		try{
-			String updateQuery = "UPDATE ?"
-							+	" SET ?=?"
-							+	" WHERE ?=?"
-							;
-
 			String idName = getIDFieldName(tableName);
+			String updateQuery = "UPDATE " + tableName 
+							+	" SET " + fieldName + "=?"
+							+	" WHERE " + idName + "=?"
+							;
+			
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
-			stmt.setString(1, tableName);
-			stmt.setString(2, fieldName);
-			stmt.setTimestamp(3, newValue);
-			stmt.setString(4, idName);
-			stmt.setInt(5, identifier);
+			stmt.setTimestamp(1, newValue);
+			stmt.setInt(2, identifier);
 			stmt.execute();
 		}
 		catch (SQLException e){
@@ -1145,15 +1138,13 @@ public class DatabaseHandler{
 	
 	public void update(String tableName, String identifier, String fieldName, boolean[][] newValue){
 		try {
-			String updateQuery = "UPDATE ?"
-							+	" SET ?=?"
-							+	" WHERE ?=?"
+			String idName = getIDFieldName(tableName);
+			String updateQuery = "UPDATE " + tableName 
+							+	" SET " + fieldName + "=?"
+							+	" WHERE " + idName + "=?"
 							;
 
-			String idName = getIDFieldName(tableName);
 			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
-			stmt.setString(1, tableName);
-			stmt.setString(2, fieldName);
 			Boolean[] oneDimensionalAvail = new Boolean[84];
 			boolean[][] twoDimensionalAvail = newValue;
 			for (int i = 0; i != twoDimensionalAvail.length ; ++i){
@@ -1162,9 +1153,8 @@ public class DatabaseHandler{
 				}
 			}
 			Array availArray = dbConnection.createArrayOf("boolean", oneDimensionalAvail);
-			stmt.setArray(3, availArray);
-			stmt.setString(4, idName);
-			stmt.setString(5, identifier);
+			stmt.setArray(1, availArray);
+			stmt.setString(2, identifier);
 			stmt.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
