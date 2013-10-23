@@ -25,7 +25,7 @@ public class MainHomeController {
 	// test login sbro3659 password
 	@RequestMapping(value ="/mainHome", method = RequestMethod.POST)
 	public String loginValidation(HttpServletRequest request, 
-			Model model){
+			Model model, Map<String, Object> map){
 		
 /** This log-in code should work but I'll leave the dummy data for now		
 */
@@ -63,12 +63,16 @@ public class MainHomeController {
 		// if they have not yet entered a group or with to join a group.
 		List<UnitOfStudy> subjectList = student.getSubjects();
 		
+		// within each unit of study there are list of projects
 		List<List<Project>> projects = new ArrayList<List<Project>>(); 
 		
 		for (UnitOfStudy uos: subjectList){
 			System.out.println(uos.getUnitCode());
 			projects.add(uos.getProjects());
 		}
+		
+		map.put("units", projects);
+		
 		
 		if(projects.size() != 0 ) {
 			for (List<Project> il: projects) {
@@ -81,7 +85,7 @@ public class MainHomeController {
 		//SUBJECT
 		//	PROJECT
 		//form action=post name="id" value = projects.get(0).get(0).getId()> group 1
-				
+		model.addAttribute("student", student);
 		return "mainHome";
 	}
 

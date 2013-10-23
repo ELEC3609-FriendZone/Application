@@ -14,9 +14,12 @@
 			<ul class="group-grid">
 				<li class="group-box">
 					<h2> Group 1 </h2>
-					<form method="post" action="/group/ "name="projId" value = projects.get(0).get(0).getId()>
+					
+					
+					<form method="GET" action="/group/ "name="projId" value = ${project.getId()}>
 						<input type="submit", value="Go to group">
-					</form>
+					</form>	
+					
 						
 				</li>
 				<li class="group-box">
