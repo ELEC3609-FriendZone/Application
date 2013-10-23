@@ -22,7 +22,7 @@ import friendzone.elec3609.service.DatabaseHandler;
 public class MainHomeController {
 
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
-	
+	// test login sbro3659 password
 	@RequestMapping(value ="/mainHome", method = RequestMethod.POST)
 	public String loginValidation(HttpServletRequest request, 
 			Model model){
@@ -43,6 +43,8 @@ public class MainHomeController {
 		// checks if the student is currently in team (should show in views the selection of current groups)
 		List<Team> teamList = student.getTeams();
 		
+		
+		
 		// checks if the student is currently enrolled in subjects. this is for the list for students to choose
 		// if they have not yet entered a group or with to join a group.
 		List<UnitOfStudy> subjectList = student.getSubjects();
@@ -52,6 +54,12 @@ public class MainHomeController {
 		for (UnitOfStudy uos: subjectList){
 			projects.add(uos.getProjects());
 		}
+		
+		// use it like this when u link to group form action=post name="id"
+		//SUBJECT
+		//	PROJECT
+		//form action=post name="id" value = projects.get(0).get(0)> group 1
+		
 		
 		model.addAttribute("student", student);
 		return "mainHome";
