@@ -4,12 +4,15 @@ import org.springframework.stereotype.Service;
 
 import friendzone.elec3609.model.Project;
 
-@Service
-public class GroupFormer {
+public class GroupFormer implements Runnable {
 	
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
-	public void createGroups(Project project){
+	public GroupFormer(Project project){
+		
+	}
+
+	public void run() {
 		
 	}
 	
