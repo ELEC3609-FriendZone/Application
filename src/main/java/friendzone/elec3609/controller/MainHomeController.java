@@ -1,5 +1,7 @@
 package friendzone.elec3609.controller;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -20,32 +22,82 @@ import friendzone.elec3609.service.DatabaseHandler;
 public class MainHomeController {
 
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
-	
+	// test login sbro3659 password
 	@RequestMapping(value ="/mainHome", method = RequestMethod.POST)
 	public String loginValidation(HttpServletRequest request, 
 			Model model){
-		if(request.getParameter("password") == null || request.getParameter("username") == null)
+		
+/** This log-in code should work but I'll leave the dummy data for now		
+*/
+		String unikey = request.getParameter("username");
+		String enteredPassword = dbHandler.hashPassword(request.getParameter("password"));
+		System.out.println("Hashed input length=" + enteredPassword.length() + ", value=" + enteredPassword);
+		String actualPassword = null;
+		
+		if(unikey == null || enteredPassword == null){
+			//should tell user to fill in all fields
+			System.out.println("Fields left empty");
 			return "redirect:/";
-		if(!(request.getParameter("password").matches("poopoo")) || !(request.getParameter("username").matches("joseph")))
+		}
+		
+		if ((actualPassword = dbHandler.getAuthentication(unikey)) == null){
+			//should tell user that an account doesn't exist for this unikey
+			System.out.println("User doesn't exist");
 			return "redirect:/";
+		}
 		
-		//if(!checkAuthentication(map.get("password").toString(), map.get("username").toString()))
-			//return "redirect:/";
+
 		
-		// test for now
-		Student student = new Student("310278570", "jcho2360", "password", "Joon", "Choi", 
-									"jcho2360@uni.sydney.edu.au", "0420799956",
-									StudyLevel.findMatch("Undergraduate") , 
-									false, new ProgrammingLanguage[] {ProgrammingLanguage.findMatch("C++")});
 		
-		// checks if the student is currently in team (should show in views the selection of current groups)
-		List<Team> teamList = student.getTeams();
+		
+		
+		
+		if (!enteredPassword.matches(actualPassword)) {
+			//should tell the user the password is incorrect
+			System.out.println("Wrong password: entered " + "\"" + enteredPassword + "\"" + " expected " + "\"" + actualPassword + "\"");
+			return "redirect:/";
+		}
+		
+		// if we reach this point, we know student exists and password is correct so just grab the student object and add it to the session attributes
+		Student student = dbHandler.getStudent(dbHandler.getSID(unikey));
 		
 		// checks if the student is currently enrolled in subjects. this is for the list for students to choose
 		// if they have not yet entered a group or with to join a group.
 		List<UnitOfStudy> subjectList = student.getSubjects();
 		
+		List<List<Project>> projects = new ArrayList<List<Project>>(); 
+		
+		for (UnitOfStudy uos: subjectList){
+			projects.add(uos.getProjects());
+		}
+		
+		// use it like this when u link to group form action=post name="id"
+		//SUBJECT
+		//	PROJECT
+		//form action=post name="id" value = projects.get(0).get(0)> group 1
+				
 		model.addAttribute("student", student);
+
+//		if(!(request.getParameter("password").matches("poopoo")) || !(request.getParameter("username").matches("joseph")))
+//			return "redirect:/";
+//		
+//		//if(!checkAuthentication(map.get("password").toString(), map.get("username").toString()))
+//			//return "redirect:/";
+//		
+//		// test for now
+//		Student student = new Student("310278570", "jcho2360", "password", "Joon", "Choi", 
+//									"jcho2360@uni.sydney.edu.au", "0420799956",
+//									StudyLevel.findMatch("Undergraduate") , 
+//									false, new ProgrammingLanguage[] {ProgrammingLanguage.findMatch("C++")});
+//		
+//		// checks if the student is currently in team (should show in views the selection of current groups)
+//		List<Team> teamList = student.getTeams();
+//		
+//		// checks if the student is currently enrolled in subjects. this is for the list for students to choose
+//		// if they have not yet entered a group or with to join a group.
+//		List<UnitOfStudy> subjectList = student.getSubjects();
+//		
+//		model.addAttribute("student", student);
 		return "mainHome";
 	}
 

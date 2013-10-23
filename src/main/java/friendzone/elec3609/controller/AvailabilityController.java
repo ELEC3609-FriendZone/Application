@@ -45,8 +45,8 @@ public class AvailabilityController {
 		//storing the data of availability
 		//availability information
 
-		student.setAvailability(availability);
-
+		//student.setAvailability(availability);
+		
 		
 		//Converts the given 2d Boolean array into strings
 		//Corresponding to their respective days
