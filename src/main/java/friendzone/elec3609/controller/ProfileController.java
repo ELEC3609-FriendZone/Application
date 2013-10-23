@@ -25,7 +25,7 @@ public class ProfileController {
 
 //Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[]{ProgrammingLanguage.C, ProgrammingLanguage.CPLUSPLUS});
 	
-
+	Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[]{ProgrammingLanguage.C, ProgrammingLanguage.CPLUSPLUS});
 	
 	@RequestMapping("/profile")
 	public String getEnums(Map<String, Object> map){
@@ -67,7 +67,10 @@ public class ProfileController {
 		System.out.println("LOOK HERE");
 		System.out.println("LOOK HERE");
 		System.out.println("LOOK HERE");
-		System.out.println(dbHandler.getSID("akel6619"));
+		System.out.println(dbHandler.getSID("abcd1234"));
+		//System.out.println(dbHandler.getStudent("372408185"));
+		
+		
 		
 //		System.out.println("LOOK HERE");
 //		if(dbHandler.getStudent(dbHandler.getSID("akel6619")).getFirstName().toString().equals(null))
