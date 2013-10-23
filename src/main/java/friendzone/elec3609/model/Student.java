@@ -216,6 +216,11 @@ public class Student{
 		return dbHandler.getTeams(SID);
 	}
 	
+	
+	public List<Team> getTeamsByProjID(int projectID) {
+		return dbHandler.getTeams(projectID);
+	}
+
 	public void copyValues(Student student){
 		this.SID = student.SID;
 		this.unikey = student.unikey;
@@ -246,4 +251,6 @@ public class Student{
 	public int getTutorialNum(String unitCode){
 		return dbHandler.getTutorialNum(SID, unitCode);
 	}
+	
+
 }
