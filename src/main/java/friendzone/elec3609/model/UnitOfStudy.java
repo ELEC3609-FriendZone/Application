@@ -79,4 +79,9 @@ public class UnitOfStudy {
 		this.lastViewed = uos.lastViewed;
 		
 	}
+	
+	public List<Student> getStudents() {
+		return dbHandler.getStudentsInUoS(unitCode);
+		
+	}
 }

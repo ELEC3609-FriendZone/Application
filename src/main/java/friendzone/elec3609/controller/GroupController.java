@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import friendzone.elec3609.model.Invitation;
+import friendzone.elec3609.model.Project;
 import friendzone.elec3609.model.Student;
 import friendzone.elec3609.model.Team;
+import friendzone.elec3609.model.UnitOfStudy;
 import friendzone.elec3609.service.DatabaseHandler;
 
 @Controller
@@ -26,13 +29,17 @@ public class GroupController {
 
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
-	@RequestMapping(value = "/group", method = RequestMethod.GET)
-	public String viewTeam(@ModelAttribute("student") Student student, HttpServletRequest request ){
+	@RequestMapping(value = "/group", method = RequestMethod.POST)
+	public String viewProject(@ModelAttribute("student") Student student, HttpServletRequest request ){
 		
 		// test print out
 		System.out.println(student.getFirstName().toString());
+		System.out.println(request.getParameter("projID"));
 		
-		Team team = dbHandler.getTeam(1);
+		Team team = dbHandler.getTeam(Integer.parseInt(request.getParameter("projId")));
+		System.out.println(team.getName().toString());
+		//if(team == null)
+			
 		// Team team = dbHandler.getTeam(request.getParameter("id") team id
 		
 		ArrayList<Student> memberList = team.getMembers();
@@ -45,8 +52,26 @@ public class GroupController {
 	}
 	
 	@RequestMapping("/group/invite")
-	public String inviteFriends(@ModelAttribute("student") Student student) {
+	public String inviteFriends(@ModelAttribute("student") Student student, HttpServletRequest request) {
+		Team currentTeam = student.getTeam(Integer.parseInt(request.getParameter("projID")));
+		boolean isInTeam;
+		if(currentTeam == null)
+			isInTeam = false;
+		else
+			isInTeam = true;
 		
+		// makes a uos object by first getting a project Object using proj id param
+		UnitOfStudy currentUoS = dbHandler.getProject(Integer.parseInt(request.getParameter("projID"))).getParent();
+		// this includes the user student as well so omit themself in the view when printing
+		List<Student> studentListInSelectedProj = dbHandler.getStudentsInUoS(currentUoS.getUnitCode());
+		
+		return "group_invite";
+	}
+	
+	@RequestMapping(value = "/group/invite", method = RequestMethod.POST)
+	public String createInvitation(@ModelAttribute("student") Student student, HttpServletRequest request) {
+		Team currentTeam = student.getTeam(Integer.parseInt(request.getParameter("projID")));
+		//Invitation invite = new Invitation()
 		return "group_invite";
 	}
 	

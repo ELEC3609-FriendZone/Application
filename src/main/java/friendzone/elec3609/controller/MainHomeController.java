@@ -46,10 +46,6 @@ public class MainHomeController {
 			return "redirect:/";
 		}
 		
-
-		
-		
-		
 		
 		
 		if (!enteredPassword.matches(actualPassword)) {
@@ -68,13 +64,21 @@ public class MainHomeController {
 		List<List<Project>> projects = new ArrayList<List<Project>>(); 
 		
 		for (UnitOfStudy uos: subjectList){
+			System.out.println(uos.getUnitCode());
 			projects.add(uos.getProjects());
+		}
+		
+		if(projects.size() != 0 ) {
+			for (List<Project> il: projects) {
+				
+				System.out.println(il);
+			}
 		}
 		
 		// use it like this when u link to group form action=post name="id"
 		//SUBJECT
 		//	PROJECT
-		//form action=post name="id" value = projects.get(0).get(0)> group 1
+		//form action=post name="id" value = projects.get(0).get(0).getId()> group 1
 				
 		model.addAttribute("student", student);
 
