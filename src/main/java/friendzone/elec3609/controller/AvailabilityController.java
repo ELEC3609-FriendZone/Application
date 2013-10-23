@@ -2,11 +2,16 @@ package friendzone.elec3609.controller;
 
 import java.util.Map;
 
+
 import javax.servlet.http.HttpServletRequest;
 
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import friendzone.elec3609.model.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import friendzone.elec3609.service.DatabaseHandler;
 
@@ -19,12 +24,12 @@ public class AvailabilityController {
 
 	//Dummy Data For now, so i can test the content on the page
 
-/**
+
 	Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[] {ProgrammingLanguage.C, ProgrammingLanguage.JAVA});
-	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
-	Project project = new Project(uos.getUnitCode(),  new java.sql.Date(8099,10,15));
-	Team team = new Team(project.getID(), "FriendZone");
-	
+//	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
+//	Project project = new Project(uos.getUnitCode(),  "aProject",new java.sql.Date(8099,10,15));
+//	Team team = new Team(project.getID(), "FriendZone");
+//	
 	//Dummy boolean availability data
 	boolean[][] availability = new boolean[][]{{true, true, false, false, true, false, true, false, false, false, true, false},
 												{true, true, false, false, true, true, false, true, true, false, true, false},
@@ -33,14 +38,14 @@ public class AvailabilityController {
 												{true, false, false, true, false, false, false, true, true, false, true, false},
 												{false, true, false, false, true, false, true, false, false, false, true, false},
 												{true, true, false, true, false, false, true, true, false, false, true, false}};									
-*/
+
 	
 	@RequestMapping("/availability")
 	public String getEnums(Map<String, Object> map){
 		//storing the data of availability
 		//availability information
-/**
-		student.setAvailability(availability);
+
+		//student.setAvailability(availability);
 
 		
 		//Converts the given 2d Boolean array into strings
@@ -66,12 +71,12 @@ public class AvailabilityController {
 			
 
 
-		//The heading of the page will include the Unit Of Study Details
-		map.put("unitcode", uos.getUnitCode());
-		map.put("unitname", uos.getUnitName());
-		
-		//The side bar of the page, includes team member details
-		map.put("team", team.getMembers());
+//		//The heading of the page will include the Unit Of Study Details
+//		map.put("unitcode", uos.getUnitCode());
+//		map.put("unitname", uos.getUnitName());
+//		
+//		//The side bar of the page, includes team member details
+//		map.put("team", team.getMembers());
 		
 		//The availability Stuff for the body information
 		//Corresponding to their respective days
@@ -84,7 +89,7 @@ public class AvailabilityController {
 		map.put("availabilitySunday", availSundayStrings);
 		
 		//return page		 
-*/
+
 		
 		return "availability";
 		
@@ -93,7 +98,7 @@ public class AvailabilityController {
 	@RequestMapping("/availability/change")
 	public String changeAvailability(HttpServletRequest request){
 		//New 2D boolean array for the availability
-		/**boolean[][] newAvailability = new boolean[7][12];
+		boolean[][] newAvailability = new boolean[7][12];
 		String s;
 		
 		//Checks if the parameter exists
@@ -115,7 +120,7 @@ public class AvailabilityController {
 
 		//Sets the students availability to the new availability
 		student.setAvailability(newAvailability);
-		*/
+		
 		return "redirect:/availability/"; //return to index page
 	}
 
