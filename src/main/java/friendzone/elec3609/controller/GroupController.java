@@ -29,22 +29,28 @@ public class GroupController {
 
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
-	@RequestMapping(value = "/group", method = RequestMethod.POST)
+	@RequestMapping(value = "/group", method = RequestMethod.GET)
 	public String viewProject(@ModelAttribute("student") Student student, HttpServletRequest request ){
 		
 		// test print out
 		System.out.println(student.getFirstName().toString());
 		System.out.println(request.getParameter("projID"));
 		
-		Team team = dbHandler.getTeam(Integer.parseInt(request.getParameter("projId")));
-		System.out.println(team.getName().toString());
-		//if(team == null)
-			
-		// Team team = dbHandler.getTeam(request.getParameter("id") team id
 		
-		ArrayList<Student> memberList = team.getMembers();
-		for(Student stud: memberList)
-			System.out.println(stud.getFirstName());
+
+		if(request.getParameter("projID") != null) { // if belongs to a project
+			Team team = dbHandler.getTeam(Integer.parseInt(request.getParameter("projId")));
+			System.out.println(team.getName().toString());
+			
+		} else {
+			// there are no projects under this unit of study
+		}
+		
+		
+		
+		//ArrayList<Student> memberList = team.getMembers();
+		//for(Student stud: memberList)
+			//System.out.println(stud.getFirstName());
 			
 			
 		
