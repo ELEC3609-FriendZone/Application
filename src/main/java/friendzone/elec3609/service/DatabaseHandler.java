@@ -950,7 +950,7 @@ public class DatabaseHandler{
 		}
 	}
 	
-	public Integer getStudentsTeam(String SID, int projectID){
+	public Team getStudentsTeam(String SID, int projectID){
 		Integer id = null;
 		try{
 			//team that has PROJECT_ID = projectID that also has TeamMembership with STUDENT=SID
@@ -968,7 +968,7 @@ public class DatabaseHandler{
 		catch (SQLException e){
 			e.printStackTrace();
 		}
-		return id;
+		return getTeam(id);
 	}
 	
 	public void addEnrolment(String unitCode, String SID, int tutorialNum){
