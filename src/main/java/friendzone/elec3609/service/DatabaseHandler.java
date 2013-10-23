@@ -2,6 +2,8 @@ package friendzone.elec3609.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.Date;
@@ -38,10 +40,10 @@ public class DatabaseHandler{
 			instance = new DatabaseHandler();
 			
 			//reset and populate!
-//			if (instance != null){
-//				instance.resetDatabase();
-//				instance.populate();
-//			}
+			if (instance != null){
+				instance.resetDatabase();
+				instance.populate();
+			}
 		}
 		return instance;
 	}
@@ -218,10 +220,31 @@ public class DatabaseHandler{
 		}
 	}
 	
+	public String hashPassword(String password){
+        try{
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+	        md.update(password.getBytes());
+	 
+	        byte byteData[] = md.digest();
+			
+			StringBuffer hexString = new StringBuffer();
+			for (int i=0;i<byteData.length;i++) {
+				String hex=Integer.toHexString(0xff & byteData[i]);
+			     	if(hex.length()==1) hexString.append('0');
+			     	hexString.append(hex);
+			}
+			password = hexString.toString();
+        }
+        catch (NoSuchAlgorithmException e){
+        	e.printStackTrace();
+        }
+        return password;
+	}
+	
 	public void populate(){
-		final int STUDENT_AMOUNT = 1000;
-		final int UOS_AMOUNT = 10;
-		final int MAX_PROJECTS = 3; // per UOS
+		final int STUDENT_AMOUNT = 300;
+		final int UOS_AMOUNT = 4;
+		final int MAX_PROJECTS = 2; // per UOS
 		final int MAX_MEMBERS = 5; // students per team
 		
 		String[] firstNames = new String[]{"Oliver", "Lucas", "Ethan", "Tom", "Noah", "Cooper", "James", "Jackson", "Liam", "Xavier",
@@ -310,6 +333,7 @@ public class DatabaseHandler{
 			// add projects to this UoS
 			int numProjects = (int)(Math.random() * (MAX_PROJECTS+1));
 			for (int j=0; j != numProjects; j++){
+				ArrayList<Student> uosStudentsCopy = new ArrayList<Student>(uosStudents);
 				Date deadline = new Date(System.currentTimeMillis() + (long)(Math.random() * 31556926000L)); //current date + up to 1 year in milliseconds
 				System.out.println("Adding Project to unit of study " + unitCode + " " + (j+1) + "/" + numProjects + "(deadline " + deadline.toGMTString() + ")");
 				Project newProject = new Project(unitCode, unitCode + " project " + j, deadline);
@@ -318,14 +342,18 @@ public class DatabaseHandler{
 				int numTeams = (numStudents / MAX_MEMBERS);
 				int projectID = newProject.getID();
 				for (int k = 0; k != numTeams; ++k){
-					System.out.println("Adding team to project " + projectID + (k+1) + "/" + numTeams);
+					System.out.println("Adding team to project " + projectID + " " + (k+1) + "/" + numTeams);
 					Team newTeam = new Team(projectID, "TEAM" + k);
 					
 					// add students to this team
-					for (int l = 0; l != MAX_MEMBERS; l++){
+					for (int l = 0; l < MAX_MEMBERS; l++){
 						int teamID = newTeam.getID();
-						int index = (int)(Math.random() * uosStudents.size());
-						Student selectedStudent = uosStudents.remove(index);
+						if (uosStudents.size() == 0){
+							System.out.println("No more students left to put in teams!");
+							break;
+						}
+						int index = (int)(Math.random() * uosStudentsCopy.size());
+						Student selectedStudent = uosStudentsCopy.remove(index);
 						System.out.println("Putting student " + selectedStudent.getUnikey() + " in team " + teamID + " for project " + projectID + " " + (l+1) + "/" + MAX_MEMBERS);
 					}
 				}
@@ -725,7 +753,7 @@ public class DatabaseHandler{
 			PreparedStatement statement = dbConnection.prepareStatement(insertQuery);
 				statement.setString(1, SID);
 				statement.setString(2, unikey);
-				statement.setString(3, password);
+				statement.setString(3, hashPassword(password));
 				statement.setString(4, firstName);
 				statement.setString(5, lastName);
 				statement.setString(6, primaryEmail);
@@ -804,8 +832,6 @@ public class DatabaseHandler{
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setInt(1, projectID);
 			stmt.setString(2, name);
-			stmt.setInt(3, projectID);
-			stmt.setString(4, name);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next())
 				id = rs.getInt(1);
