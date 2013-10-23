@@ -800,7 +800,7 @@ public class DatabaseHandler{
 		}
 	}
 	
-	public int addInvitation(int projectID, String senderSID, String recipientSID){
+	public Integer addInvitation(int projectID, String senderSID, String recipientSID){
 		Integer id = null;
 		try{
 			String insertQuery = "INSERT INTO Invitation"
@@ -822,7 +822,7 @@ public class DatabaseHandler{
 		return id;
 	}
 	
-	public int addTeam(int projectID, String name){
+	public Integer addTeam(int projectID, String name){
 		Integer id = null;
 		try{
 			String insertQuery = "INSERT INTO Team"
@@ -843,7 +843,7 @@ public class DatabaseHandler{
 		return id;
 	}
 	
-	public int addProject(String unitCode, String projectName, Date deadline){
+	public Integer addProject(String unitCode, String projectName, Date deadline){
 		Integer id = null;
 		try{
 			String insertQuery = "INSERT INTO Project"
@@ -865,7 +865,7 @@ public class DatabaseHandler{
 		return id;
 	}
 	
-	public int addMeeting(int teamID, Timestamp start, Timestamp end){
+	public Integer addMeeting(int teamID, Timestamp start, Timestamp end){
 		Integer id = null;
 		try{
 			String insertQuery = "INSERT INTO Meeting"
@@ -908,7 +908,7 @@ public class DatabaseHandler{
 		}
 	}
 	
-	public int addInstantMessage(String senderID, int teamID, String message){
+	public Integer addInstantMessage(String senderID, int teamID, String message){
 		Integer id = null;
 		try{
 			String insertQuery = "INSERT INTO InstantMessage"
@@ -948,6 +948,27 @@ public class DatabaseHandler{
 		catch (SQLException e){
 			e.printStackTrace();
 		}
+	}
+	
+	public Integer getStudentsTeam(String SID, int projectID){
+		Integer id = null;
+		try{
+			//team that has PROJECT_ID = projectID that also has TeamMembership with STUDENT=SID
+			String selectQuery = "SELECT TEAM_ID"
+							+	" FROM TeamMembership INNER JOIN Team ON TeamMembership(TEAM) = Team(TEAM_ID)"
+							+	" WHERE STUDENT=? AND PROJECT_ID=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setString(1, SID);
+			stmt.setInt(2, projectID);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) //
+				id = rs.getInt(0);
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return id;
 	}
 	
 	public void addEnrolment(String unitCode, String SID, int tutorialNum){
