@@ -273,7 +273,7 @@ public class DatabaseHandler{
 			
 			String unikey = null;
 			do{
-				unikey = (firstName.charAt(1) + lastName.substring(0, 3) + String.valueOf(1000 + (int)(Math.random() * 9000))).toLowerCase(); 
+				unikey = (firstName.charAt(0) + lastName.substring(0, 3) + String.valueOf(1000 + (int)(Math.random() * 9000))).toLowerCase(); 
 			} while (usedUnikeys.contains(unikey));
 			usedUnikeys.add(unikey);
 			
