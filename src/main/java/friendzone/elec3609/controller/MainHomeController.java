@@ -1,5 +1,7 @@
 package friendzone.elec3609.controller;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +46,12 @@ public class MainHomeController {
 		// checks if the student is currently enrolled in subjects. this is for the list for students to choose
 		// if they have not yet entered a group or with to join a group.
 		List<UnitOfStudy> subjectList = student.getSubjects();
+		
+		List<List<Project>> projects = new ArrayList<List<Project>>(); 
+		
+		for (UnitOfStudy uos: subjectList){
+			projects.add(uos.getProjects());
+		}
 		
 		model.addAttribute("student", student);
 		return "mainHome";
