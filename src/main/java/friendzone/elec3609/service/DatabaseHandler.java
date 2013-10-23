@@ -1464,4 +1464,25 @@ public class DatabaseHandler{
 		return columnNames;
 	}
 
+	public ArrayList<Student> getStudentsInUoS(String unitCode) {
+		ArrayList<Student> unitsStudents = new ArrayList<Student>();
+		try{
+			String selectQuery = "SELECT STUDENT"
+							+	" FROM ENROLMENT"
+							+	" WHERE UOS=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setString(1, unitCode);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()){
+				String sid = rs.getString(0);
+				Student matchingStudent= getStudent(sid);
+				unitsStudents.add(matchingStudent);
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return unitsStudents;
+	}
 }
