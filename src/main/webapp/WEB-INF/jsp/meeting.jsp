@@ -4,8 +4,8 @@
 		<link rel="stylesheet" type="text/css" href="../../styles/styles.css" />
 	</head>
 	<body>
-		<div class="page-header">
-			<a href="/mainHome/"class="appTitle"><h1>FriendZone</h1></a>
+		<div class="page-wrapper">
+			<a href="/mainHome/" class="appTitle"><h1>FriendZone</h1></a>
 		</div>
 		<div class="page-body">
 			<h1>Meeting Page</h1>
