@@ -24,9 +24,6 @@
 		</tr>
 		<tr>
 			<td class="details">
-				<div class="links">
-					<a href="/profile/">edit</a>
-				</div>
 				<div class="profile-details">
 					<h3>Details</h3>
 					<table>
@@ -43,6 +40,10 @@
 							<td>${primaryEmail}</td>
 						</tr>
 						<tr>
+							<td><b>Email2:</b></td>
+							<td>${secondaryEmail}</td>
+						</tr>
+						<tr>
 							<td><b>Mobile:</b></td>
 							<td>${mobile}</td>
 						</tr>
@@ -51,14 +52,17 @@
 			</td>
 			<td>
 				<div class="links">
-					<a href="/profile/">edit</a>
+					<a href="/profile/edit/">edit</a>
 				</div>
 				<div class="page-body">
 					<h2>Preferences</h2>
-					<h3>Study Levels</h3>
+					<h3>Degree</h3>
+					<ul>${degree}
+					</ul>
+					<h3>Study Level</h3>
 					<ul>${studyLevels}
 					</ul>
-					<h3>Role</h3>
+					<h3>Preferred Role</h3>
 					<ul>${preferredRole}
 					</ul>
 					<h3>Languages</h3>
@@ -71,6 +75,18 @@
 					<ul>
 						<li>${firstSocialMedia}</li>
 						<li>${secondSocialMedia}</li>
+					</ul>
+					<h3>English as a second Language?</h3>
+					<ul>
+						<c:choose>
+							<c:when test="${ESL == true}">
+								Yes
+							</c:when>
+							<c:otherwise> No </c:otherwise>
+						</c:choose>
+					</ul>
+					<h3>Experience</h3>
+					<ul>${experience}
 					</ul>
 				</div>
 			</td>

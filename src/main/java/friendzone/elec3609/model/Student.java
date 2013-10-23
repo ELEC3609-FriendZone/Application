@@ -106,7 +106,22 @@ public class Student{
 		dbHandler.update(TABLE_NAME, SID, "FIRST_NAME", firstName);
 	
 	}
-
+	public void setProgrammingLanguages(ProgrammingLanguage[] languages)
+	{
+		this.languages = languages;
+		String languageString = "";
+		boolean firstPassed = false;
+		for (ProgrammingLanguage language : languages){
+			if (!firstPassed){
+				firstPassed = true;
+			}
+			else{
+				languageString += ", ";
+			}
+			languageString += language.toString();
+		}
+		dbHandler.update(TABLE_NAME, SID, "LANGUAGES", languageString);
+	}
 	public void setUnikey(String unikey) throws IllegalArgumentException{
 		if (unikey == null)
 			throw new IllegalArgumentException();
