@@ -6,7 +6,8 @@ import friendzone.elec3609.model.Project;
 
 @Service
 public class GroupFormer {
-	//DatabaseHandler dbHandler;
+	
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	public void createGroups(Project project){
 		
