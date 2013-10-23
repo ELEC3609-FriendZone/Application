@@ -355,6 +355,7 @@ public class DatabaseHandler{
 						int index = (int)(Math.random() * uosStudentsCopy.size());
 						Student selectedStudent = uosStudentsCopy.remove(index);
 						System.out.println("Putting student " + selectedStudent.getUnikey() + " in team " + teamID + " for project " + projectID + " " + (l+1) + "/" + MAX_MEMBERS);
+						selectedStudent.joinTeam(teamID);
 					}
 				}
 			}
