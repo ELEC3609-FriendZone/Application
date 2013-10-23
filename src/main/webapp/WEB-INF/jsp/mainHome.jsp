@@ -1,56 +1,20 @@
 <html>
 	<head>
 		<title>Friendzone-</title>
-		<style type="text/css">
-			body {
-				margin-top: 0px;
-				margin-right: 0px;
-				margin-bottom: 0px;
-				margin-left: 0px;
-				background: rgba(238, 236, 225, 1);
-			}
-			
-			.page-header {
-				FONT-FAMILY: 'Times New Roman';
-				TEXT-TRANSFORM: capitalize;
-				background: rgba(102, 153, 204, 1);
-				height: 10%;
-				width: 100%;
-			}
-			
-			h1{
-				text-align:center;
-			}
-			
-			.appTitle{
-				color: rgba(0, 0, 0, 1);
-			}
-	
-			.page-body {
-				background: rgba(260,260, 260, 1);
-				margin-top:1%;
-				margin-left:10%;
-				margin-right:10%;
-			}
-			
-			.formTable{
-			
-			}
-		</style>
+		<link rel="stylesheet" type="text/css" href="../../styles/styles.css" />
 	</head>
 	<body>
-		<div class="page-header">
-			<a href="/"class="appTitle"><h1>FriendZone</h1></a>
+		<div id="header-wrapper">
+			<img src="../images/title.png" alt="Friendzone">
 		</div>
-		<div class="page-body">
-			<h1>Main Page</h1>
-			<h2>Other Pages</h2>
-			<ul>
-				<li><a href="/profile/"> profile </a></li>
-				<li><a href="/group/"> group </a></li>
-				<li><a href="/availability/"> availability </a></li>
-				<li><a href="/meeting/"> meeting </a></li>
-				<li><a href="/subject/"> subject </a></li>
+		<div id="page-content" align="center">
+			<ul class="group-grid">
+				<li class="group-box"><h2> Group 1 </h2></li>
+				<li class="group-box"><h2> Group 2 </h2></li>
+				<li class="group-box"><h2> Group 3 </h2></li>
+				<li class="group-box"><h2> Group 4 </h2></li>
+				<li class="group-box"><h2> Group 5 </h2></li>
+				<li class="group-box"><h2> Group 6 </h2></li>
 			</ul>
 		</div>
 	</body>

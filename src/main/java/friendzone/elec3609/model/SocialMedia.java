@@ -55,13 +55,9 @@ public class SocialMedia {
 		return address;
 	}
 	public void setProvider(Provider provider) throws IllegalArgumentException{
-		if (provider == null)
-			throw new IllegalArgumentException();
 		this.provider = provider;
 	}
 	public void setAddress(String address) throws IllegalArgumentException{
-		if (address == null)
-			throw new IllegalArgumentException();
 		this.address = address;
 	}
 	public String toString(){
