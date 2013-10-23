@@ -126,7 +126,7 @@ public class Student{
 	
 	public void setPreferredRole(Role role){
 		this.preferredRole = role;
-		dbHandler.update(TABLE_NAME, SID, "PREFERRED_ROLE", role.toString());
+		dbHandler.update(TABLE_NAME, SID, "PREFERRED_ROLE", (role == null? null : role.toString()));
 	}
 	
 	public ProgrammingLanguage getLanguage(int i){
