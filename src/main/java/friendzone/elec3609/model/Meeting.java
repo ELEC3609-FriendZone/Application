@@ -58,4 +58,8 @@ public class Meeting {
 		this.end = meeting.end;
 		this.location = meeting.location;
 	}
+	
+	public String getLocation(){
+		return location;
+	}
 }

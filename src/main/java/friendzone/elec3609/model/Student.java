@@ -106,7 +106,22 @@ public class Student{
 		dbHandler.update(TABLE_NAME, SID, "FIRST_NAME", firstName);
 	
 	}
-
+	public void setProgrammingLanguages(ProgrammingLanguage[] languages)
+	{
+		this.languages = languages;
+		String languageString = "";
+		boolean firstPassed = false;
+		for (ProgrammingLanguage language : languages){
+			if (!firstPassed){
+				firstPassed = true;
+			}
+			else{
+				languageString += ", ";
+			}
+			languageString += language.toString();
+		}
+		dbHandler.update(TABLE_NAME, SID, "LANGUAGES", languageString);
+	}
 	public void setUnikey(String unikey) throws IllegalArgumentException{
 		if (unikey == null)
 			throw new IllegalArgumentException();
@@ -217,8 +232,8 @@ public class Student{
 	}
 	
 	
-	public List<Team> getTeamsByProjID(int projectID) {
-		return dbHandler.getTeams(projectID);
+	public Team getTeam(int projectID) {
+		return dbHandler.getStudentsTeam(SID, projectID);
 	}
 
 	public void copyValues(Student student){
@@ -251,6 +266,7 @@ public class Student{
 	public int getTutorialNum(String unitCode){
 		return dbHandler.getTutorialNum(SID, unitCode);
 	}
+	
 	
 
 }

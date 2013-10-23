@@ -19,19 +19,33 @@ public class Project {
 	String parent;
 	Date deadline;
 	String description;
+	int maxTeamSize;
+	int minTeamSize;
 	Timestamp lastViewed;
 	
-	public Project(String unitCode, String projectName, Date deadline){
+	public Project(String unitCode, String projectName, Date deadline, int minTeamSize, int maxTeamSize){
 		this.parent = unitCode;
 		this.deadline = deadline;
-		id = dbHandler.addProject(parent, projectName, deadline);
+		this.minTeamSize = minTeamSize;
+		this.maxTeamSize = maxTeamSize;
+		id = dbHandler.addProject(parent, projectName, deadline, minTeamSize, maxTeamSize);
 		lastViewed = new Timestamp(System.currentTimeMillis());
 	}
 	
-	public Project(int id, String unitCode, Date deadline){
+	public Project(int id, String unitCode, Date deadline, int minTeamSize, int maxTeamSize){
+		if (deadline.before(new Date(System.currentTimeMillis()))){
+			throw new IllegalArgumentException("Cannot create a project with a deadline before this date.");
+		}
+		
+		if (minTeamSize > maxTeamSize){
+			throw new IllegalArgumentException("Maximum team size must be greater than or equal to minimum team size");
+		}
+		
 		this.parent = unitCode;
 		this.deadline = deadline;
 		this.id = id;
+		this.minTeamSize = minTeamSize;
+		this.maxTeamSize = maxTeamSize;
 		lastViewed = new Timestamp(System.currentTimeMillis());
 	}
 	
@@ -45,6 +59,14 @@ public class Project {
 	
 	public int getID(){
 		return id;
+	}
+	
+	public int getMinTeamSize(){
+		return minTeamSize;
+	}
+	
+	public int getMaxTeamSize(){
+		return maxTeamSize;
 	}
 	
 	public Date getDeadline(){

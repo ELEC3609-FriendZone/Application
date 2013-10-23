@@ -131,6 +131,8 @@ public class DatabaseHandler{
 			+	"CREATE TABLE Project ("
 			+	"	PROJECT_ID		SERIAL		NOT NULL,"
 			+	"	UOS_ID			CHAR(8)		REFERENCES UnitOfStudy(UOS_ID)		NOT NULL,"
+			+	"	MAX_TEAM_SIZE	INTEGER		NOT NULL,"
+			+	"	MIN_TEAM_SIZE	INTEGER		NOT NULL,"
 			+	"	NAME			VARCHAR(20)	NOT NULL,"
 			+	"	DESCRIPTION		VARCHAR(100),"
 			+	"	DEADLINE		DATE		NOT NULL,"
@@ -245,6 +247,7 @@ public class DatabaseHandler{
 		final int STUDENT_AMOUNT = 300;
 		final int UOS_AMOUNT = 4;
 		final int MAX_PROJECTS = 2; // per UOS
+		final int MIN_MEMBERS = 3;
 		final int MAX_MEMBERS = 5; // students per team
 		
 		String[] firstNames = new String[]{"Oliver", "Lucas", "Ethan", "Tom", "Noah", "Cooper", "James", "Jackson", "Liam", "Xavier",
@@ -270,7 +273,7 @@ public class DatabaseHandler{
 			
 			String unikey = null;
 			do{
-				unikey = (firstName.charAt(1) + lastName.substring(0, 3) + String.valueOf(1000 + (int)(Math.random() * 9000))).toLowerCase(); 
+				unikey = (firstName.charAt(0) + lastName.substring(0, 3) + String.valueOf(1000 + (int)(Math.random() * 9000))).toLowerCase(); 
 			} while (usedUnikeys.contains(unikey));
 			usedUnikeys.add(unikey);
 			
@@ -336,7 +339,7 @@ public class DatabaseHandler{
 				ArrayList<Student> uosStudentsCopy = new ArrayList<Student>(uosStudents);
 				Date deadline = new Date(System.currentTimeMillis() + (long)(Math.random() * 31556926000L)); //current date + up to 1 year in milliseconds
 				System.out.println("Adding Project to unit of study " + unitCode + " " + (j+1) + "/" + numProjects + "(deadline " + deadline.toGMTString() + ")");
-				Project newProject = new Project(unitCode, unitCode + " project " + j, deadline);
+				Project newProject = new Project(unitCode, unitCode + " project " + j, deadline, MIN_MEMBERS, MAX_MEMBERS);
 				
 				// create teams for this project
 				int numTeams = (numStudents / MAX_MEMBERS);
@@ -346,6 +349,7 @@ public class DatabaseHandler{
 					Team newTeam = new Team(projectID, "TEAM" + k);
 					
 					// add students to this team
+					int teamSize = MIN_MEMBERS + (int)(Math.random() * (MAX_MEMBERS - MIN_MEMBERS+1));
 					for (int l = 0; l < MAX_MEMBERS; l++){
 						int teamID = newTeam.getID();
 						if (uosStudents.size() == 0){
@@ -481,7 +485,7 @@ public class DatabaseHandler{
 				projectStatement.setInt(1, projectID);
 				ResultSet projectRs = projectStatement.executeQuery();
 				if (projectRs.next()){
-					matchingProject = new Project(projectID, projectRs.getString("UOS"), projectRs.getDate("DEADLINE"));
+					matchingProject = new Project(projectID, projectRs.getString("UOS"), projectRs.getDate("DEADLINE"), projectRs.getInt("MIN_TEAM_SIZE"), projectRs.getInt("MAX_TEAM_SIZE"));
 					if (projectMap.get(projectID) == null){
 						projectMap.put(projectID, matchingProject);
 					}
@@ -843,18 +847,20 @@ public class DatabaseHandler{
 		return id;
 	}
 	
-	public Integer addProject(String unitCode, String projectName, Date deadline){
+	public Integer addProject(String unitCode, String projectName, Date deadline, int minTeamSize, int maxTeamSize){
 		Integer id = null;
 		try{
 			String insertQuery = "INSERT INTO Project"
-							+	" (UOS_ID, NAME, DEADLINE)"
-							+	" VALUES (?,?,?)"
+							+	" (UOS_ID, NAME, DEADLINE, MIN_TEAM_SIZE, MAX_TEAM_SIZE)"
+							+	" VALUES (?,?,?,?,?)"
 							+	" RETURNING PROJECT_ID"
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setString(1, unitCode);
 			stmt.setString(2, projectName);
 			stmt.setDate(3, deadline);
+			stmt.setInt(4, minTeamSize);
+			stmt.setInt(5, maxTeamSize);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next())
 				id = rs.getInt(1);
@@ -950,7 +956,7 @@ public class DatabaseHandler{
 		}
 	}
 	
-	public Integer getStudentsTeam(String SID, int projectID){
+	public Team getStudentsTeam(String SID, int projectID){
 		Integer id = null;
 		try{
 			//team that has PROJECT_ID = projectID that also has TeamMembership with STUDENT=SID
@@ -968,7 +974,7 @@ public class DatabaseHandler{
 		catch (SQLException e){
 			e.printStackTrace();
 		}
-		return id;
+		return getTeam(id);
 	}
 	
 	public void addEnrolment(String unitCode, String SID, int tutorialNum){
@@ -1458,4 +1464,25 @@ public class DatabaseHandler{
 		return columnNames;
 	}
 
+	public ArrayList<Student> getStudentsInUoS(String unitCode) {
+		ArrayList<Student> unitsStudents = new ArrayList<Student>();
+		try{
+			String selectQuery = "SELECT STUDENT"
+							+	" FROM ENROLMENT"
+							+	" WHERE UOS=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setString(1, unitCode);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()){
+				String sid = rs.getString(0);
+				Student matchingStudent= getStudent(sid);
+				unitsStudents.add(matchingStudent);
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return unitsStudents;
+	}
 }

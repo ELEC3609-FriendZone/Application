@@ -1,7 +1,10 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<<<<<<< HEAD
+=======
 
+>>>>>>> 2efb1466f8f880bf1e5f089a14f3a02129a6463a
 <html>
 <head>
 <title>Friendzone-Availability</title>
@@ -40,7 +43,7 @@
 					<td >
 						<ul>
 							<li class="right-panel">
-								<h1>Availability</h1>
+								<h4>Availability</h4>
 								<form method="post" action="/availability/change/">
 							<table>
 								<tr class="table-heading">
@@ -63,7 +66,7 @@
 									<c:forEach items="${availabilityMonday}" var="aMonday">
 										<c:choose>
 											<c:when test="${aMonday=='true'}">
-												<td class="table-available"></td>
+												<td class="table-available">X</td>
 											</c:when>
 											<c:otherwise>
 												<td class="table-unavailable"></td>
@@ -77,7 +80,7 @@
 									<c:forEach items="${availabilityTuesday}" var="aTuesday">
 										<c:choose>
 											<c:when test="${aTuesday=='true'}">
-												<td class="table-available"></td>
+												<td class="table-available">X</td>
 											</c:when>
 											<c:otherwise>
 												<td class="table-unavailable"></td>
@@ -88,10 +91,14 @@
 								<tr>
 									<td class="table-heading">Wednesday</td>
 									<c:forEach items="${availabilityWednesday}" var="aWednesday">
+<<<<<<< HEAD
+										</td-->
+=======
 										</td>
+>>>>>>> 2efb1466f8f880bf1e5f089a14f3a02129a6463a
 										<c:choose>
 											<c:when test="${aWednesday=='true'}">
-												<td class="table-available"></td>
+												<td class="table-available">X</td>
 											</c:when>
 											<c:otherwise>
 												<td class="table-unavailable"></td>
@@ -104,7 +111,7 @@
 									<c:forEach items="${availabilityThursday}" var="aThursday">
 										<c:choose>
 											<c:when test="${aThursday=='true'}">
-												<td class="table-available"></td>
+												<td class="table-available">X</td>
 											</c:when>
 											<c:otherwise>
 												<td class="table-unavailable"></td>
@@ -117,7 +124,7 @@
 									<c:forEach items="${availabilityFriday}" var="aFriday">
 										<c:choose>
 											<c:when test="${aFriday=='true'}">
-												<td class="table-available"></td>
+												<td class="table-available">X</td>
 											</c:when>
 											<c:otherwise>
 												<td class="table-unavailable"></td>
@@ -130,7 +137,7 @@
 									<c:forEach items="${availabilitySaturday}" var="aSaturday">
 										<c:choose>
 											<c:when test="${aSaturday=='true'}">
-												<td class="table-available"></td>
+												<td class="table-available">X</td>
 											</c:when>
 											<c:otherwise>
 												<td class="table-unavailable"></td>
@@ -143,7 +150,7 @@
 									<c:forEach items="${availabilitySunday}" var="aSunday">
 										<c:choose>
 											<c:when test="${aSunday=='true'}">
-												<td class="table-available"></td>
+												<td class="table-available">X</td>
 											</c:when>
 											<c:otherwise>
 												<td class="table-unavailable"></td>
