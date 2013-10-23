@@ -46,6 +46,8 @@ public class MainHomeController {
 			return "redirect:/";
 		}
 		
+		
+		
 		if (!enteredPassword.matches(actualPassword)) {
 			//should tell the user the password is incorrect
 			System.out.println("Wrong password: entered " + "\"" + enteredPassword + "\"" + " expected " + "\"" + actualPassword + "\"");
@@ -54,7 +56,6 @@ public class MainHomeController {
 		
 		// if we reach this point, we know student exists and password is correct so just grab the student object and add it to the session attributes
 		Student student = dbHandler.getStudent(dbHandler.getSID(unikey));
-		model.addAttribute("student", student);
 		
 		// now we need to load in this students list of subjects and the projects in those subjects to that the view can see them
 		
@@ -65,13 +66,21 @@ public class MainHomeController {
 		List<List<Project>> projects = new ArrayList<List<Project>>(); 
 		
 		for (UnitOfStudy uos: subjectList){
+			System.out.println(uos.getUnitCode());
 			projects.add(uos.getProjects());
+		}
+		
+		if(projects.size() != 0 ) {
+			for (List<Project> il: projects) {
+				
+				System.out.println(il);
+			}
 		}
 		
 		// use it like this when u link to group form action=post name="id"
 		//SUBJECT
 		//	PROJECT
-		//form action=post name="id" value = projects.get(0).get(0)> group 1
+		//form action=post name="id" value = projects.get(0).get(0).getId()> group 1
 				
 		return "mainHome";
 	}
