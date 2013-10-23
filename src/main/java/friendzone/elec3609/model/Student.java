@@ -217,8 +217,8 @@ public class Student{
 	}
 	
 	
-	public List<Team> getTeamsByProjID(int projectID) {
-		return dbHandler.getTeams(projectID);
+	public Team getTeam(int projectID) {
+		return dbHandler.getStudentsTeam(SID, projectID);
 	}
 
 	public void copyValues(Student student){
