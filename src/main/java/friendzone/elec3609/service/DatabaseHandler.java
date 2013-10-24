@@ -27,6 +27,7 @@ import friendzone.elec3609.model.SocialMedia.Provider;
 public class DatabaseHandler{
 	Map<String, UnitOfStudy> uosMap = new HashMap<String, UnitOfStudy>();
 	Map<String, Student> studentMap = new HashMap<String, Student>();
+	Map<String, Admin> adminMap = new HashMap<String, Admin>();
 	Map<Integer, Team> teamMap = new HashMap<Integer, Team>();
 	Map<Integer, Project> projectMap = new HashMap<Integer, Project>();	
 	Map<Integer, Invitation> inviteMap = new HashMap<Integer, Invitation>();
@@ -49,7 +50,6 @@ public class DatabaseHandler{
 	}
 	
 	
-	//Since the DatabaseHandler is marked as a service, it acts as a singleton and the constructor gets called automatically when the application starts
 	private DatabaseHandler(){
 		try {
 			dbConnection = getConnection();
@@ -86,141 +86,201 @@ public class DatabaseHandler{
 	}
 	
 	
-	public void resetDatabase(){
-		String createQuery = 
-				"DROP TABLE IF EXISTS Student CASCADE;"
-			+	"CREATE TABLE Student ("
-			+	"	SID					CHAR(9) 		NOT NULL,"
-			+ 	"	UNIKEY 				CHAR(8) 		UNIQUE NOT NULL,"
-			+	"	PASSWORD			CHAR(64)		NOT NULL,"
-			+	"	FIRST_NAME			VARCHAR(20)		NOT NULL,"
-			+	"	LAST_NAME			VARCHAR(20)		NOT NULL,"
-			+	"	COURSE				VARCHAR(50),"
-			+	"	PRIMARY_EMAIL		VARCHAR(50) 	NOT NULL,"
-			+	"	SECONDARY_EMAIL 	VARCHAR(50),"
-			+	"	MOBILE				CHAR(10)		NOT NULL,"
-			+	"	SOCIAL_MEDIA_1		VARCHAR(50),"
-			+	"	SOCIAL_MEDIA_2		VARCHAR(50),"
-			+	"	STUDY_LEVEL			VARCHAR(20)		NOT NULL,"
-			+	"	PREFERRED_ROLE		VARCHAR(15)," 					//	"Project Manager", "Programmer", "Tester"...
-		//	+	"	PREFERRED_CONTACT	SMALLINT,"					
-			+	"	EXPERIENCE			VARCHAR(200),"
-			+	"	ESL					BOOLEAN			NOT NULL,"
-			+	"	LANGUAGES			VARCHAR(50),"
-			+	"	AVAILABILITY		BOOLEAN[84],"					//	7 days x 12 hours (8am-8pm) 
-			+	"	LAST_MODIFIED		TIMESTAMP		DEFAULT NOW(),"
-			+	"	PRIMARY KEY			(SID)"
-			+ 	");"
-			+	"DROP TABLE IF EXISTS UnitOfStudy CASCADE;"
-			+	"CREATE TABLE UnitOfStudy ("
-			+	"	UOS_ID				CHAR(8)			NOT NULL,"
-			+	"	UOS_NAME			VARCHAR(50)		NOT NULL,"
-			+	"	UOS_DESCRIPTION		VARCHAR(100),"
-			+	"	NUM_STUDENTS		INTEGER			NOT NULL,"
-			+	"	LAST_MODIFIED		TIMESTAMP 		DEFAULT NOW(),"
-			+	"	PRIMARY KEY			(UOS_ID)"
-			+ 	");"
-			+	"DROP TABLE IF EXISTS Enrolment CASCADE;"
-			+	"CREATE TABLE Enrolment ("
-			+	"	UOS				CHAR(8)		REFERENCES UnitOfStudy(UOS_ID)		NOT NULL,"
-			+	"	STUDENT			CHAR(9)		REFERENCES Student(SID)				NOT NULL,"
-			+	"	TUTORIAL_NUM	SMALLINT	NOT NULL,"
-			+	"	PRIMARY KEY		(UOS, STUDENT)" 
-			+	");"
-			+	"DROP TABLE IF EXISTS Project CASCADE;"
-			+	"CREATE TABLE Project ("
-			+	"	PROJECT_ID		SERIAL		NOT NULL,"
-			+	"	UOS_ID			CHAR(8)		REFERENCES UnitOfStudy(UOS_ID)		NOT NULL,"
-			+	"	MAX_TEAM_SIZE	INTEGER		NOT NULL,"
-			+	"	MIN_TEAM_SIZE	INTEGER		NOT NULL,"
-			+	"	NAME			VARCHAR(20)	NOT NULL,"
-			+	"	DESCRIPTION		VARCHAR(100),"
-			+	"	DEADLINE		DATE		NOT NULL,"
-			+	"	LAST_MODIFIED	TIMESTAMP	DEFAULT NOW(),"
-			+	"	PRIMARY KEY		(PROJECT_ID)"
-			+	");"
-			+	"DROP TABLE IF EXISTS Team CASCADE;" //could not use the name "Group" since it's a reserved word in SQL
+	private enum CreateQuery{
+		
+		STUDENT("STUDENT",
+					"DROP TABLE IF EXISTS Student CASCADE;"
+				+	"CREATE TABLE Student ("
+				+	"	SID					CHAR(9) 		NOT NULL,"
+				+ 	"	UNIKEY 				CHAR(8) 		UNIQUE NOT NULL,"
+				+	"	PASSWORD			CHAR(64)		NOT NULL,"
+				+	"	FIRST_NAME			VARCHAR(20)		NOT NULL,"
+				+	"	LAST_NAME			VARCHAR(20)		NOT NULL,"
+				+	"	COURSE				VARCHAR(50),"
+				+	"	PRIMARY_EMAIL		VARCHAR(50) 	NOT NULL,"
+				+	"	SECONDARY_EMAIL 	VARCHAR(50),"
+				+	"	MOBILE				CHAR(10)		NOT NULL,"
+				+	"	SOCIAL_MEDIA_1		VARCHAR(50),"
+				+	"	SOCIAL_MEDIA_2		VARCHAR(50),"
+				+	"	STUDY_LEVEL			VARCHAR(20)		NOT NULL,"
+				+	"	PREFERRED_ROLE		VARCHAR(15)," 					//	"Project Manager", "Programmer", "Tester"...
+			//	+	"	PREFERRED_CONTACT	SMALLINT,"					
+				+	"	EXPERIENCE			VARCHAR(200),"
+				+	"	ESL					BOOLEAN			NOT NULL,"
+				+	"	LANGUAGES			VARCHAR(50),"
+				+	"	AVAILABILITY		BOOLEAN[84],"					//	7 days x 12 hours (8am-8pm) 
+				+	"	LAST_MODIFIED		TIMESTAMP		DEFAULT NOW(),"
+				+	"	PRIMARY KEY			(SID)"
+				+ 	");"),
+		
+		UOS("UnitOfStudy",
+					"DROP TABLE IF EXISTS UnitOfStudy CASCADE;"
+				+	"CREATE TABLE UnitOfStudy ("
+				+	"	UOS_ID				CHAR(8)			NOT NULL,"
+				+	"	UOS_NAME			VARCHAR(50)		NOT NULL,"
+				+	"	UOS_DESCRIPTION		VARCHAR(100),"
+				+	"	NUM_STUDENTS		INTEGER			NOT NULL,"
+				+	"	LAST_MODIFIED		TIMESTAMP 		DEFAULT NOW(),"
+				+	"	PRIMARY KEY			(UOS_ID)"
+				+ 	");"),
+		
+		ENROLMENT("Enrolment",
+					"DROP TABLE IF EXISTS Enrolment CASCADE;"
+				+	"CREATE TABLE Enrolment ("
+				+	"	UOS				CHAR(8)		REFERENCES UnitOfStudy(UOS_ID)		NOT NULL,"
+				+	"	FIRST_SEM		BOOLEAN		NOT NULL,"
+				+	"	YEAR			SMALLINT	NOT NULL,"			
+				+	"	STUDENT			CHAR(9)		REFERENCES Student(SID)				NOT NULL,"
+				+	"	TUTORIAL_NUM	SMALLINT	NOT NULL,"
+				+	"	PRIMARY KEY		(UOS, STUDENT)" 
+				+	");"),
+		
+		PROJECT("Project",
+					"DROP TABLE IF EXISTS Project CASCADE;"
+				+	"CREATE TABLE Project ("
+				+	"	PROJECT_ID		SERIAL		NOT NULL,"
+				+	"	UOS_ID			CHAR(8)		REFERENCES UnitOfStudy(UOS_ID)		NOT NULL,"
+				+	"	MAX_TEAM_SIZE	INTEGER		NOT NULL,"
+				+	"	MIN_TEAM_SIZE	INTEGER		NOT NULL,"
+				+	"	NAME			VARCHAR(20)	NOT NULL,"
+				+	"	DESCRIPTION		VARCHAR(100),"
+				+	"	INVITE_DEADLINE	DATE		NOT NULL," //need to trigger GroupFormer when this date is hit!
+				+	"	START			DATE		NOT NULL,"
+				+	"	DEADLINE		DATE		NOT NULL,"
+				+	"	LAST_MODIFIED	TIMESTAMP	DEFAULT NOW(),"
+				+	"	PRIMARY KEY		(PROJECT_ID)"
+				+	");"),
+		
+		TEAM_MEMBERSHIP("TeamMembership",
+						"DROP TABLE IF EXISTS TeamMembership CASCADE;"
+						+	"CREATE TABLE TeamMembership ("
+						+	"	STUDENT				CHAR(9)		REFERENCES Student(SID)		NOT NULL,"
+						+	"	TEAM				INTEGER		REFERENCES Team(TEAM_ID)	NOT NULL,"
+						+	"	LAST_VIEWED_CONVO	TIMESTAMP,"
+						// should enforce exists ENROLMENT with STUDENT=STUDENT, UOS= TEAM -> PROJECT_ID -> UOS_ID
+						+	"	PRIMARY KEY (STUDENT, TEAM)"
+						+	");"),
+		
+		TEAM("Team",
+				"DROP TABLE IF EXISTS Team CASCADE;" //could not use the name "Group" since it's a reserved word in SQL
 			+	"CREATE TABLE Team ("
 			+	"	TEAM_ID			SERIAL		NOT NULL,"
 			+	"	NAME			VARCHAR(20)	NOT NULL,"
 			+	"	PROJECT_ID		INTEGER		REFERENCES Project(PROJECT_ID)		NOT NULL,"
 			+	"	PRIMARY KEY		(TEAM_ID)"
-			+	");"
-			+	"DROP TABLE IF EXISTS TeamMembership CASCADE;"
-			+	"CREATE TABLE TeamMembership ("
-			+	"	STUDENT		CHAR(9)		REFERENCES Student(SID)		NOT NULL,"
-			+	"	TEAM		INTEGER		REFERENCES Team(TEAM_ID)	NOT NULL,"
-			// should enforce exists ENROLMENT with STUDENT=STUDENT, UOS= TEAM -> PROJECT_ID -> UOS_ID
-			+	"	PRIMARY KEY (STUDENT, TEAM)"
-			+	");"
-			+	"DROP TABLE IF EXISTS Meeting CASCADE;"
-			+	"CREATE TABLE Meeting("
-			+	"	MEETING_ID	SERIAL			NOT NULL,"
-			+	"	TEAM		INTEGER			REFERENCES Team(TEAM_ID)	NOT NULL,"
-			+	"	START_TIME	TIMESTAMP		NOT NULL,"
-			+	"	END_TIME	TIMESTAMP		NOT NULL,"
-			+	"	LOCATION	VARCHAR(20),"
-			+	"	PRIMARY KEY (MEETING_ID)"
-			+	");"
-			+ 	"DROP TABLE IF EXISTS Administrator CASCADE;"
-			+	"CREATE TABLE Administrator ("
-			+	"	STAFF_NUM		CHAR(9)		NOT NULL,"	//format of a USYD staff number?	
-			+	"	UOS				CHAR(8)		REFERENCES UnitOfStudy(UOS_ID)		NOT NULL,"
-			+	"	PRIMARY KEY (STAFF_NUM, UOS)" // a staff member could administer multiple courses
-			+	");"
-			+	"DROP TABLE IF EXISTS InstantMessage CASCADE;"
-			+	"CREATE TABLE InstantMessage ("
-			+	"	MESSAGE_ID	SERIAL			NOT NULL,"
-			+	"	SENDER		CHAR(9)			REFERENCES Student(SID)		NOT NULL,"
-			+	"	TEAM		INTEGER			REFERENCES Team(TEAM_ID)	NOT NULL,"
-			+	"	MESSAGE		VARCHAR(200)	NOT NULL,"
-			+	"	PRIMARY KEY	(MESSAGE_ID)"
-			+	");"
-			+	"DROP TABLE IF EXISTS Invitation CASCADE;"
-			+	"CREATE TABLE Invitation ("
-			+	"	INVITE_ID	SERIAL			NOT NULL,"
-			+	"	MESSAGE		VARCHAR(100),"	
-			+	"	PROJECT		INTEGER			REFERENCES Project(PROJECT_ID)	NOT NULL,"
-			+	"	SENDER		CHAR(9)			REFERENCES Student(SID)			NOT NULL,"
-			+	"	RECIPIENT	CHAR(9)			REFERENCES Student(SID)			NOT NULL,"	
-			+	"	PRIMARY KEY	(INVITE_ID)"
-			+	");"
-			// Now that the tables are made, we define the triggers to make LAST_MODIFIED work
-			+	"DROP FUNCTION IF EXISTS UpdateLastModified();"
-			+	"CREATE FUNCTION UpdateLastModified() RETURNS trigger AS $$"
-			+	"	BEGIN"
-			+	"		NEW.LAST_MODIFIED := NOW();"	
-			+	"		RETURN NEW;"
-			+	"	END;" 
-			+	"$$ LANGUAGE PLPGSQL;"
-			+	"DROP TRIGGER IF EXISTS UpdateStudentLastModified ON Invitation;"
-			+	"CREATE TRIGGER UpdateStudentLastModified"
-			+	"	BEFORE UPDATE ON Student"
-			+	"	FOR EACH ROW"
-			+	"	EXECUTE PROCEDURE UpdateLastModified();"
-			+	"DROP TRIGGER IF EXISTS UpdateUnitOfStudyLastModified ON UnitOfStudy;"
-			+	"CREATE TRIGGER UpdateUnitOfStudyLastModified"
-			+	"	BEFORE UPDATE ON UnitOfStudy"
-			+	"	FOR EACH ROW"
-			+	"	EXECUTE PROCEDURE UpdateLastModified();"
-			+	"DROP TRIGGER IF EXISTS UpdateProjectModified ON UnitOfStudy;"
-			+	"CREATE TRIGGER UpdateProjectLastModified"
-			+	"	BEFORE UPDATE ON Project"
-			+	"	FOR EACH ROW"
-			+	"	EXECUTE PROCEDURE UpdateLastModified();"			
-		;
+			+	");"),
+		
 
-		try{
-			Statement stmt = dbConnection.createStatement();
-			stmt.executeUpdate(createQuery);
-			stmt.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			//System.err.println("Could not create tables!");
-		} finally {
-			System.out.println("\nDatabase has been reset!\n");
+		MEETING("Meeting",
+					"DROP TABLE IF EXISTS Meeting CASCADE;"
+				+	"CREATE TABLE Meeting("
+				+	"	MEETING_ID	SERIAL			NOT NULL,"
+				+	"	TEAM		INTEGER			REFERENCES Team(TEAM_ID)	NOT NULL,"
+				+	"	START_TIME	TIMESTAMP		NOT NULL,"
+				+	"	END_TIME	TIMESTAMP		NOT NULL,"
+				+	"	LOCATION	VARCHAR(20),"
+				+	"	PRIMARY KEY (MEETING_ID)"
+				+	");"),
+		
+		ADMINISTRATOR("Administrator",
+						"DROP TABLE IF EXISTS Administrator CASCADE;"
+					+	"CREATE TABLE Administrator("
+					+	"	STAFF_NUM		CHAR(8)		NOT NULL,"	//format of a USYD staff number?
+					+	"	FIRST_NAME		VARCHAR(20)	NOT NULL,"
+					+	"	PASSWORD		CHAR(64)	NOT NULL,"
+					+	"	LAST_NAME		VARCHAR(20)	NOT NULL,"
+					+	"	PRIMARY KEY (STAFF_NUM)" // a staff member could administer multiple courses
+					+	");"),
+		
+
+		ADMINISTRATION("Administration",
+							"DROP TABLE IF EXISTS Administration CASCADE;"
+						+	"CREATE TABLE Administration("
+						+	"	STAFF_NUM	CHAR(8)		REFERENCES Administrator(STAFF_NUM)		NOT NULL,"
+						+	"	UOS 		CHAR(8)		REFERENCES UnitOfStudy(UOS_ID)			NOT NULL,"
+						+	"	PRIMARY KEY	(STAFF_NUM, UOS)"
+						+	");"),
+		
+		INSTANT_MESSAGE("InstantMessage",
+						"DROP TABLE IF EXISTS InstantMessage CASCADE;"
+						+	"CREATE TABLE InstantMessage ("
+						+	"	MESSAGE_ID	SERIAL			NOT NULL,"
+						+	"	SENDER		CHAR(9)			REFERENCES Student(SID)		NOT NULL,"
+						+	"	TEAM		INTEGER			REFERENCES Team(TEAM_ID)	NOT NULL,"
+						+	"	SENT_TIME	TIMESTAMP		NOT NULL,"
+						+	"	MESSAGE		VARCHAR(200)	NOT NULL,"
+						+	"	PRIMARY KEY	(MESSAGE_ID)"
+						+	");"),
+		
+		INVITATION("Invitation",
+						"DROP TABLE IF EXISTS Invitation CASCADE;"
+					+	"CREATE TABLE Invitation ("
+					+	"	INVITE_ID	SERIAL			NOT NULL,"
+					+	"	MESSAGE		VARCHAR(100),"
+					+	"	ACCEPTED	BOOLEAN			NOT NULL,"
+					+	"	PROJECT		INTEGER			REFERENCES Project(PROJECT_ID)	NOT NULL,"
+					+	"	SENDER		CHAR(9)			REFERENCES Student(SID)			NOT NULL,"
+					+	"	RECIPIENT	CHAR(9)			REFERENCES Student(SID)			NOT NULL,"	
+					+	"	PRIMARY KEY	(INVITE_ID)"
+					+	");"),
+		
+		FUNCTIONS("Functions",
+					"DROP FUNCTION IF EXISTS UpdateLastModified();"
+				+	"CREATE FUNCTION UpdateLastModified() RETURNS trigger AS $$"
+				+	"	BEGIN"
+				+	"		NEW.LAST_MODIFIED := NOW();"	
+				+	"		RETURN NEW;"
+				+	"	END;" 
+				+	"$$ LANGUAGE PLPGSQL;"
+				),
+				
+		TRIGGERS("Triggers",
+						"DROP TRIGGER IF EXISTS UpdateStudentLastModified ON Invitation;"
+						+	"CREATE TRIGGER UpdateStudentLastModified"
+						+	"	BEFORE UPDATE ON Student"
+						+	"	FOR EACH ROW"
+						+	"	EXECUTE PROCEDURE UpdateLastModified();"
+						+	"DROP TRIGGER IF EXISTS UpdateUnitOfStudyLastModified ON UnitOfStudy;"
+						+	"CREATE TRIGGER UpdateUnitOfStudyLastModified"
+						+	"	BEFORE UPDATE ON UnitOfStudy"
+						+	"	FOR EACH ROW"
+						+	"	EXECUTE PROCEDURE UpdateLastModified();"
+						+	"DROP TRIGGER IF EXISTS UpdateProjectModified ON UnitOfStudy;"
+						+	"CREATE TRIGGER UpdateProjectLastModified"
+						+	"	BEFORE UPDATE ON Project"
+						+	"	FOR EACH ROW"
+						+	"	EXECUTE PROCEDURE UpdateLastModified();");
+		
+		
+		private final String tableName, query;
+		private CreateQuery(String tableName, String query){
+			this.tableName = tableName;
+			this.query = query;
+		}
+		
+		public String getTableName(){
+			return tableName;
+		}
+		public String getQuery(){
+			return query;
 		}
 	}
+	
+	public void resetDatabase(){
+		for (CreateQuery query : CreateQuery.values()){
+			try{
+				Statement stmt = dbConnection.createStatement();
+				stmt.executeUpdate(query.getQuery());
+				stmt.close();
+			} catch (SQLException e) {
+				System.err.println("Failed to create " + query.getTableName());
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
+		System.out.println("\nDatabase has been reset!\n");
+	}
+	
 	
 	public String hashPassword(String password){
         try{
@@ -244,126 +304,162 @@ public class DatabaseHandler{
 	}
 	
 	public void populate(){
-		final int STUDENT_AMOUNT = 300;
-		final int UOS_AMOUNT = 4;
-		final int MAX_PROJECTS = 2; // per UOS
-		final int MIN_MEMBERS = 3;
-		final int MAX_MEMBERS = 5; // students per team
-		
-		String[] firstNames = new String[]{"Oliver", "Lucas", "Ethan", "Tom", "Noah", "Cooper", "James", "Jackson", "Liam", "Xavier",
-											"Lily", "Isabella", "Emily", "Chloe", "Charlotte", "Zoe", "Isabelle", "Olivia", "Sophie", "Amelia"};
-		String[] lastNames = new String[]{"Smith", "Jones", "Williams", "Brown", "Wilson", "Taylor", "Morton", "White", "Martin", "Anderson",
-											"Thompson", "Nguyen", "Thomas", "Walker", "Harris", "Lee", "Ryan", "Robinson", "Kelly", "King"};
-		String[] unitCodes = new String[]{"ELEC", "INFO", "COMP", "ISYS"};
-		
-		HashSet<String> usedUnitCodes = new HashSet<String>();
-		HashSet<String> usedSIDs = new HashSet<String>();
-		HashSet<String> usedUnikeys = new HashSet<String>();
-		ArrayList<Student> students = new ArrayList<Student>();
-		// populate student table
-		for (int i=0; i != STUDENT_AMOUNT; ++i){
-			String SID = null;
-			do{
-				SID = String.valueOf(300000000 + (int)(Math.random() * 100000000));
-			} while (usedSIDs.contains(SID));
-			usedSIDs.add(SID);
+		try{
+			final int STUDENT_AMOUNT = 300;
+			final int UOS_AMOUNT = 4;
+			final int ADMIN_AMOUNT = 3;
+			final int MAX_PROJECTS = 2; // per UOS
+			final int MIN_MEMBERS = 3;
+			final int MAX_MEMBERS = 5; // students per team
 			
-			String firstName = firstNames[(int)(Math.random() * firstNames.length)];
-			String lastName = lastNames[(int)(Math.random() * firstNames.length)];
+			String[] firstNames = new String[]{"Oliver", "Lucas", "Ethan", "Tom", "Noah", "Cooper", "James", "Jackson", "Liam", "Xavier",
+												"Lily", "Isabella", "Emily", "Chloe", "Charlotte", "Zoe", "Isabelle", "Olivia", "Sophie", "Amelia"};
+			String[] lastNames = new String[]{"Smith", "Jones", "Williams", "Brown", "Wilson", "Taylor", "Morton", "White", "Martin", "Anderson",
+												"Thompson", "Nguyen", "Thomas", "Walker", "Harris", "Lee", "Ryan", "Robinson", "Kelly", "King"};
+			String[] unitCodes = new String[]{"ELEC", "INFO", "COMP", "ISYS"};
 			
-			String unikey = null;
-			do{
-				unikey = (firstName.charAt(0) + lastName.substring(0, 3) + String.valueOf(1000 + (int)(Math.random() * 9000))).toLowerCase(); 
-			} while (usedUnikeys.contains(unikey));
-			usedUnikeys.add(unikey);
-			
-			String password = "password";
-
-			System.out.println("Adding student " + (i+1) + "/" + STUDENT_AMOUNT + " (unikey " + unikey + ", password " + password + ")");
-			
-			String primaryEmail = unikey + "@uni.sydney.edu.au";
-			String mobile = String.valueOf(041) + String.valueOf(100000 + (int)(Math.random() * 900000)); 
-			StudyLevel studyLevel = StudyLevel.values()[(int)(Math.random() * StudyLevel.values().length)];
-			boolean ESL = ((int)(Math.random()) == (int)(Math.random()));
-			ProgrammingLanguage languages[] = new ProgrammingLanguage[(int)(Math.random() * ProgrammingLanguage.values().length)];
-			
-			HashSet<ProgrammingLanguage> usedLangs = new HashSet<ProgrammingLanguage>();
-			for (int j=0; j != languages.length; ++j){
-				ProgrammingLanguage newLanguage = null;
+			HashSet<String> usedUnitCodes = new HashSet<String>();
+			HashSet<String> usedSIDs = new HashSet<String>();
+			HashSet<String> usedUnikeys = new HashSet<String>();
+			ArrayList<Student> students = new ArrayList<Student>();
+			// populate student table
+			for (int i=0; i != STUDENT_AMOUNT; ++i){
+				String SID = null;
 				do{
-					newLanguage = ProgrammingLanguage.values()[(int)(Math.random() * ProgrammingLanguage.values().length)];
-
-				} while (usedLangs.contains(newLanguage));
-				usedLangs.add(newLanguage);
-				languages[j] = newLanguage;
-			}
-
-			Student newStudent = new Student(SID, unikey, password, firstName, lastName, primaryEmail, mobile, studyLevel, ESL, languages);
-
-			students.add(newStudent);
-		}
-		
-		
-		// populate UoS table
-		for (int i=0; i != UOS_AMOUNT; ++i){
-			
-			String unitCode = null;
-			do{
-				unitCode = unitCodes[(int)(Math.random() * unitCodes.length)] + String.valueOf(1000 + (int)(Math.random() * 3000));
-			} while (usedUnitCodes.contains(unitCode));
-			usedUnitCodes.add(unitCode);
-		
-			System.out.println("Adding Unit of Study " + (i+1) + "/" + UOS_AMOUNT + "(unitCode " + unitCode + ")");
-			
-			String unitName = "<unit name for " + unitCode + ">";
-			int numStudents = (int)(Math.random() * STUDENT_AMOUNT); 
-			UnitOfStudy newUOS = new UnitOfStudy(unitCode, unitName, numStudents);
-			
-			// enrol students to the UOS
-			ArrayList<Student> uosStudents = new ArrayList<Student>();
-			HashSet<Student> enrolledStudents = new HashSet<Student>();
-			for (int j=0; j != numStudents; j++){
-				Student student = null;
-				do{
-					student = students.get((int)(Math.random() * students.size()));
-				} while (enrolledStudents.contains(student));
-				System.out.println("Enrolling student " + student.getSID() + " to unit of study " + unitCode + " " + (j+1) + "/" + numStudents);
-				student.enrolTo(unitCode);
-				enrolledStudents.add(student);
-				uosStudents.add(student);
-			}
-			
-			// add projects to this UoS
-			int numProjects = (int)(Math.random() * (MAX_PROJECTS+1));
-			for (int j=0; j != numProjects; j++){
-				ArrayList<Student> uosStudentsCopy = new ArrayList<Student>(uosStudents);
-				Date deadline = new Date(System.currentTimeMillis() + (long)(Math.random() * 31556926000L)); //current date + up to 1 year in milliseconds
-				System.out.println("Adding Project to unit of study " + unitCode + " " + (j+1) + "/" + numProjects + "(deadline " + deadline.toGMTString() + ")");
-				Project newProject = new Project(unitCode, unitCode + " project " + j, deadline, MIN_MEMBERS, MAX_MEMBERS);
+					SID = String.valueOf(300000000 + (int)(Math.random() * 100000000));
+				} while (usedSIDs.contains(SID));
+				usedSIDs.add(SID);
 				
-				// create teams for this project
-				int numTeams = (numStudents / MAX_MEMBERS);
-				int projectID = newProject.getID();
-				for (int k = 0; k != numTeams; ++k){
-					System.out.println("Adding team to project " + projectID + " " + (k+1) + "/" + numTeams);
-					Team newTeam = new Team(projectID, "TEAM" + k);
-					
-					// add students to this team
-					int teamSize = MIN_MEMBERS + (int)(Math.random() * (MAX_MEMBERS - MIN_MEMBERS+1));
-					for (int l = 0; l < MAX_MEMBERS; l++){
-						int teamID = newTeam.getID();
-						if (uosStudents.size() == 0){
-							System.out.println("No more students left to put in teams!");
-							break;
-						}
-						int index = (int)(Math.random() * uosStudentsCopy.size());
-						Student selectedStudent = uosStudentsCopy.remove(index);
-						System.out.println("Putting student " + selectedStudent.getUnikey() + " in team " + teamID + " for project " + projectID + " " + (l+1) + "/" + MAX_MEMBERS);
-						selectedStudent.joinTeam(teamID);
+				String firstName = firstNames[(int)(Math.random() * firstNames.length)];
+				String lastName = lastNames[(int)(Math.random() * firstNames.length)];
+				
+				String unikey = null;
+				do{
+					unikey = (firstName.charAt(0) + lastName.substring(0, 3) + String.valueOf(1000 + (int)(Math.random() * 9000))).toLowerCase(); 
+				} while (usedUnikeys.contains(unikey));
+				usedUnikeys.add(unikey);
+				
+				String password = "password";
+	
+				System.out.println("Adding student " + (i+1) + "/" + STUDENT_AMOUNT + " (unikey " + unikey + ", password " + password + ")");
+				
+				String primaryEmail = unikey + "@uni.sydney.edu.au";
+				String mobile = String.valueOf(041) + String.valueOf(100000 + (int)(Math.random() * 900000)); 
+				StudyLevel studyLevel = StudyLevel.values()[(int)(Math.random() * StudyLevel.values().length)];
+				boolean ESL = ((int)(Math.random()) == (int)(Math.random()));
+				ProgrammingLanguage languages[] = new ProgrammingLanguage[(int)(Math.random() * ProgrammingLanguage.values().length)];
+				
+				HashSet<ProgrammingLanguage> usedLangs = new HashSet<ProgrammingLanguage>();
+				for (int j=0; j != languages.length; ++j){
+					ProgrammingLanguage newLanguage = null;
+					do{
+						newLanguage = ProgrammingLanguage.values()[(int)(Math.random() * ProgrammingLanguage.values().length)];
+	
+					} while (usedLangs.contains(newLanguage));
+					usedLangs.add(newLanguage);
+					languages[j] = newLanguage;
+				}
+	
+				Student newStudent = new Student(SID, unikey, password, firstName, lastName, primaryEmail, mobile, studyLevel, ESL, languages);
+				
+				boolean[][] availability = new boolean[7][12];
+				for (boolean[] days : availability){
+					for (boolean hour : days){
+						hour = ((int)(Math.random() * 2)) == ((int)(Math.random() * 2)); //(int)(Math.random() * 2) returns either 0 or 1, so our cases are (0 == 1), (1 == 0), (0 == 0) or (1 == 1)
 					}
 				}
+				newStudent.setAvailability(availability);
+				students.add(newStudent);
 			}
-		}	
+			
+			
+			// populate UoS table
+			for (int i=0; i != UOS_AMOUNT; ++i){
+				
+				String unitCode = null;
+				do{
+					unitCode = unitCodes[(int)(Math.random() * unitCodes.length)] + String.valueOf(1000 + (int)(Math.random() * 3000));
+				} while (usedUnitCodes.contains(unitCode));
+				usedUnitCodes.add(unitCode);
+			
+				System.out.println("Adding Unit of Study " + (i+1) + "/" + UOS_AMOUNT + "(unitCode " + unitCode + ")");
+				
+				String unitName = "<unit name for " + unitCode + ">";
+				int numStudents = (int)(Math.random() * STUDENT_AMOUNT); 
+				UnitOfStudy newUOS = new UnitOfStudy(unitCode, unitName, numStudents);
+				
+				// enrol students to the UOS
+				ArrayList<Student> uosStudents = new ArrayList<Student>();
+				HashSet<Student> enrolledStudents = new HashSet<Student>();
+				for (int j=0; j != numStudents; j++){
+					Student student = null;
+					do{
+						student = students.get((int)(Math.random() * students.size()));
+					} while (enrolledStudents.contains(student));
+					System.out.println("Enrolling student " + student.getSID() + " to unit of study " + unitCode + " " + (j+1) + "/" + numStudents);
+					
+					// param = unitcode, firstsem, year
+					student.enrolTo(unitCode,(1+ (int)(Math.random() * 2)), (2013 + (int)(Math.random() * 2)));
+					enrolledStudents.add(student);
+					uosStudents.add(student);
+				}
+				
+				// add projects to this UoS
+				int numProjects = (int)(Math.random() * (MAX_PROJECTS+1));
+				for (int j=0; j != numProjects; j++){
+					ArrayList<Student> uosStudentsCopy = new ArrayList<Student>(uosStudents);
+					Date inviteDeadline = new Date(System.currentTimeMillis() + (long)(Math.random() * 31556926000L)); //current date + up to 1 year in milliseconds
+					Date start = new Date(inviteDeadline.getTime() + (long)(Math.random() * 31556926000L)); // invite deadline + up to 1 year in milliseconds
+					Date deadline = new Date(inviteDeadline.getTime() + (long)(Math.random() * 31556926000L)); // start date  + up to 1 year in milliseconds
+					
+					System.out.println("Adding Project to unit of study " + unitCode + " " + (j+1) + "/" + numProjects + "(deadline " + deadline.toGMTString() + ")");
+					Project newProject = new Project(unitCode, unitCode + " project " + j, inviteDeadline, start, deadline, MIN_MEMBERS, MAX_MEMBERS);
+					
+					// create teams for this project
+					int numTeams = (numStudents / MAX_MEMBERS);
+					int projectID = newProject.getID();
+					for (int k = 0; k != numTeams; ++k){
+						System.out.println("Adding team to project " + projectID + " " + (k+1) + "/" + numTeams);
+						Team newTeam = new Team(projectID, "TEAM" + k);
+						
+						// add students to this team
+						int teamSize = MIN_MEMBERS + (int)(Math.random() * (MAX_MEMBERS - MIN_MEMBERS+1));
+						for (int l = 0; l < MAX_MEMBERS; l++){
+							int teamID = newTeam.getID();
+							if (uosStudents.size() == 0){
+								System.out.println("No more students left to put in teams!");
+								break;
+							}
+							int index = (int)(Math.random() * uosStudentsCopy.size());
+							Student selectedStudent = uosStudentsCopy.remove(index);
+							System.out.println("Putting student " + selectedStudent.getUnikey() + " in team " + teamID + " for project " + projectID + " " + (l+1) + "/" + MAX_MEMBERS);
+							selectedStudent.joinTeam(teamID);
+						}
+					}
+				}
+				
+				// create admins for this unit
+				HashSet<String> usedStaffIds = new HashSet<String>();
+				for (int j=0; j != ADMIN_AMOUNT; j++){
+					String firstName = firstNames[(int)(Math.random() * firstNames.length)];
+					String lastName = lastNames[(int)(Math.random() * firstNames.length)];
+					String password = "password";
+					String staffID = null;
+					do{
+						staffID = (firstName.charAt(0) + lastName.substring(0, 3) + String.valueOf(1000 + (int)(Math.random() * (ADMIN_AMOUNT * 10)))).toLowerCase(); //dramatically lower range of possible staff ID's because we want staff with more than 1 subject administrated  
+					} while (usedStaffIds.contains(staffID));
+					usedStaffIds.add(staffID);
+					
+					System.out.println("Adding staffID " + staffID + " as an administrator of " + unitCode);
+					Admin newAdmin = new Admin(staffID, password, firstName, lastName); // if a student with this primary key already exists, it just wont create them in the db, so this is still valid
+					newAdmin.addUnitOfStudy(unitCode);
+				}
+			}
+		}
+		catch (NullPointerException e){
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 
 			
@@ -425,6 +521,30 @@ public class DatabaseHandler{
 	  try{
 	   PreparedStatement statement = dbConnection.prepareStatement(fetchQuery);
 	   statement.setString(1, unikey);
+	   ResultSet rs = statement.executeQuery();
+	   if (rs.next()){ // using if instead of while since there can only be 1 result
+		   password = rs.getString("PASSWORD");
+	   }
+	  } catch (SQLException e){
+	   e.printStackTrace();
+	  }
+	  return password;
+	 }
+	 
+	 /*
+	  * Takes login and returns a hashed pw of that login if the login exists.
+	  * Returns null if login doesn't exist.
+	  */
+	 public String getAdminAuthentication(String staffID) {
+	  String password = null;
+	  String fetchQuery =
+	     " SELECT PASSWORD"
+	    + " FROM Administrator"
+	    + " WHERE STAFF_ID=?" 
+	    ;
+	  try{
+	   PreparedStatement statement = dbConnection.prepareStatement(fetchQuery);
+	   statement.setString(1, staffID);
 	   ResultSet rs = statement.executeQuery();
 	   if (rs.next()){ // using if instead of while since there can only be 1 result
 		   password = rs.getString("PASSWORD");
@@ -580,6 +700,35 @@ public class DatabaseHandler{
 		return matchingUOS;
 	}
 	
+	public Admin getAdministrator(String staffID){
+		Admin matchingAdmin = adminMap.get(staffID);
+		try{
+			String selectQuery = "SELECT *"
+							+	" FROM Administrator"
+							+	" WHERE STAFF_ID=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setString(1, staffID);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()){
+				matchingAdmin = new Admin(rs.getString("STAFF_ID"), rs.getString("PASSWORD"), rs.getString("FIRST_NAME"), rs.getString("LAST_NAME"));
+				
+				if (adminMap.get(staffID) == null){
+					adminMap.put(staffID, matchingAdmin);
+				}
+				else{
+					adminMap.get(staffID).copyValues(matchingAdmin);
+				}
+				matchingAdmin = adminMap.get(staffID);
+			}
+				
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return matchingAdmin;
+	}
+	
 	public Student getStudent(String SID){
 		Student matchingStudent = studentMap.get(SID);
 		try{
@@ -610,7 +759,8 @@ public class DatabaseHandler{
 					System.out.println("Student exists!");
 					String languageString = rs.getString("LANGUAGES");
 					String[] languageNames = languageString.split(",");
-					ProgrammingLanguage[] languages = new ProgrammingLanguage[languageNames.length];
+					ProgrammingLanguage[] languages = new ProgrammingLanguage[(languageString.equals("")? 0 : languageNames.length)];
+		
 					for (int i=0; i < languages.length; ++i){
 						languages[i] = ProgrammingLanguage.findMatch(languageNames[i].trim());
 					}
@@ -645,6 +795,7 @@ public class DatabaseHandler{
 						Provider provider = SocialMedia.Provider.findMatch(socialMediaComponents[0]);
 						String address = socialMediaComponents[1].trim();
 						matchingStudent.setFirstSocialMedia(provider, address);
+
 					}
 					else{
 						matchingStudent.setFirstSocialMedia(null, null);
@@ -808,14 +959,15 @@ public class DatabaseHandler{
 		Integer id = null;
 		try{
 			String insertQuery = "INSERT INTO Invitation"
-							+	" (PROJECT, SENDER, RECIPIENT)"
-							+	" VALUES (?,?,?)"
+							+	" (PROJECT, SENDER, RECIPIENT, ACCEPTED)"
+							+	" VALUES (?,?,?,?)"
 							+ 	" RETURNING INVITE_ID"
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setInt(1, projectID);
 			stmt.setString(2, senderSID);
 			stmt.setString(3, recipientSID);
+			stmt.setBoolean(4, false);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) 
 				id = rs.getInt(1);
@@ -847,20 +999,22 @@ public class DatabaseHandler{
 		return id;
 	}
 	
-	public Integer addProject(String unitCode, String projectName, Date deadline, int minTeamSize, int maxTeamSize){
+	public Integer addProject(String unitCode, String projectName, Date inviteDeadline, Date start, Date deadline, int minTeamSize, int maxTeamSize){
 		Integer id = null;
 		try{
 			String insertQuery = "INSERT INTO Project"
-							+	" (UOS_ID, NAME, DEADLINE, MIN_TEAM_SIZE, MAX_TEAM_SIZE)"
-							+	" VALUES (?,?,?,?,?)"
+							+	" (UOS_ID, NAME, INVITE_DEADLINE, START, DEADLINE, MIN_TEAM_SIZE, MAX_TEAM_SIZE)"
+							+	" VALUES (?,?,?,?,?,?,?)"
 							+	" RETURNING PROJECT_ID"
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setString(1, unitCode);
 			stmt.setString(2, projectName);
-			stmt.setDate(3, deadline);
-			stmt.setInt(4, minTeamSize);
-			stmt.setInt(5, maxTeamSize);
+			stmt.setDate(3, inviteDeadline);
+			stmt.setDate(4, start);
+			stmt.setDate(5, deadline);
+			stmt.setInt(6, minTeamSize);
+			stmt.setInt(7, maxTeamSize);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next())
 				id = rs.getInt(1);
@@ -877,6 +1031,7 @@ public class DatabaseHandler{
 			String insertQuery = "INSERT INTO Meeting"
 							+	" (TEAM, START_TIME, END_TIME)"
 							+	" VALUES (?,?,?)"
+							+	" RETURNING MEETING_ID"
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setInt(1, teamID);
@@ -900,7 +1055,6 @@ public class DatabaseHandler{
 							+	" (STUDENT, TEAM)"
 							+	" SELECT ?,?"
 							+	" WHERE NOT EXISTS (SELECT 1 FROM TeamMembership WHERE STUDENT=? AND TEAM=?)" //allows re-enrolling when already enrolled to occur without error
-							
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setString(1, SID);
@@ -936,12 +1090,32 @@ public class DatabaseHandler{
 		return id;
 	}
 	
-	public void addAdministrator(String staffID, String unitCode){
+	public void addAdministrator(String staffID, String password, String firstName, String lastName){
 		try{
 			String insertQuery = "INSERT INTO Administrator"
+							+	" (STAFF_NUM, PASSWORD, FIRST_NAME, LAST_NAME)"
+							+	" SELECT ?,?,?,?"
+							+	" WHERE NOT EXISTS (SELECT 1 FROM Administrator WHERE STAFF_NUM=?)" 
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
+			stmt.setString(1, staffID);
+			stmt.setString(2, hashPassword(password));
+			stmt.setString(3, firstName);
+			stmt.setString(4, lastName);
+			stmt.setString(5, staffID);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void addAdministration(String staffID, String unitCode){
+		try{
+			String insertQuery = "INSERT INTO Administration"
 							+	" (STAFF_NUM, UOS)"
 							+	" SELECT ?,?"
-							+	" WHERE NOT EXISTS (SELECT 1 FROM Administrator WHERE STAFF_NUM=? AND UOS=?)" //allows re-applying as administrator when already admin without error
+							+	" WHERE NOT EXISTS (SELECT 1 FROM Administration WHERE STAFF_NUM=? AND UOS=?)" //allows re-applying as administrator when already admin without error
 							
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
@@ -977,19 +1151,22 @@ public class DatabaseHandler{
 		return getTeam(id);
 	}
 	
-	public void addEnrolment(String unitCode, String SID, int tutorialNum){
+	public void addEnrolment(String unitCode, String SID, int tutorialNum, boolean firstSem, int year){
 		try{
 			String insertQuery = "INSERT INTO Enrolment"
-							+	" (UOS, STUDENT, TUTORIAL_NUM)"
-							+	" SELECT ?,?,?"
+							+	" (UOS, STUDENT, TUTORIAL_NUM, FIRST_SEM, YEAR)"
+							+	" SELECT ?,?,?,?,?"
 							+	" WHERE NOT EXISTS (SELECT 1 FROM Enrolment WHERE UOS=? AND STUDENT=?)" //allows re-enrolment without throwing an error
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setString(1, unitCode);
 			stmt.setString(2, SID);
 			stmt.setInt(3, tutorialNum);
-			stmt.setString(4, unitCode);
-			stmt.setString(5, SID);
+			stmt.setBoolean(4, firstSem);
+			stmt.setInt(5, year);
+			stmt.setString(6, unitCode);
+			stmt.setString(7, SID);
+			
 			
 			stmt.execute();
 		}
@@ -1273,7 +1450,7 @@ public class DatabaseHandler{
 				int teamID = rs.getInt(1);
 				String meetingQuery = "SELECT MEETING_ID"
 								+	" FROM Meeting"
-								+	" WHERE TEAM_ID=?"
+								+	" WHERE TEAM=?"
 								;
 				PreparedStatement meetingStmt = dbConnection.prepareStatement(meetingQuery);
 				meetingStmt.setInt(1, teamID);
@@ -1485,4 +1662,29 @@ public class DatabaseHandler{
 		}
 		return unitsStudents;
 	}
+
+
+	public ArrayList<UnitOfStudy> getAdminUnitsOfStudy(String staffID){
+		ArrayList<UnitOfStudy> adminUnits = new ArrayList<UnitOfStudy>();
+		try{
+			String selectQuery = "SELECT UOS"
+							+	" FROM Administration"
+							+	" WHERE STAFF_NUM=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setString(1, staffID);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()){
+				String unitCode = rs.getString(0);
+				UnitOfStudy matchingStudent= getUnitOfStudy(unitCode);
+				adminUnits.add(matchingStudent);
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return adminUnits;
+	}
+	 
+	
 }

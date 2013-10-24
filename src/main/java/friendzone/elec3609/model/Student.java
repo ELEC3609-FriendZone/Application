@@ -255,8 +255,14 @@ public class Student{
 		this.lastViewed = student.lastViewed;
 	}
 
-	public void enrolTo(String unitCode) {
-		dbHandler.addEnrolment(unitCode, SID, (int)(Math.random() * 10));
+	public void enrolTo(String unitCode, int semester, int year) {
+		boolean firstSem;
+		if(semester == 1) {
+			firstSem = true;
+		} else
+			firstSem = false;
+		
+		dbHandler.addEnrolment(unitCode, SID, (int)(Math.random() * 10), firstSem, year);
 	}
 	
 	public void joinTeam(int teamID){
@@ -267,6 +273,8 @@ public class Student{
 		return dbHandler.getTutorialNum(SID, unitCode);
 	}
 	
-	
+	public List<Invitation> getInvitation() {
+		return dbHandler.getInvitations(SID);
+	}
 
 }

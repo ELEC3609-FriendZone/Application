@@ -82,6 +82,5 @@ public class UnitOfStudy {
 	
 	public List<Student> getStudents() {
 		return dbHandler.getStudentsInUoS(unitCode);
-		
 	}
 }
