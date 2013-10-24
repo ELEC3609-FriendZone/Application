@@ -5,11 +5,15 @@
 </head>
 <body>
 	<div id="header-wrapper">
-		<img src="images/title.png" alt="Friendzone">
+		<table style="width: 100%;">
+			<tr>
+				<td class="left"> <img src="images/title.png" alt="Friendzone"></td>
+			</tr>
+		</table>
 	</div>
 	<div id="form-login">
 		<form class="form" name="login" method="post" action="/mainHome/">
-			<table align="center">
+			<table class="center">
 				<tbody>
 					<tr>
 					<td colspan="2" rowspan="1">

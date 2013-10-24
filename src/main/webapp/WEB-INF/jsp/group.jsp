@@ -25,7 +25,7 @@
 		<div id="center">
 			<ul> 
 				<li class="left-panel"><h4> Group Members </h4></li>
-				<li class="right-panel"><h4> Upcoming events </h4></li>
+				<li class="right-panel"><h1> Activity </h1></li>
 			</ul>
 		</div>
 	</body>

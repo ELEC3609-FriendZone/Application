@@ -14,9 +14,15 @@
 				<td class="left"> <a href ="/mainHome/"><img src="../images/title.png" alt="Friendzone"></a></td>
 				<td style="text-align: right;"> 
 					<a href="/subject/">Details</a>  
+<<<<<<< HEAD
 					<a href="/meeting/new">New Meeting</a> 
+					<a href="/meeting/">View Meeting</a> 
+					<a href=""> My Availability</a> 
+=======
+					<a href="/meeting/">New Meeting</a> 
 					<a href="">View Meeting</a> 
 					<a href="/availability"> My Availability</a> 
+>>>>>>> cfcb95ddc87ff57d76409793188507acb31b83fc
 					<a href="/subject/">Chat</a>
 				</td>
 			</tr>
@@ -42,8 +48,12 @@
 					<td style="vertical-align: top">
 						<ul>
 							<li class="right-panel">
-								<h1>Group Meetings</h1>
+<<<<<<< HEAD
+								<h1>Meeting Page</h1>
 								${team}<br>
+=======
+								<h1>Group Meetings</h1>
+>>>>>>> cfcb95ddc87ff57d76409793188507acb31b83fc
 								${studentTeams} <br>
 								${meetingAttendees} <br>
 								${teamMembers} <br>

@@ -7,11 +7,17 @@
 </head>
 <body>
 	<div id="header-wrapper">
-		<img src="images/title.png" alt="Friendzone" href="/">
+		<table style="width: 100%;">
+			<tr>
+				<td class="left"><a href="/../mainHome/"><img
+						src="../../images/title.png" alt="Friendzone"></a></td>
+			</tr>
+		</table>
 	</div>
 	<div>
 		<h1>Edit Profile Page</h1>
 	</div>
+	<div id="form-registration">
 	<form class="form" method="post" action="/profile/editComplete">
 		<table align="center">
 			<tr>
@@ -91,5 +97,6 @@
 			</tr>
 		</table>
 	</form>
+	</div>
 </body>
 </html>
