@@ -745,6 +745,7 @@ public class DatabaseHandler{
 					String[] languageNames = languageString.split(",");
 					ProgrammingLanguage[] languages = new ProgrammingLanguage[languageNames.length];
 					for (int i=0; i < languages.length; ++i){
+						if (languages[i].equals("")) break; // the empty string "" still splits into an array of length 1
 						languages[i] = ProgrammingLanguage.findMatch(languageNames[i].trim());
 					}
 					
