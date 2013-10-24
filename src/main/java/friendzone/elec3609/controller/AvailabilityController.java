@@ -4,11 +4,14 @@ import java.util.Map;
 
 
 
+
 import javax.servlet.http.HttpServletRequest;
 
 
 
+
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
@@ -30,7 +33,7 @@ public class AvailabilityController {
 	//Dummy Data For now, so i can test the content on the page
 
 
-	Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[] {ProgrammingLanguage.C, ProgrammingLanguage.JAVA});
+	//Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[] {ProgrammingLanguage.C, ProgrammingLanguage.JAVA});
 //	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
 //	Project project = new Project(uos.getUnitCode(),  "aProject",new java.sql.Date(8099,10,15));
 //	Team team = new Team(project.getID(), "FriendZone");
@@ -46,7 +49,7 @@ public class AvailabilityController {
 
 	
 	@RequestMapping("/availability")
-	public String getEnums(Map<String, Object> map){
+	public String getEnums(Map<String, Object> map, @ModelAttribute("student") Student student){
 		//storing the data of availability
 		//availability information
 
@@ -101,7 +104,7 @@ public class AvailabilityController {
 	}
 	
 	@RequestMapping("/availability/change")
-	public String changeAvailability(HttpServletRequest request){
+	public String changeAvailability(HttpServletRequest request, @ModelAttribute("student") Student student){
 		//New 2D boolean array for the availability
 		boolean[][] newAvailability = new boolean[7][12];
 		String s;

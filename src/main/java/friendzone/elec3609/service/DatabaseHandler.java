@@ -41,10 +41,10 @@ public class DatabaseHandler{
 			instance = new DatabaseHandler();
 			
 			//reset and populate!
-			if (instance != null){
-				instance.resetDatabase();
-				instance.populate();
-			}
+//			if (instance != null){
+//				instance.resetDatabase();
+//				instance.populate();
+//			}
 		}
 		return instance;
 	}
@@ -1665,4 +1665,6 @@ public class DatabaseHandler{
 		}
 		return adminUnits;
 	}
+	 
+	
 }
