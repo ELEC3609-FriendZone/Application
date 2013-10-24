@@ -29,6 +29,7 @@ public class Student{
 	SocialMedia[] socialMedia = new SocialMedia[MAX_SOCIAL_MEDIA];
 	boolean ESL;
 	boolean[][] availability = new boolean[7][12];
+	ContactMethod preferredContact;
 	Timestamp lastViewed;
 	
 	public Student(String SID, String unikey, String password, String firstName, String lastName, String primaryEmail, String mobile, StudyLevel studyLevel, boolean ESL, ProgrammingLanguage[] languages){ //takes all the NOT NULL attributes as arguments
@@ -51,6 +52,15 @@ public class Student{
 	
 	public void setLastViewed(Timestamp lastViewed){
 		this.lastViewed = lastViewed;
+	}
+	
+	public void setPreferredContact(ContactMethod contact){
+		this.preferredContact = contact;
+		dbHandler.update(TABLE_NAME, SID, "PREFERRED_CONTACT", contact.ordinal());
+	}
+	
+	public ContactMethod getPreferredContact(){
+		return preferredContact;
 	}
 	
 	public List<UnitOfStudy> getSubjects(){
@@ -253,8 +263,14 @@ public class Student{
 		this.ESL = student.ESL;
 		this.availability = student.availability;
 		this.lastViewed = student.lastViewed;
+		this.preferredContact = student.preferredContact;
 	}
 
+	public ContactMethod getPrefferedContact() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	public void enrolTo(String unitCode) {
 		dbHandler.addEnrolment(unitCode, SID, (int)(Math.random() * 10));
 	}
@@ -266,6 +282,8 @@ public class Student{
 	public int getTutorialNum(String unitCode){
 		return dbHandler.getTutorialNum(SID, unitCode);
 	}
+
+	
 	
 	
 

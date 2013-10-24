@@ -104,7 +104,7 @@ public class DatabaseHandler{
 				+	"	SOCIAL_MEDIA_2		VARCHAR(50),"
 				+	"	STUDY_LEVEL			VARCHAR(20)		NOT NULL,"
 				+	"	PREFERRED_ROLE		VARCHAR(15)," 					//	"Project Manager", "Programmer", "Tester"...
-			//	+	"	PREFERRED_CONTACT	SMALLINT,"					
+				+	"	PREFERRED_CONTACT	SMALLINT,"					
 				+	"	EXPERIENCE			VARCHAR(200),"
 				+	"	ESL					BOOLEAN			NOT NULL,"
 				+	"	LANGUAGES			VARCHAR(50),"
@@ -808,6 +808,9 @@ public class DatabaseHandler{
 					else{
 						matchingStudent.setSecondSocialMedia(null, null);
 					}
+					
+					Integer preferredContact = rs.getInt("PREFERRED_CONTACT");
+					matchingStudent.setPreferredContact(((preferredContact == null)? null : ContactMethod.values()[preferredContact]));
 					
 					boolean[][] twoDimensionalAvail = new boolean[7][12];
 					if (rs.getArray("AVAILABILITY") != null){
