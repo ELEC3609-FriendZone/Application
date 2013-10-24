@@ -1,5 +1,5 @@
 package friendzone.elec3609.controller;
-
+import org.springframework.web.bind.annotation.SessionAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +19,7 @@ import friendzone.elec3609.model.StudyLevel;
 import friendzone.elec3609.model.ProgrammingLanguage;
 
 @Controller
+@SessionAttributes({"student", "dbHandler"})
 public class ProfileController {
 
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();

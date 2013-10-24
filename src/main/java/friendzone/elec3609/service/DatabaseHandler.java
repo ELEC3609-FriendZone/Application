@@ -232,7 +232,7 @@ public class DatabaseHandler{
 				+	"		RETURN NEW;"
 				+	"	END;" 
 				+	"$$ LANGUAGE PLPGSQL;"
-				+	"DROP FUNCTION IF EXISTS GetNewMessages"
+//				+	"DROP FUNCTION IF EXISTS GetNewMessages"
 				),
 				
 		TRIGGERS("Triggers",

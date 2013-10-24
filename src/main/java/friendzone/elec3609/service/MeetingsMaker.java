@@ -192,7 +192,7 @@ public class MeetingsMaker {
 					{
 						//Increment the count in that particular spot of the array
 						availCount[i][j] += 1;
-						System.out.println(String.valueOf(s.getUnikey()));
+						//System.out.println(String.valueOf(s.getUnikey()));
 						if(availCount[i][j] > maxCount)
 							maxCount = availCount[i][j];
 					}

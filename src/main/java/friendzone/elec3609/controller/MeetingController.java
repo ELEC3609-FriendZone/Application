@@ -10,12 +10,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import friendzone.elec3609.service.DatabaseHandler;
 import friendzone.elec3609.service.MeetingsMaker;
 import friendzone.elec3609.model.*;
 
 @Controller
+@SessionAttributes({"student", "dbHandler"})
 public class MeetingController {
 
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
@@ -25,10 +27,10 @@ public class MeetingController {
 //	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
 //	Project project = new Project(uos.getUnitCode(),  "aProject",new java.sql.Date(8099,10,15));
 //	Team team = new Team(1234, project.getID(), "FriendZone");
-	Team team = dbHandler.getTeam(4);
+//	Team team = dbHandler.getTeam(4);
 	//Meeting meeting = dbHandler.getMeetings("371830314").get(0);
 	//Student student = dbHandler.getStudent("325516396");
-	Student student = dbHandler.getStudent(team.getMembers().get(0).getSID());
+//	Student student = dbHandler.getStudent(team.getMembers().get(0).getSID());
 	
 	@RequestMapping("/meeting")
 	public String getEnums(Map<String, Object> map){
@@ -80,7 +82,7 @@ public class MeetingController {
 //		System.out.println("LOOK HERE");
 //		System.out.println("LOOK HERE");
 //		System.out.println(team.toString());
-		System.out.println(student.getMeetings());
+//		System.out.println(student.getMeetings());
 /**
 		//////////////////////////////////////////////////////////////////////////////////
 		Student student = dbHandler.getStudent("371830314");
@@ -159,7 +161,7 @@ public class MeetingController {
 		
 		/////////////////////////////////////////////////////////////////////////////////
 */		
-		//dbHandler.addMeeting(1, );
+/**		//dbHandler.addMeeting(1, );
 		//dbHandler.addMeeting(1, new java.sql.Timestamp(2013, 12, 10, 3, 50, 20, 1), new java.sql.Timestamp(2013, 12, 10, 4, 20, 20, 1));
 //		INSERT INTO meeting VALUES (1,1, timestamp '2013-09-27 23:00:00', timestamp '2013-09-27 23:30:00', 'School OF IT')
 //		map.put("studentTeams",student.getTeams());
@@ -172,14 +174,14 @@ public class MeetingController {
 		//map.put("meetingLocation", dbHandler.getMeetings(team.getMembers().get(0).getSID()));
 		//map.put("meetingLocation", dbHandler.getMeetings("371830314").get(0).getLocation());
 		//map.put("team", dbHandler.getMeetings("371830314").get(0).getAttendees());
-		
+*/		
 		return "meeting";
 	}
 	
 	@RequestMapping("/meeting/new")
 	public String newMeeting(Map<String, Object> map){
 		
-		//Get an arrayList<String> Of team names
+/*		//Get an arrayList<String> Of team names
 		List<Team> studentTeams = student.getTeams();
 		ArrayList<String> teamNames = new ArrayList<String>();
 		for(Team t: studentTeams)
@@ -232,7 +234,7 @@ public class MeetingController {
 			availSaturdayStrings.add(String.valueOf(ca[5][j]));
 			availSundayStrings.add(String.valueOf(ca[6][j]));
 		}
-		ArrayList<String> teamNames2 =teamNames;
+		ArrayList<String>teamNames2 =teamNames;
 		//ArrayList<String>[][] members= mm.getMembers();
 		//ArrayList<String> availMembers = mm.getAvailableMembers(0, 0, team);
 		map.put("availabilityMonday", availMondayStrings);
@@ -243,9 +245,9 @@ public class MeetingController {
 		map.put("availabilitySaturday", availSaturdayStrings);
 		map.put("availabilitySunday", availSundayStrings);
 		map.put("teamNames", teamNames);
-		map.put("teamNames2", teamNames2);
+		map.put("teamNames2", teamNames);
 		map.put("maxCount", mm.getMaxCount());
-		map.put("teamSize", team.getMembers().size());
+		map.put("teamSize", team.getMembers().size());*/
 		//map.put("availMembers", );
 		return "newMeeting";
 	}
