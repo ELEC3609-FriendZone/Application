@@ -45,7 +45,7 @@ public class Invitation {
 	 }
 	 
 	 public void decline(){
-		 dbHandler.respondToInvitation(id, false);
+		 dbHandler.deleteInvitation(id);
 	 }
 	 
 	 public void setMessage(String message){
