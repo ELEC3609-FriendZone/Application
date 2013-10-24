@@ -30,32 +30,47 @@ public class GroupController {
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	@RequestMapping(value = "/group", method = RequestMethod.GET)
-	public String viewProject(@ModelAttribute("student") Student student, HttpServletRequest request ){
+	public String viewProject(@ModelAttribute("student") Student student, 
+							HttpServletRequest request, Map<String, Object> map ){
 		
 		// test print out
 		System.out.println(student.getFirstName().toString());
 		System.out.println(request.getParameter("projID"));
 		
+		boolean hasTeamInCurrentProj;
+		ArrayList<Student> memberList;
 		
-
 		if(request.getParameter("projID") != null) { // if belongs to a project
 			Team team = dbHandler.getTeam(Integer.parseInt(request.getParameter("projId")));
 			System.out.println(team.getName().toString());
+			hasTeamInCurrentProj = true;
+			
+			// make member list
+			 memberList = team.getMembers();
+			for(Student stud: memberList)
+				System.out.println(stud.getFirstName());
 			
 		} else {
 			// there are no projects under this unit of study
+			hasTeamInCurrentProj = false;
+			return "redirect:/group/join";
 		}
 		
 		
 		
-		//ArrayList<Student> memberList = team.getMembers();
-		//for(Student stud: memberList)
-			//System.out.println(stud.getFirstName());
+		
 			
 			
 		
 		return "group";
 	}
+	
+	@RequestMapping("/group/join")
+	public String needsAGroup(@ModelAttribute("student") Student student, HttpServletRequest request) {
+		
+		return "group_invite";
+	}
+	
 	
 	@RequestMapping("/group/invite")
 	public String inviteFriends(@ModelAttribute("student") Student student, HttpServletRequest request) {

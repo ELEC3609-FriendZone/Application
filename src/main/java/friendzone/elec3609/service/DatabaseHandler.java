@@ -104,7 +104,7 @@ public class DatabaseHandler{
 				+	"	SOCIAL_MEDIA_2		VARCHAR(50),"
 				+	"	STUDY_LEVEL			VARCHAR(20)		NOT NULL,"
 				+	"	PREFERRED_ROLE		VARCHAR(15)," 					//	"Project Manager", "Programmer", "Tester"...
-			//	+	"	PREFERRED_CONTACT	SMALLINT,"					
+				+	"	PREFERRED_CONTACT	SMALLINT,"					
 				+	"	EXPERIENCE			VARCHAR(200),"
 				+	"	ESL					BOOLEAN			NOT NULL,"
 				+	"	LANGUAGES			VARCHAR(50),"
@@ -811,6 +811,9 @@ public class DatabaseHandler{
 						matchingStudent.setSecondSocialMedia(null, null);
 					}
 					
+					Integer preferredContact = rs.getInt("PREFERRED_CONTACT");
+					matchingStudent.setPreferredContact(((preferredContact == null)? null : ContactMethod.values()[preferredContact]));
+					
 					boolean[][] twoDimensionalAvail = new boolean[7][12];
 					if (rs.getArray("AVAILABILITY") != null){
 						Array availArray = rs.getArray("AVAILABILITY");
@@ -1489,9 +1492,41 @@ public class DatabaseHandler{
 		return teams;
 	}
 
+	public void respondToInvitation(int inviteID, boolean accepted){
+		
+		try{
+			String updateQuery = "UPDATE Invitation"
+							+	" SET ACCEPTED=?"
+							+	" WHERE RECIPIENT=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
+			stmt.setBoolean(1, accepted);
+			stmt.setInt(2, inviteID);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
 	public ArrayList<Project> getProjects(String unitCode) {
 		ArrayList<Project> projects = new ArrayList<Project>();
-		
+		try{
+			String selectQuery = "SELECT PROJECT_ID"
+							+	" FROM Project"
+							+	" WHERE UOS_ID=?"
+							;
+			PreparedStatement selectStatement = dbConnection.prepareStatement(selectQuery);
+			selectStatement.setString(1, unitCode);
+			ResultSet selectRs = selectStatement.executeQuery();
+			while (selectRs.next()){
+				int projectID = selectRs.getInt(1);
+				Project matchingProject = getProject(projectID);
+				projects.add(matchingProject);
+			}
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
 		return projects;
 	}	
 	
@@ -1684,6 +1719,21 @@ public class DatabaseHandler{
 			e.printStackTrace();
 		}
 		return adminUnits;
+	}
+	
+	public void deleteInvitation(int inviteId) {
+		try{
+			String deleteQuery = "DELETE"
+							+	" FROM Invitation"
+							+	" WHERE INVITE_ID = ?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(deleteQuery);
+			stmt.setInt(1, inviteId);
+			ResultSet rs = stmt.executeQuery();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
 	}
 	 
 	
