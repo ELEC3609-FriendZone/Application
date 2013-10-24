@@ -40,7 +40,7 @@
 					<td >
 						<ul>
 							<li class="right-panel">
-								<h4>Availability</h4>
+								<h1>Availability</h1>
 								<form method="post" action="/availability/change/">
 							<table>
 								<tr class="table-heading">
@@ -91,7 +91,7 @@
 										</td>
 										<c:choose>
 											<c:when test="${aWednesday=='true'}">
-												<td class="table-available">X</td>
+												<td class="table-available"></td>
 											</c:when>
 											<c:otherwise>
 												<td class="table-unavailable"></td>
@@ -206,7 +206,7 @@
 					</td>
 				</tr>
 			</tbody>
-			</table>	
+		</table>
 	</div>
 </body>
 </html>

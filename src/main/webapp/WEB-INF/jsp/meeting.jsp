@@ -15,8 +15,8 @@
 				<td style="text-align: right;"> 
 					<a href="/subject/">Details</a>  
 					<a href="/meeting/">New Meeting</a> 
-					<a href="/meeting/">View Meeting</a> 
-					<a href=""> My Availability</a> 
+					<a href="">View Meeting</a> 
+					<a href="/availability"> My Availability</a> 
 					<a href="/subject/">Chat</a>
 				</td>
 			</tr>
@@ -37,10 +37,10 @@
 							</li>
 						</ul>
 					</td>
-					<td >
+					<td style="vertical-align: top">
 						<ul>
 							<li class="right-panel">
-								<h1>Meeting Page</h1>
+								<h1>Group Meetings</h1>
 								${studentTeams} <br>
 								${meetingAttendees} <br>
 								${teamMembers} <br>

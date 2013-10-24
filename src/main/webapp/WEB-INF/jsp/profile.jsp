@@ -7,90 +7,111 @@
 </head>
 <body>
 	<div id="header-wrapper">
-		<img src="images/title.png" alt="Friendzone" href="/">
+		<table style="width: 100%;">
+			<tr>
+				<td class="left"><a href="/mainHome/"><img
+						src="../images/title.png" alt="Friendzone"></a></td>
+				<td style="text-align: right;"> 
+					<div class="links">
+						<a href="/profile/edit/">Edit</a>
+					</div>
+				</td>
+			</tr>
+		</table>
 	</div>
-	<div>
-		<h1>Profile Page</h1>
+	<div class="left">
+		<h1>Profile</h1>
+		<h3>${firstName} ${lastName}</h3>
 	</div>
-	<table>
-		<tr>
-			<td>
-				<div class="user-details">
-					<h2>Profile</h2>
-					<i><h3>${firstName} ${lastName}</h3></i>
-				</div>
-			</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td class="details">
-				<div class="profile-details">
-					<h3>Details</h3>
-					<table>
-						<tr>
-							<td><b>Unikey:</b></td>
-							<td>${unikey}</td>
-						</tr>
-						<tr>
-							<td><b>SID:</b></td>
-							<td>${SID}</td>
-						</tr>
-						<tr>
-							<td><b>Email:</b></td>
-							<td>${primaryEmail}</td>
-						</tr>
-						<tr>
-							<td><b>Email2:</b></td>
-							<td>${secondaryEmail}</td>
-						</tr>
-						<tr>
-							<td><b>Mobile:</b></td>
-							<td>${mobile}</td>
-						</tr>
-					</table>
-				</div>
-			</td>
-			<td>
-				<div class="links">
-					<a href="/profile/edit/">edit</a>
-				</div>
-				<div class="page-body">
-					<h2>Preferences</h2>
-					<h3>Degree</h3>
-					<ul>${degree}
-					</ul>
-					<h3>Study Level</h3>
-					<ul>${studyLevels}
-					</ul>
-					<h3>Preferred Role</h3>
-					<ul>${preferredRole}
-					</ul>
-					<h3>Languages</h3>
-					<ul>
-						<c:forEach items="${languages}" var="language">
-							<li>${language}</li>
-						</c:forEach>
-					</ul>
-					<h3>Social Media</h3>
-					<ul>
-						<li>${firstSocialMedia}</li>
-						<li>${secondSocialMedia}</li>
-					</ul>
-					<h3>English as a second Language?</h3>
-					<ul>
-						<c:choose>
-							<c:when test="${ESL == true}">
-								Yes
-							</c:when>
-							<c:otherwise> No </c:otherwise>
-						</c:choose>
-					</ul>
-					<h3>Experience</h3>
-					<ul>${experience}
-					</ul>
-				</div>
-			</td>
-		</tr>
-	</table>
+	<div id="page-content">
+		<table>
+			<tbody>
+				<tr>
+					<td style="vertical-align: top">
+						<ul class="left">
+							<li class="left-panel">
+								<h4>Details</h4>
+								<table id="detail-table">
+									<tr>
+										<td><b>Unikey: </b></td>
+										<td>${unikey}</td>
+									</tr>
+									<tr>
+										<td><b>SID:</b></td>
+										<td>${SID}</td>
+									</tr>
+									<tr>
+										<td><b>Email: </b></td>
+										<td>${primaryEmail}</td>
+									</tr>
+									<tr>
+										<td><b>Mobile: </b></td>
+										<td>${mobile}</td>
+									</tr>
+								</table>
+							</li>
+						</ul>
+					</td>
+					<td style="vertical-align: top">
+						<ul class="left">
+							<li class="right-panel">
+								<h1>Preferences</h1>
+								<table id="preferences-table">
+									<tr>
+										<td><h5>Study Level:</h5></td>
+										<td>
+											<ul>${studyLevels}</ul>
+										</td>
+									</tr>
+									<tr>
+										<td><h5>Role:</h5></td>
+										<td>
+											<ul>${preferredRole}</ul>
+										</td>
+									</tr>
+									<tr>
+										<td><h5>Languages</h5></td>
+										<td>
+											<ul>
+												<c:forEach items="${languages}" var="language">
+													<li>${language}</li>
+												</c:forEach>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td><h5>Social Media</h5></td>
+										<td>
+											<ul>
+												<li>${firstSocialMedia}</li>
+												<li>${secondSocialMedia}</li>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td><h5>English as a second Language?</h5></td>
+										<td>
+											<ul>
+												<c:choose>
+													<c:when test="${ESL == true}"> Yes </c:when>
+													<c:otherwise> No </c:otherwise>
+												</c:choose>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td><h5>Experience</h5></td>
+										<td>
+											<ul>${experience}</ul>
+										</td>
+									</tr>
+								</table>
+							</li>
+						</ul>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </body>
 </html>
