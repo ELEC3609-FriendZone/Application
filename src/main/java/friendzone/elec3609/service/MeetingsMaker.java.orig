@@ -22,6 +22,8 @@ public class MeetingsMaker {
 		//supposed constructor :/ 
 		//I forgot How To Java! HAHAHAHA
 	}
+	
+	
 	//This function will return a list of the timestamps
 	public ArrayList<String> getTimes(ArrayList<ArrayList<Integer>> values)
 	{
@@ -133,6 +135,7 @@ public class MeetingsMaker {
 		}
 		return days;
 	}
+<<<<<<< HEAD
 	
 	//This function will return a list of the available team members at that time
 	public ArrayList<String> getAvailableMembers(int i, int j, Team team)
@@ -298,4 +301,6 @@ public class MeetingsMaker {
 	
 
 	
+=======
+>>>>>>> 6fa95752337ea6b16d0550737cdb283452acb905
 }

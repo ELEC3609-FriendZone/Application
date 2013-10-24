@@ -17,18 +17,22 @@ public class Project {
 	
 	Integer id;
 	String parent;
+	Date inviteDeadline;
+	Date start;
 	Date deadline;
 	String description;
 	int maxTeamSize;
 	int minTeamSize;
 	Timestamp lastViewed;
 	
-	public Project(String unitCode, String projectName, Date deadline, int minTeamSize, int maxTeamSize){
+	public Project(String unitCode, String projectName, Date inviteDeadline, Date start, Date deadline, int minTeamSize, int maxTeamSize){
 		this.parent = unitCode;
+		this.inviteDeadline = inviteDeadline;
+		this.start = start;
 		this.deadline = deadline;
 		this.minTeamSize = minTeamSize;
 		this.maxTeamSize = maxTeamSize;
-		id = dbHandler.addProject(parent, projectName, deadline, minTeamSize, maxTeamSize);
+		id = dbHandler.addProject(parent, projectName, inviteDeadline, start, deadline, minTeamSize, maxTeamSize);
 		lastViewed = new Timestamp(System.currentTimeMillis());
 	}
 	
@@ -73,6 +77,14 @@ public class Project {
 		return deadline;
 	}
 	
+	public Date getStart(){
+		return start;
+	}
+	
+	public Date getInviteDeadline(){
+		return inviteDeadline;
+	}
+	
 	public UnitOfStudy getParent(){
 		return dbHandler.getUnitOfStudy(parent);
 		
@@ -91,6 +103,20 @@ public class Project {
 			throw new IllegalArgumentException();
 		this.deadline = deadline;
 		dbHandler.update(TABLE_NAME, id, "DEADLINE", deadline);
+	}
+	
+	public void setStat(Date start) throws IllegalArgumentException{
+		if (start == null)
+			throw new IllegalArgumentException();
+		this.start = start;
+		dbHandler.update(TABLE_NAME, id, "START", start);
+	}
+	
+	public void setInviteDeadline(Date inviteDeadline) throws IllegalArgumentException{
+		if (inviteDeadline == null)
+			throw new IllegalArgumentException();
+		this.inviteDeadline = inviteDeadline;
+		dbHandler.update(TABLE_NAME, id, "INVITE_DEADLINE", inviteDeadline);
 	}
 	
 	public void setParent(String unitCode) throws IllegalArgumentException{
