@@ -267,6 +267,8 @@ public class Student{
 		return dbHandler.getTutorialNum(SID, unitCode);
 	}
 	
-	
+	public List<Meeting> getMeetings(){
+		return dbHandler.getMeetings(SID);
+	}
 
 }

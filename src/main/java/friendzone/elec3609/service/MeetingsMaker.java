@@ -14,6 +14,8 @@ public class MeetingsMaker {
 	
 //	ArrayList<String> times, days,  members = new ArrayList<String>();
 //	int[][] availCount = new int[7][12];
+	int maxCount = 0;
+	ArrayList<String>[][] members = new ArrayList[7][12];
 	
 	public MeetingsMaker()
 	{
@@ -169,7 +171,7 @@ public class MeetingsMaker {
 		return count;
 	}
 	
-	//This finds if there is an available time for the group to meet as a whole 
+	/**This finds if there is an available time for the group to meet as a whole */
 	public int[][] countAvailability(Team team){
 		
 		//initializing variables
@@ -190,22 +192,28 @@ public class MeetingsMaker {
 					//If any value is true
 					if(studAvail[i][j] == true)
 					{
-//						//Increment the count in that particular spot of the array
-//						if(availCount[i][j] == null)
-//						{
-//							availCount[i][j] = 1;
-//						}
-//						else 
-//						{
-							int count = availCount[i][j];
-							availCount[i][j] = count++;
-//						}
+						//Increment the count in that particular spot of the array
+						availCount[i][j] += 1;
+						System.out.println(String.valueOf(s.getUnikey()));
+						if(availCount[i][j] > maxCount)
+							maxCount = availCount[i][j];
 					}
 				}
 			}
 		}
 		
 		return availCount;
+	}
+	
+	/**Gets the maxCount variable*/
+	public int getMaxCount()
+	{
+		return maxCount;
+	}
+	
+	public ArrayList<String>[][] getMembers()
+	{
+		return members;
 	}
 	
 	//This stores the best possible meeting times
