@@ -1492,6 +1492,23 @@ public class DatabaseHandler{
 		return teams;
 	}
 
+	public void respondToInvitation(int inviteID, boolean accepted){
+		
+		try{
+			String updateQuery = "UPDATE Invitation"
+							+	" SET ACCEPTED=?"
+							+	" WHERE RECIPIENT=?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(updateQuery);
+			stmt.setBoolean(1, accepted);
+			stmt.setInt(2, inviteID);
+			stmt.execute();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
 	public ArrayList<Project> getProjects(String unitCode) {
 		ArrayList<Project> projects = new ArrayList<Project>();
 		try{

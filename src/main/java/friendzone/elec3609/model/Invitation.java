@@ -7,6 +7,7 @@ import friendzone.elec3609.service.DatabaseHandler;
 public class Invitation {
 	 
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
+	final static String TABLE_NAME = "Invitation";
 	
 	int id;
 	private String senderID;
@@ -40,15 +41,16 @@ public class Invitation {
 	 }
 	 
 	 public void accept(){
-		 dbHandler.update("Invitation", recipientID, "ACCEPTED", true);
+		 dbHandler.respondToInvitation(id, true);
 	 }
 	 
 	 public void decline(){
-		 
+		 dbHandler.respondToInvitation(id, false);
 	 }
 	 
 	 public void setMessage(String message){
 		 this.message = message;
+		 dbHandler.update(TABLE_NAME, id, "MESSAGE", message);
 	 }
 	 
 	 public Student getSender(){
