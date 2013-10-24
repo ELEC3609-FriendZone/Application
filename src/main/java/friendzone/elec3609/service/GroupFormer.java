@@ -107,7 +107,7 @@ public class GroupFormer{
 								}
 							}
 						}
-						value += (combinedLanguages.size() * );
+			//			value += (combinedLanguages.size() * );
 						
 					}
 					this.complement = new Link(end, start, this);
