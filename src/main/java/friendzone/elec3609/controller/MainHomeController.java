@@ -77,7 +77,7 @@ public class MainHomeController {
 		if(projects.size() != 0 ) {
 			for (List<Project> il: projects) {
 				
-				System.out.println(il);
+				System.out.println();
 			}
 		}
 		

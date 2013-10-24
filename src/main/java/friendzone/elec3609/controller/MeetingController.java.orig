@@ -22,7 +22,11 @@ public class MeetingController {
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	//dummy data
+<<<<<<< HEAD
+	//Student student = dbHandler.getStudent("371830314");
+=======
 	//Student student = dbHandler.getStudent("123456789");
+>>>>>>> 2486fc913e73a7e2071ac370d4a5ab9038ff5047
 //	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
 //	Project project = new Project(uos.getUnitCode(),  "aProject",new java.sql.Date(8099,10,15));
 //	Team team = new Team(1234, project.getID(), "FriendZone");

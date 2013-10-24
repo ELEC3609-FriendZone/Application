@@ -273,8 +273,13 @@ public class Student{
 		return dbHandler.getTutorialNum(SID, unitCode);
 	}
 	
+<<<<<<< HEAD
+	public List<Meeting> getMeetings(){
+		return dbHandler.getMeetings(SID);
+=======
 	public List<Invitation> getInvitation() {
 		return dbHandler.getInvitations(SID);
+>>>>>>> 2486fc913e73a7e2071ac370d4a5ab9038ff5047
 	}
 
 }
