@@ -13,11 +13,12 @@
 			<tr>
 				<td class="left"> <a href ="/mainHome/"><img src="../images/title.png" alt="Friendzone"></a></td>
 				<td style="text-align: right;"> 
-					<a href="/subject/">Details</a>  
-					<a href="/meeting/new">New Meeting</a> 
-					<a href="/meeting/">View Meeting</a> 
-					<a href=""> My Availability</a> 
-					<a href="/subject/">Chat</a>
+					<a href="/availability"> My Availability</a>
+					<a href="/meeting/">View Meetings</a> 
+					<a href="/meeting/new/">New Meeting</a>  
+					<a href="/subject/">Chat</a>	
+					<a href="/profile/" class="button-small1"> ${Firstname} ${Lastname}</a>
+					<a href="/logout/" class="button-small2"> Log out</a>
 				</td>
 			</tr>
 		</table>
