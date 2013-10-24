@@ -1494,7 +1494,22 @@ public class DatabaseHandler{
 
 	public ArrayList<Project> getProjects(String unitCode) {
 		ArrayList<Project> projects = new ArrayList<Project>();
-		
+		try{
+			String selectQuery = "SELECT PROJECT_ID"
+							+	" FROM Project"
+							+	" WHERE UOS_ID=?"
+							;
+			PreparedStatement selectStatement = dbConnection.prepareStatement(selectQuery);
+			selectStatement.setString(1, unitCode);
+			ResultSet selectRs = selectStatement.executeQuery();
+			while (selectRs.next()){
+				int projectID = selectRs.getInt(1);
+				Project matchingProject = getProject(projectID);
+				projects.add(matchingProject);
+			}
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
 		return projects;
 	}	
 	
