@@ -31,7 +31,7 @@ public class ProfileController {
 	
 	//Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[]{ProgrammingLanguage.C, ProgrammingLanguage.CPLUSPLUS});
 	
-	Student student = dbHandler.getStudent("123456789");
+	//Student student = dbHandler.getStudent("123456789");
 	
 	@RequestMapping("/profile")
 	public String getEnums(Map<String, Object> map, @ModelAttribute("student") Student student){
@@ -76,7 +76,7 @@ public class ProfileController {
 	
 	//
 	@RequestMapping("/profile/edit")
-	public String editProfile(Map<String, Object> map){
+	public String editProfile(Map<String, Object> map, @ModelAttribute("student") Student student){
 		map.put("programmingLanguages", ProgrammingLanguage.getNames());
 		map.put("roles", Role.getNames());	
 		map.put("socialMediaProviders", SocialMedia.Provider.getNames());
@@ -85,7 +85,7 @@ public class ProfileController {
 	}
 	
 	@RequestMapping("/profile/editComplete")
-	public String changeProfile(HttpServletRequest request){//, @ModelAttribute("student") Student student){
+	public String changeProfile(HttpServletRequest request, @ModelAttribute("student") Student student){
 		
 		//Converts the string of languages back to a programming language
 		//And then sets it
