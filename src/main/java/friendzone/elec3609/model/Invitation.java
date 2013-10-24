@@ -40,7 +40,7 @@ public class Invitation {
 	 }
 	 
 	 public void accept(){
-		 
+		 dbHandler.update("Invitation", recipientID, "ACCEPTED", true);
 	 }
 	 
 	 public void decline(){

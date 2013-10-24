@@ -1685,6 +1685,21 @@ public class DatabaseHandler{
 		}
 		return adminUnits;
 	}
+	
+	public void deleteInvitation(int inviteId) {
+		try{
+			String deleteQuery = "DELETE"
+							+	" FROM Invitation"
+							+	" WHERE INVITE_ID = ?"
+							;
+			PreparedStatement stmt = dbConnection.prepareStatement(deleteQuery);
+			stmt.setInt(1, inviteId);
+			ResultSet rs = stmt.executeQuery();
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+	}
 	 
 	
 }
