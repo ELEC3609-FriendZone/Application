@@ -290,5 +290,9 @@ public class Student{
 	public List<Invitation> getInvitation() {
 		return dbHandler.getInvitations(SID);
 	}
+	
+	public List<Meeting> getMeetings() {
+		return dbHandler.getMeetings(SID);
+	}
 
 }

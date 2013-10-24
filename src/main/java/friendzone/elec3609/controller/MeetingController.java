@@ -26,7 +26,7 @@ public class MeetingController {
 //	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
 //	Project project = new Project(uos.getUnitCode(),  "aProject",new java.sql.Date(8099,10,15));
 //	Team team = new Team(1234, project.getID(), "FriendZone");
-	Team team = dbHandler.getTeam(4);
+	Team team = dbHandler.getTeam(1);
 	//Meeting meeting = dbHandler.getMeetings("371830314").get(0);
 	//Student student = dbHandler.getStudent("325516396");
 	Student student = dbHandler.getStudent(team.getMembers().get(0).getSID());
@@ -48,6 +48,7 @@ public class MeetingController {
 		//map.put("meetingLocation", dbHandler.getMeetings(team.getMembers().get(0).getSID()));
 		//map.put("meetingLocation", dbHandler.getMeetings("371830314").get(0).getLocation());
 		//map.put("team", dbHandler.getMeetings("371830314").get(0).getAttendees());
+		map.put("meetings", student.getMeetings());
 		
 		return "meeting";
 	}

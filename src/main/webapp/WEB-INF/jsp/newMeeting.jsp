@@ -138,6 +138,8 @@
 									</c:forEach>
 								</select>
 								<br>
+								Meeting Location: <input type="text" name="location">
+								<br>
 								Choose Time:
 								<form method="post" action="/meeting/create">
 									<table>
@@ -181,7 +183,7 @@
 											 	</c:if>
 										    <c:forEach var="j" begin="0" end="11">
 										    	<td><!-- input type="radio" name="avail${i}${j}" value="avail${i}${j}"-->
-										    	<input type="radio" name="studyLevel" value="avail${i}${j}"></td>
+										    	<input type="radio" name="meetingTime" value="avail${i}${j}"></td>
 										     </c:forEach>
 										   </tr>
 										</c:forEach>
