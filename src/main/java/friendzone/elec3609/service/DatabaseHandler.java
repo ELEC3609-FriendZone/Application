@@ -1273,7 +1273,7 @@ public class DatabaseHandler{
 				int teamID = rs.getInt(1);
 				String meetingQuery = "SELECT MEETING_ID"
 								+	" FROM Meeting"
-								+	" WHERE TEAM_ID=?"
+								+	" WHERE TEAM=?"
 								;
 				PreparedStatement meetingStmt = dbConnection.prepareStatement(meetingQuery);
 				meetingStmt.setInt(1, teamID);
