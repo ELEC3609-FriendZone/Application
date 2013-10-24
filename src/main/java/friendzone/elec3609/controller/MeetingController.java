@@ -2,21 +2,22 @@ package friendzone.elec3609.controller;
 
 import java.util.Map;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import friendzone.elec3609.service.DatabaseHandler;
 import friendzone.elec3609.model.*;
 
 @Controller
+@SessionAttributes({"student", "dbHandler"})
 public class MeetingController {
 
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 	
 	//dummy data
-	Student student = dbHandler.getStudent("123456789");
+	//Student student = dbHandler.getStudent("123456789");
 //	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
 //	Project project = new Project(uos.getUnitCode(),  "aProject",new java.sql.Date(8099,10,15));
 //	Team team = new Team(1234, project.getID(), "FriendZone");

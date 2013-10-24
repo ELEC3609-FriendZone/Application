@@ -232,7 +232,6 @@ public class DatabaseHandler{
 				+	"		RETURN NEW;"
 				+	"	END;" 
 				+	"$$ LANGUAGE PLPGSQL;"
-				+	"DROP FUNCTION IF EXISTS GetNewMessages"
 				),
 				
 		TRIGGERS("Triggers",
@@ -398,7 +397,9 @@ public class DatabaseHandler{
 						student = students.get((int)(Math.random() * students.size()));
 					} while (enrolledStudents.contains(student));
 					System.out.println("Enrolling student " + student.getSID() + " to unit of study " + unitCode + " " + (j+1) + "/" + numStudents);
-					student.enrolTo(unitCode);
+					
+					// param = unitcode, firstsem, year
+					student.enrolTo(unitCode,(1+ (int)(Math.random() * 2)), (2013 + (int)(Math.random() * 2)));
 					enrolledStudents.add(student);
 					uosStudents.add(student);
 				}
@@ -758,12 +759,12 @@ public class DatabaseHandler{
 					System.out.println("Student exists!");
 					String languageString = rs.getString("LANGUAGES");
 					String[] languageNames = languageString.split(",");
-					ProgrammingLanguage[] languages = new ProgrammingLanguage[languageNames.length];
+					ProgrammingLanguage[] languages = new ProgrammingLanguage[(languageString.equals("")? 0 : languageNames.length)];
+		
 					for (int i=0; i < languages.length; ++i){
-						if (languages[i].equals("")) break; // the empty string "" still splits into an array of length 1
 						languages[i] = ProgrammingLanguage.findMatch(languageNames[i].trim());
 					}
-					
+		
 					matchingStudent = new Student(SID,
 							 rs.getString("UNIKEY"),
 							 rs.getString("PASSWORD"),
@@ -774,7 +775,7 @@ public class DatabaseHandler{
 							 StudyLevel.findMatch(rs.getString("STUDY_LEVEL")),
 							 rs.getBoolean("ESL"),
 							 languages);
-					
+		
 					System.out.println("Unikey: " + matchingStudent.getUnikey()
 									+  "First Name: " + matchingStudent.getFirstName()
 									+  "Last Name: " + matchingStudent.getLastName()
@@ -794,11 +795,12 @@ public class DatabaseHandler{
 						Provider provider = SocialMedia.Provider.findMatch(socialMediaComponents[0]);
 						String address = socialMediaComponents[1].trim();
 						matchingStudent.setFirstSocialMedia(provider, address);
+
 					}
 					else{
 						matchingStudent.setFirstSocialMedia(null, null);
 					}
-					
+
 					if (rs.getString("SOCIAL_MEDIA_2") != null){
 						String[] socialMediaComponents = rs.getString("SOCIAL_MEDIA_2").split(":");
 						Provider provider = SocialMedia.Provider.findMatch(socialMediaComponents[0]);
@@ -808,7 +810,7 @@ public class DatabaseHandler{
 					else{
 						matchingStudent.setSecondSocialMedia(null, null);
 					}
-					
+
 					boolean[][] twoDimensionalAvail = new boolean[7][12];
 					if (rs.getArray("AVAILABILITY") != null){
 						Array availArray = rs.getArray("AVAILABILITY");
@@ -1149,19 +1151,22 @@ public class DatabaseHandler{
 		return getTeam(id);
 	}
 	
-	public void addEnrolment(String unitCode, String SID, int tutorialNum){
+	public void addEnrolment(String unitCode, String SID, int tutorialNum, boolean firstSem, int year){
 		try{
 			String insertQuery = "INSERT INTO Enrolment"
-							+	" (UOS, STUDENT, TUTORIAL_NUM)"
-							+	" SELECT ?,?,?"
+							+	" (UOS, STUDENT, TUTORIAL_NUM, FIRST_SEM, YEAR)"
+							+	" SELECT ?,?,?,?,?"
 							+	" WHERE NOT EXISTS (SELECT 1 FROM Enrolment WHERE UOS=? AND STUDENT=?)" //allows re-enrolment without throwing an error
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(insertQuery);
 			stmt.setString(1, unitCode);
 			stmt.setString(2, SID);
 			stmt.setInt(3, tutorialNum);
-			stmt.setString(4, unitCode);
-			stmt.setString(5, SID);
+			stmt.setBoolean(4, firstSem);
+			stmt.setInt(5, year);
+			stmt.setString(6, unitCode);
+			stmt.setString(7, SID);
+			
 			
 			stmt.execute();
 		}

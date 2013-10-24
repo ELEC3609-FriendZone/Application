@@ -6,10 +6,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import friendzone.elec3609.service.DatabaseHandler;
 import friendzone.elec3609.model.Role;
@@ -19,6 +20,7 @@ import friendzone.elec3609.model.StudyLevel;
 import friendzone.elec3609.model.ProgrammingLanguage;
 
 @Controller
+@SessionAttributes({"student", "dbHandler"})
 public class ProfileController {
 
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
@@ -29,10 +31,10 @@ public class ProfileController {
 	
 	//Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[]{ProgrammingLanguage.C, ProgrammingLanguage.CPLUSPLUS});
 	
-	Student student = dbHandler.getStudent("123456789");
+	//Student student = dbHandler.getStudent("123456789");
 	
 	@RequestMapping("/profile")
-	public String getEnums(Map<String, Object> map){
+	public String getEnums(Map<String, Object> map, @ModelAttribute("student") Student student){
 		//More Dummy Data
 //
 //		student.setPreferredRole(Role.PROGRAMMER);
@@ -83,7 +85,7 @@ public class ProfileController {
 	}
 	
 	@RequestMapping("/profile/editComplete")
-	public String changeProfile(HttpServletRequest request){
+	public String changeProfile(HttpServletRequest request, @ModelAttribute("student") Student student){
 		
 		//Converts the string of languages back to a programming language
 		//And then sets it
