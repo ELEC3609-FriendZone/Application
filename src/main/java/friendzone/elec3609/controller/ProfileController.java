@@ -85,7 +85,7 @@ public class ProfileController {
 	}
 	
 	@RequestMapping("/profile/editComplete")
-	public String changeProfile(HttpServletRequest request, @ModelAttribute("student") Student student){
+	public String changeProfile(HttpServletRequest request){//, @ModelAttribute("student") Student student){
 		
 		//Converts the string of languages back to a programming language
 		//And then sets it

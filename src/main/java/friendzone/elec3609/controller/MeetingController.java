@@ -48,6 +48,7 @@ public class MeetingController {
 		//map.put("meetingLocation", dbHandler.getMeetings(team.getMembers().get(0).getSID()));
 		//map.put("meetingLocation", dbHandler.getMeetings("371830314").get(0).getLocation());
 		//map.put("team", dbHandler.getMeetings("371830314").get(0).getAttendees());
+		map.put("meetings", student.getMeetings());
 		
 		return "meeting";
 	}
