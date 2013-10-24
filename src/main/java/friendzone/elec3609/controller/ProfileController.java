@@ -31,7 +31,7 @@ public class ProfileController {
 	
 	//Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[]{ProgrammingLanguage.C, ProgrammingLanguage.CPLUSPLUS});
 	
-	//Student student = dbHandler.getStudent("123456789");
+	Student student = dbHandler.getStudent("123456789");
 	
 	@RequestMapping("/profile")
 	public String getEnums(Map<String, Object> map, @ModelAttribute("student") Student student){

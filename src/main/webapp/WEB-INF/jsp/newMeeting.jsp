@@ -179,7 +179,8 @@
 											 		<td class="table-heading">Sunday</td>
 											 	</c:if>
 										    <c:forEach var="j" begin="0" end="11">
-										    	<td><input type=radio name="avail${i}${j}" value="avail${i}${j}"></td>
+										    	<td><!-- input type="radio" name="avail${i}${j}" value="avail${i}${j}"-->
+										    	<input type="radio" name="studyLevel" value="avail${i}${j}"></td>
 										     </c:forEach>
 										   </tr>
 										</c:forEach>
