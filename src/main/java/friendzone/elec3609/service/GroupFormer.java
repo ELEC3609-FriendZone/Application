@@ -7,13 +7,23 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import friendzone.elec3609.model.ProgrammingLanguage;
 import friendzone.elec3609.model.Project;
 import friendzone.elec3609.model.Student;
 import friendzone.elec3609.model.Team;
+import friendzone.elec3609.model.UnitOfStudy;
 
 @Service
 public class GroupFormer{
 	
+	// The following list are the weightings used to determine the compatibility of two students
+	final static int SAME_TUTORIAL_WEIGHT = 5; // added once if both students are in the same tute
+	final static int SAME_PREFERRED_ROLE_WEIGHT = -1000; // subtracted once if both students have the same preferred role. This is done to increase the chance of a student obtaining their preferred role once they are in the same
+	final static int SAME_ESL_WEIGHT = 50; // if both students have english as a second language, they are more likely to want to be in a group with other ESL students. Similarly, fluent English speakers are more likely to want to work with other fluent English speakers.
+	final static int SAME_CONTACT_PREFERENCE_WEIGHT = 40; // added once if both students have the same preferred contact method
+	final static int SAME_STUDY_LEVEL_WEIGHT = 5; // added once if both students have the same study level
+	final static int SHARED_LANGUAGE_WEIGHT = 100; // added for each language that both students share
+	final static int PERCENTAGE_COMPATIBLE_LANGUAGE_WEIGHT = 200; // this score is multiplied by the percentage of compatible languages ( / union of first and seconds languages
 	/**
 	 * This class is used to run the group forming algorithm. As a <code>Runnable</code> object, it can run in it's own <code>Thread</code> and will update the database when it completes.
 	 * Since students access their teams through a database query, they will receive the updates next time they load any view with team-relevant info.
@@ -21,6 +31,11 @@ public class GroupFormer{
 	 */
 	private class GroupFormingAlgorithm implements Runnable{
 
+		int projectID;
+		int minTeamSize;
+		int maxTeamSize;
+		String unitCode;	
+		
 		/**
 		 * Node class used by the algorithm, contains an SID of the student it represents and a compatibility score with every other node  (null for dummy nodes) 
 		 * @author CJR
@@ -34,11 +49,7 @@ public class GroupFormer{
 				this.student = student;	
 				links = new ArrayList<Link>();
 			}
-			public void addLink(Node node){
-				Link link = new Link(this, node);
-				links.add(link);
-				node.getLinks().add(link);
-			}
+			
 			public Student getStudent(){
 				return student;
 			}
@@ -59,27 +70,66 @@ public class GroupFormer{
 			boolean considered; //links are marked as considered if the nodes are in the same group, if the result of a switch has been examined, or if we just finished switching these nodes
 			Node start;
 			Node end;
+			Link complement; //the link that goes in the other direction (start = end and end = start)
 			int value; // value is the compatibility strength between these two students - it is based on a variety of factors such as acceptance of invitation, languages known and tutorial number and is set when the Link is created
 			
-			public Link(Node start, Node end){
+			public Link(Node start, Node end, Link complement){
 				this.start = start;
 				this.end = end;
 				
-				start.addLink(end); // addLink makes the link go both ways, so we don't need to also call end.addLink(start)
-
-				//calculate the compatibility between these two students - if the student is null, we have a dummy node, and all nodes have compatibility 0 with dummy nodes
-				if (end == null){
-					value = 0;
+				if (complement == null){ //if we don't already have a complement link, we need to calculate the value of the link and then MAKE a complement link
+					if (end == null){ // if the student is null, we have a dummy node, and all nodes have compatibility 0 with dummy nodes
+						value = 0;
+					}
+					else{ //calculate the compatibility between these two students 
+						Student first = start.getStudent();
+						Student second = end.getStudent();
+						
+						//run through all the cases that add to or subtract from compatibility
+						if (first.getESL() == second.getESL())
+							value += SAME_ESL_WEIGHT;
+						
+						if (first.getPreferredRole() == second.getPreferredRole()){
+							value += SAME_PREFERRED_ROLE_WEIGHT;
+						}
+						
+						if (first.getTutorialNum(unitCode) == second.getTutorialNum(unitCode)){
+							value += SAME_TUTORIAL_WEIGHT;
+						}
+						
+						HashSet<ProgrammingLanguage> combinedLanguages = new HashSet<ProgrammingLanguage>();
+						for (ProgrammingLanguage firstsLanguage : first.getLanguages()){
+							combinedLanguages.add(firstsLanguage);
+							for (ProgrammingLanguage secondsLanguage : second.getLanguages()){
+								combinedLanguages.add(secondsLanguage);
+								if (firstsLanguage == secondsLanguage){
+									value += SHARED_LANGUAGE_WEIGHT;
+								}
+							}
+						}
+						value += (combinedLanguages.size() * );
+						
+					}
+					this.complement = new Link(end, start, this);
+				} else {
+					this.complement = complement;
+					this.value = complement.getValue();
 				}
-				else{
-					
-				}			
+			
 			}
 			public boolean considered(){
 				return considered;
 			}
+			
 			public void setConsidered(boolean considered){
 				this.considered = considered;
+			}
+			
+			public void setComplement(Link complement){
+				this.complement = complement;
+			}
+			public Link getComplement(){
+				return complement;
 			}
 			public boolean connects(Node a, Node b){
 				return (start == a && end == b) || (start == b || end == a);
@@ -88,19 +138,18 @@ public class GroupFormer{
 				return value;
 			}
 		}
-				
-		int projectID;
-		int minTeamSize;
-		int maxTeamSize;
+					
 		ArrayList<ArrayList<Node>> groups; //we have a list of groups, and each group has a list of nodes (its current members) 
 		HashMap<Link, ArrayList<Link>> teamLinks; //given a Link object, this will return all links (link.start, u) where u is a member of link.ends group 
 		
 		public GroupFormingAlgorithm(int projectID){
 			this.projectID = projectID;
 			Project project = dbHandler.getProject(projectID);
+			UnitOfStudy parent = project.getParent();
+			this.unitCode = unitCode;
 			this.minTeamSize = project.getMinTeamSize();
 			this.maxTeamSize = project.getMaxTeamSize();
-			
+		
 			//build the data structure
 			List<Student> studentList = project.getParent().getStudents();
 			int numGroups = (studentList.size() / maxTeamSize) + (studentList.size() % maxTeamSize > 0? 1 : 0);
@@ -115,7 +164,7 @@ public class GroupFormer{
 			//every pairing has a unique link, so we can discard link where i==j (can't link to self) and i<j (Link(i,j) == Link(j,i), so just make Link(j,i))
 			for (int i = 0; i < nodeList.length; ++i){ 
 				for (int j = i+1; j < nodeList.length; ++j){
-					Link newLink = new Link(nodeList[i], nodeList[j]);
+					Link newLink = new Link(nodeList[i], nodeList[j], null);
 					
 				}
 			}

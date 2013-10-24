@@ -11,6 +11,4 @@ public class MeetingsMaker {
 	public void createMeeting(Project project){
 		
 	}
-	
-	
 }
