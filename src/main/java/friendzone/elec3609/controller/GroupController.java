@@ -56,11 +56,9 @@ public class GroupController {
 			return "redirect:/group/join";
 		}
 		
-		
-		
-		
-			
-			
+		// Header details 
+		map.put("firstname", student.getFirstName());
+		map.put("lastname", student.getLastName());
 		
 		return "group";
 	}

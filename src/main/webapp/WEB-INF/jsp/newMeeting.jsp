@@ -11,13 +11,14 @@
 	<div id="header-wrapper">
 		<table style="width: 100%;">
 			<tr>
-				<td class="left"> <a href ="/mainHome/"><img src="../images/title.png" alt="Friendzone"></a></td>
-				<td style="text-align: right;"> 
-					<a href="/availability"> My Availability</a>
+				<td class="left">
+				<a href="/mainHome/"><img src="../../images/title.png" alt="Friendzone"></a></td>
+				<td style="text-align: right;">
+					<a href="/availability"> My Availability</a> 
 					<a href="/meeting/">View Meetings</a> 
-					<a href="/meeting/new/">New Meeting</a>  
-					<a href="/subject/">Chat</a>	
-					<a href="/profile/" class="button-small1"> ${Firstname} ${Lastname}</a>
+					<a href="/meeting/new/">New Meeting</a> 
+					<a href="/subject/">Chat</a> 
+					<a href="/profile/" class="button-small1"> ${Firstname} ${Lastname}</a> 
 					<a href="/logout/" class="button-small2"> Log out</a>
 				</td>
 			</tr>
@@ -34,20 +35,18 @@
 					<td style="vertical-align: top">
 						<ul>
 							<li class="left-panel">
-								<h4>Group Members</h4> 
-								<br> TeamID:${teamID}
-								<br> Team Name: ${teamName}
+								<h4>Group Members</h4> <br> TeamID:${teamID} <br> Team
+								Name: ${teamName}
 							</li>
 						</ul>
 					</td>
-					<td >
+					<td>
 						<ul>
 							<li class="right-panel">
-								<h1>Create a New Meeting</h1>
-								<h2>Member Availabilities:</h2>
-								<c:forEach items="${teamNames}" var="tname">
+								<h1>Create a New Meeting</h1> <br>
+								<h2>Member Availabilities</h2> <c:forEach items="${teamNames}" var="tname">
 									<ul>
-										<li>${tname}</li>
+										<li class="left"><h5>${tname}</h5></li>
 										<table>
 											<tr class="table-heading">
 												<td>Day</td>
@@ -71,9 +70,11 @@
 														<c:when test="${aMonday != '0'}">
 															<td title="${aMonday}" class="table-unavailable">${aMonday}</td>
 														</c:when>
-														<c:otherwise><td></td></c:otherwise>
+														<c:otherwise>
+															<td></td>
+														</c:otherwise>
 													</c:choose>
-													
+
 												</c:forEach>
 											</tr>
 											<tr>
@@ -83,9 +84,11 @@
 														<c:when test="${aTuesday != '0'}">
 															<td class="table-unavailable">${aTuesday}</td>
 														</c:when>
-														<c:otherwise><td></td></c:otherwise>
+														<c:otherwise>
+															<td></td>
+														</c:otherwise>
 													</c:choose>
-													
+
 												</c:forEach>
 											</tr>
 											<tr>
@@ -95,7 +98,9 @@
 														<c:when test="${aWednesday != '0'}">
 															<td class="table-unavailable">${aWednesday}</td>
 														</c:when>
-														<c:otherwise><td></td></c:otherwise>
+														<c:otherwise>
+															<td></td>
+														</c:otherwise>
 													</c:choose>
 												</c:forEach>
 											</tr>
@@ -106,7 +111,9 @@
 														<c:when test="${aThursday != '0'}">
 															<td class="table-unavailable">${aThursday}</td>
 														</c:when>
-														<c:otherwise><td></td></c:otherwise>
+														<c:otherwise>
+															<td></td>
+														</c:otherwise>
 													</c:choose>
 												</c:forEach>
 											</tr>
@@ -117,85 +124,98 @@
 														<c:when test="${aFriday != '0'}">
 															<td class="table-unavailable">${aFriday}</td>
 														</c:when>
-														<c:otherwise><td></td></c:otherwise>
+														<c:otherwise>
+															<td></td>
+														</c:otherwise>
 													</c:choose>
 												</c:forEach>
 											</tr>
 										</table>
-										<br>
-										The Maximum number of members that have a possible meeting time together is: ${maxCount}/${teamSize}
-										<br>
-										Available Team members: ${availMembers}
-										<br>
+										<p class="left">
+											The Maximum number of members that have a possible meeting
+											time together is: ${maxCount}/${teamSize} <br> Available
+											Team members: ${availMembers}
+										</p>
+										<li class="body-divider"></li>
 									</ul>
-								</c:forEach>
-								<br>
+								</c:forEach> <br>
+							</li>
+							
+							<li class="right-panel-white">
 								<h2>Create Meeting</h2>
-								Choose Team:
-								<select name="teamChosen">
-									<c:forEach items="${teamNames}" var="option">
-										<option value="${option}"> ${option} </option>
-									</c:forEach>
-								</select>
-								<br>
-								Meeting Location: <input type="text" name="location">
-								<br>
-								Choose Time:
+								<p class="left">
+									Choose Team: <select name="teamChosen">
+										<c:forEach items="${teamNames}" var="option">
+											<option value="${option}">${option}</option>
+										</c:forEach>
+									</select> <br> Meeting Location: <input type="text" name="location">
+								</p>
+								<p class="left">Choose Time:</p>
 								<form method="post" action="/meeting/create">
 									<table>
 										<tr class="table-heading">
-												<td>Day</td>
-												<td>8am</td>
-												<td>9am</td>
-												<td>10am</td>
-												<td>11am</td>
-												<td>12pm</td>
-												<td>1pm</td>
-												<td>2pm</td>
-												<td>3pm</td>
-												<td>4pm</td>
-												<td>5pm</td>
-												<td>6pm</td>
-												<td>7pm</td>
-											</tr>
+											<td>Day</td>
+											<td>8am</td>
+											<td>9am</td>
+											<td>10am</td>
+											<td>11am</td>
+											<td>12pm</td>
+											<td>1pm</td>
+											<td>2pm</td>
+											<td>3pm</td>
+											<td>4pm</td>
+											<td>5pm</td>
+											<td>6pm</td>
+											<td>7pm</td>
+										</tr>
 										<c:forEach var="i" begin="0" end="6">
 											<tr>
 												<c:if test="${i==0}">
-											 		<td class="table-heading">Monday</td>
-											 	</c:if>
-											 	<c:if test="${i==1}">
-											 		<td class="table-heading">Tuesday</td>
-											 	</c:if>
-											 	<c:if test="${i==2}">
-											 		<td class="table-heading">Wednesday</td>
-											 	</c:if>
-											 	<c:if test="${i==3}">
-											 		<td class="table-heading">Thursday</td>
-											 	</c:if>
-											 	<c:if test="${i==4}">
-											 		<td class="table-heading">Friday</td>
-											 	</c:if>
-											 	<c:if test="${i==5}">
-											 		<td class="table-heading">Saturday</td>
-											 	</c:if>
-											 	<c:if test="${i==6}">
-											 		<td class="table-heading">Sunday</td>
-											 	</c:if>
-										    <c:forEach var="j" begin="0" end="11">
-										    	<td><!-- input type="radio" name="avail${i}${j}" value="avail${i}${j}"-->
-										    	<input type="radio" name="meetingTime" value="avail${i}${j}"></td>
-										     </c:forEach>
-										   </tr>
+													<td class="table-heading">Monday</td>
+												</c:if>
+												<c:if test="${i==1}">
+													<td class="table-heading">Tuesday</td>
+												</c:if>
+												<c:if test="${i==2}">
+													<td class="table-heading">Wednesday</td>
+												</c:if>
+												<c:if test="${i==3}">
+													<td class="table-heading">Thursday</td>
+												</c:if>
+												<c:if test="${i==4}">
+													<td class="table-heading">Friday</td>
+												</c:if>
+												<c:if test="${i==5}">
+													<td class="table-heading">Saturday</td>
+												</c:if>
+												<c:if test="${i==6}">
+													<td class="table-heading">Sunday</td>
+												</c:if>
+												<c:forEach var="j" begin="0" end="11">
+													<td>
+														<!-- input type="radio" name="avail${i}${j}" value="avail${i}${j}"-->
+														<input type="radio" name="meetingTime"
+														value="avail${i}${j}">
+													</td>
+												</c:forEach>
+											</tr>
 										</c:forEach>
 									</table>
-									<p align="right"><input type="submit" value="Create Meeting" class="button-orange"/></p>
+									<p align="right">
+										<input type="submit" value="Create Meeting"
+											class="button-orange" />
+									</p>
 								</form>
 							</li>
 						</ul>
 					</td>
 				</tr>
 			</tbody>
-			</table>	
+		</table>
+	</div>
+	<!-- Footer -->
+	<div>
+		<jsp:include page="footer.jsp" />
 	</div>
 </body>
 </html>

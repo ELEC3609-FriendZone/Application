@@ -26,7 +26,11 @@
 		<div id="center">
 			<ul> 
 				<li class="left-panel"><h4> Group Members </h4></li>
-				<li class="right-panel"><h1> Activity </h1></li>
+				<li class="right-panel">
+					<h1> Activity </h1> 
+					<li class="body-divider"> </li>
+				
+				</li>
 			</ul>
 		</div>
 			<!-- Footer -->

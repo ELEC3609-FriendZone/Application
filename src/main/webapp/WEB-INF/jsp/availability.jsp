@@ -154,6 +154,8 @@
 								</tr>
 							</table>
 							<li class="body-divider"> </li>
+							</li> 
+							<li class="right-panel-white">
 							<p> <h3> Tick the boxes below to edit your availability </h3> </p>
 							<table>
 								<tr class="table-heading">
@@ -203,7 +205,6 @@
 							<p align="right"><input type="submit" value="Change Availability" class="button-orange"/></p>
 						</form>
 							</li>
-							<!--li class="body-divider"> </li-->
 						</ul>
 					</td>
 				</tr>
