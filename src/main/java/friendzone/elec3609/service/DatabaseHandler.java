@@ -764,7 +764,7 @@ public class DatabaseHandler{
 					for (int i=0; i < languages.length; ++i){
 						languages[i] = ProgrammingLanguage.findMatch(languageNames[i].trim());
 					}
-		
+					
 					matchingStudent = new Student(SID,
 							 rs.getString("UNIKEY"),
 							 rs.getString("PASSWORD"),
@@ -775,7 +775,7 @@ public class DatabaseHandler{
 							 StudyLevel.findMatch(rs.getString("STUDY_LEVEL")),
 							 rs.getBoolean("ESL"),
 							 languages);
-		
+					
 					System.out.println("Unikey: " + matchingStudent.getUnikey()
 									+  "First Name: " + matchingStudent.getFirstName()
 									+  "Last Name: " + matchingStudent.getLastName()
@@ -800,7 +800,7 @@ public class DatabaseHandler{
 					else{
 						matchingStudent.setFirstSocialMedia(null, null);
 					}
-
+					
 					if (rs.getString("SOCIAL_MEDIA_2") != null){
 						String[] socialMediaComponents = rs.getString("SOCIAL_MEDIA_2").split(":");
 						Provider provider = SocialMedia.Provider.findMatch(socialMediaComponents[0]);
@@ -810,7 +810,7 @@ public class DatabaseHandler{
 					else{
 						matchingStudent.setSecondSocialMedia(null, null);
 					}
-
+					
 					boolean[][] twoDimensionalAvail = new boolean[7][12];
 					if (rs.getArray("AVAILABILITY") != null){
 						Array availArray = rs.getArray("AVAILABILITY");
@@ -1450,7 +1450,7 @@ public class DatabaseHandler{
 				int teamID = rs.getInt(1);
 				String meetingQuery = "SELECT MEETING_ID"
 								+	" FROM Meeting"
-								+	" WHERE TEAM_ID=?"
+								+	" WHERE TEAM=?"
 								;
 				PreparedStatement meetingStmt = dbConnection.prepareStatement(meetingQuery);
 				meetingStmt.setInt(1, teamID);

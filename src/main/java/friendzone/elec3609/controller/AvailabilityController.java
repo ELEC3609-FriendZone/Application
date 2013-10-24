@@ -26,12 +26,12 @@ import friendzone.elec3609.service.DatabaseHandler;
 @SessionAttributes({"student", "dbHandler"})
 public class AvailabilityController {
 
-	//Student student = dbHandler.getStudent(//StudentID);
+	
 
 	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
 
 	//Dummy Data For now, so i can test the content on the page
-
+//	Student student = dbHandler.getStudent("390076323");
 
 	//Student student = new Student("123456789", "abcd1234", "password", "aFirstName", "aLastname", "abcd1234@uni.sydney.edu.au", "0412345678", StudyLevel.UNDERGRADUATE, true, new ProgrammingLanguage[] {ProgrammingLanguage.C, ProgrammingLanguage.JAVA});
 //	UnitOfStudy uos =  new UnitOfStudy("ELEC3609", "Internet Software Platforms", 500);
