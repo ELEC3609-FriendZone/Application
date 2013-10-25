@@ -37,7 +37,7 @@
 						</td>
 					</tr>
 					<tr align="center">
-						<td align="center"><a class="button-green" href="/registration/"> Register </a></td>
+						<td align="center"><a class="button-green" href="/admin/"> Administrator </a></td>
 						<td><input class="button-orange" type="submit" value="log in"></td>
 					</tr>
 			</table>
