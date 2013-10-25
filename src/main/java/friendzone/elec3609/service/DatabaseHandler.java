@@ -1730,7 +1730,7 @@ public class DatabaseHandler{
 			stmt.setString(1, staffID);
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()){
-				String unitCode = rs.getString(0);
+				String unitCode = rs.getString(1);
 				UnitOfStudy matchingStudent= getUnitOfStudy(unitCode);
 				adminUnits.add(matchingStudent);
 			}
