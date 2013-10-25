@@ -283,7 +283,7 @@ public class GroupFormer{
 				}
 			}
 			
-			//now we can put nodes into groups
+			//now we can put nodes into groups, enforcing size > min and < max
 			for (int i = 0; i != numGroups; i++){
 				Group newGroup = new Group();
 				for (int j = 0; j != maxTeamSize; j++){
@@ -385,6 +385,5 @@ public class GroupFormer{
 		thread.run();
 		return;
 	}
-	
-	
+
 }

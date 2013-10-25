@@ -741,7 +741,6 @@ public class DatabaseHandler{
 				}
 				matchingAdmin = adminMap.get(staffID);
 			}
-				
 		}
 		catch (SQLException e){
 			e.printStackTrace();
