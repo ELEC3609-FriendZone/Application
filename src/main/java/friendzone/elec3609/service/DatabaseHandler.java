@@ -560,7 +560,7 @@ public class DatabaseHandler{
 	  String fetchQuery =
 	     " SELECT PASSWORD"
 	    + " FROM Administrator"
-	    + " WHERE STAFF_ID=?" 
+	    + " WHERE STAFF_NUM=?" 
 	    ;
 	  try{
 	   PreparedStatement statement = dbConnection.prepareStatement(fetchQuery);
@@ -725,13 +725,13 @@ public class DatabaseHandler{
 		try{
 			String selectQuery = "SELECT *"
 							+	" FROM Administrator"
-							+	" WHERE STAFF_ID=?"
+							+	" WHERE STAFF_NUM=?"
 							;
 			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
 			stmt.setString(1, staffID);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()){
-				matchingAdmin = new Admin(rs.getString("STAFF_ID"), rs.getString("PASSWORD"), rs.getString("FIRST_NAME"), rs.getString("LAST_NAME"));
+				matchingAdmin = new Admin(rs.getString("STAFF_NUM"), rs.getString("PASSWORD"), rs.getString("FIRST_NAME"), rs.getString("LAST_NAME"));
 				
 				if (adminMap.get(staffID) == null){
 					adminMap.put(staffID, matchingAdmin);
