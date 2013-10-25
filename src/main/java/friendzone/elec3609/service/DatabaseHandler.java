@@ -170,7 +170,6 @@ public class DatabaseHandler{
 			+	"	PRIMARY KEY		(TEAM_ID)"
 			+	");"),
 		
-
 		MEETING("Meeting",
 					"DROP TABLE IF EXISTS Meeting CASCADE;"
 				+	"CREATE TABLE Meeting("
@@ -323,6 +322,22 @@ public class DatabaseHandler{
 			HashSet<String> usedUnikeys = new HashSet<String>();
 			ArrayList<Student> students = new ArrayList<Student>();
 			// populate student table
+			
+			boolean[][] allTrue = new boolean[7][12];
+			boolean[][] allFalse = new boolean[7][12];
+			for (int i = 0; i != allTrue.length; i++){
+				for (int j=0; j != allFalse.length; j++){
+					allTrue[i][j] = true;
+					allFalse[i][j] = false;
+				}
+			}
+			
+			Student minStats = new Student("000000000", "mind1234", "password", "Min", "Stats", "mind1234@uni.sydney.edu.au", "041000000", StudyLevel.UNDERGRADUATE, false, new ProgrammingLanguage[0]);
+			minStats.setAvailability(allFalse);
+			Student maxStats = new Student("999999999", "maxd1234", "password", "Max", "Stats", "maxd1234@uni.sydney.edu.au", "041999999", StudyLevel.POSTGRADUATE, true, ProgrammingLanguage.values());
+			Admin maxStatsAdmin = new Admin("maxd1234", "password", "Max", "Stats");
+			maxStats.setAvailability(allTrue);
+			
 			for (int i=0; i != STUDENT_AMOUNT; ++i){
 				String SID = null;
 				do{
@@ -391,7 +406,9 @@ public class DatabaseHandler{
 				// enrol students to the UOS
 				ArrayList<Student> uosStudents = new ArrayList<Student>();
 				HashSet<Student> enrolledStudents = new HashSet<Student>();
-				for (int j=0; j != numStudents; j++){
+				for (int j=0; j != numStudents-1; j++){
+					maxStats.enrolTo(unitCode, 2, 2014);
+					
 					Student student = null;
 					do{
 						student = students.get((int)(Math.random() * students.size()));
@@ -416,15 +433,17 @@ public class DatabaseHandler{
 					Project newProject = new Project(unitCode, unitCode + " project " + j, inviteDeadline, start, deadline, MIN_MEMBERS, MAX_MEMBERS);
 					
 					// create teams for this project
-					int numTeams = (numStudents / MAX_MEMBERS);
+					int numTeams = ((numStudents-1) / MAX_MEMBERS);
 					int projectID = newProject.getID();
 					for (int k = 0; k != numTeams; ++k){
 						System.out.println("Adding team to project " + projectID + " " + (k+1) + "/" + numTeams);
 						Team newTeam = new Team(projectID, "TEAM" + k);
 						
+						if (k == 0) maxStats.joinTeam(newTeam.getID());
+						
 						// add students to this team
 						int teamSize = MIN_MEMBERS + (int)(Math.random() * (MAX_MEMBERS - MIN_MEMBERS+1));
-						for (int l = 0; l < MAX_MEMBERS; l++){
+						for (int l = 0; l < teamSize; l++){
 							int teamID = newTeam.getID();
 							if (uosStudents.size() == 0){
 								System.out.println("No more students left to put in teams!");
@@ -437,7 +456,7 @@ public class DatabaseHandler{
 						}
 					}
 				}
-				
+							
 				// create admins for this unit
 				HashSet<String> usedStaffIds = new HashSet<String>();
 				for (int j=0; j != ADMIN_AMOUNT; j++){
@@ -453,6 +472,7 @@ public class DatabaseHandler{
 					System.out.println("Adding staffID " + staffID + " as an administrator of " + unitCode);
 					Admin newAdmin = new Admin(staffID, password, firstName, lastName); // if a student with this primary key already exists, it just wont create them in the db, so this is still valid
 					newAdmin.addUnitOfStudy(unitCode);
+					maxStatsAdmin.addUnitOfStudy(unitCode);
 				}
 			}
 		}
@@ -1719,6 +1739,26 @@ public class DatabaseHandler{
 			e.printStackTrace();
 		}
 		return adminUnits;
+	}
+	
+	public List<Invitation> getInvitations(int projectID, boolean onlyAccepted){
+		ArrayList<Invitation> invites = new ArrayList<Invitation>();
+		try{
+			String selectQuery = "SELECT *"
+							+	" FROM Invitation"
+							+	" WHERE PROJECT=? " + (onlyAccepted? "AND ACCEPTED=TRUE" : "");
+			PreparedStatement stmt = dbConnection.prepareStatement(selectQuery);
+			stmt.setInt(1, projectID);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()){
+				Invitation matchingInvite = new Invitation(rs.getInt("INVITE_ID"), rs.getString("SENDER"), rs.getString("RECIPIENT"), rs.getInt("PROJECT"), rs.getString("MESSAGE"));
+				invites.add(matchingInvite);
+			}
+		}
+		catch (SQLException e){
+			e.printStackTrace();
+		}
+		return invites;
 	}
 	
 	public void deleteInvitation(int inviteId) {

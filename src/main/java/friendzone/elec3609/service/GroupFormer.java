@@ -8,6 +8,7 @@ import java.util.Stack;
 
 import org.springframework.stereotype.Service;
 
+import friendzone.elec3609.model.Invitation;
 import friendzone.elec3609.model.ProgrammingLanguage;
 import friendzone.elec3609.model.Project;
 import friendzone.elec3609.model.Student;
@@ -16,6 +17,9 @@ import friendzone.elec3609.model.UnitOfStudy;
 
 @Service
 public class GroupFormer{
+	
+	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
+	
 	
 	// The following list are the weightings used to determine the compatibility of two students
 	final static int SAME_ESL_WEIGHT = 50; // if both students have english as a second language, they are more likely to want to be in a group with other ESL students. Similarly, fluent English speakers are more likely to want to work with other fluent English speakers.
@@ -37,34 +41,38 @@ public class GroupFormer{
 		int minTeamSize;
 		int maxTeamSize; 
 		String unitCode;	
-		Stack<Link> links;
+		Stack<Link> stackedLinks;
+		List<Student> studentList;
+		ArrayList<Link> allLinks;
 		ArrayList<Group> groups; 
+		HashMap<Student, ArrayList<Student>> initialGroups;
 		
 		private class Group{
-			int maxSize;
-			int numDummyNodes = 0;
+			int currentSize; //refers to the number of students, not the number of nodes - a group could have 5 nodes, but all with more than one student!
 			HashSet<Node> nodes;
 			
-			public Group(int maxSize){
-				this.maxSize = maxSize;
-			}
-			
 			public void addNode(Node node){
-				if (node.getStudent() == null){
-					numDummyNodes++;
+				if (node.getStudents() != null){
+					currentSize += node.getStudents().size();
 				}
+				node.setGroup(this);
 				nodes.add(node);
 			}
 			
+			public int getCurrentSize(){
+				return currentSize;
+			}
+			
 			public void removeNode(Node node){
-				if (node.getStudent() == null){
-					numDummyNodes--;
+				if (node.getStudents() != null){ //if this is a one-student node with no student object, its one of our dummy nodes
+					currentSize -= node.getStudents().size();
 				}
+				node.setGroup(null);
 				nodes.remove(node);
 			}
 			
-			public int getMaxSize(){
-				return maxSize;
+			public Node[] getMembers(){
+				return (Node[]) nodes.toArray();
 			}
 		}
 		
@@ -73,23 +81,47 @@ public class GroupFormer{
 		 * @author CJR
 		 */
 		private class Node{
-			Student student;
-			int groupId;
+			HashMap<Node, Link> links;
+			ArrayList<Student> students;
+			Group group;
 			
-			public Node(Student student){
-				this.student = student;	
+			public Node(ArrayList<Student> students){
+				this.students = students;	
+				links = new HashMap<Node, Link>();
 			}
 			
-			public Student getStudent(){
-				return student;
+			public ArrayList<Student> getStudents(){
+				return students;
 			}
 			
-			public void setGroupId(int groupId){
-				this.groupId = groupId;
+			public void setGroup(Group group){
+				this.group = group;
 			}
 			
-			public int getGroupId(){
-				return groupId;
+			public int getNumStudents(){
+				return students.size();
+			}
+			
+			public void setLinkTo(Node node, Link link){
+				links.put(node, link);
+			}
+			
+			public Link getLinkTo(Node node){
+				return links.get(node);
+			}
+			
+			public Group getGroup(){
+				return group;
+			}
+			
+			public void switchGroup(Node node){
+				Group thisGroup = group;
+				Group nodesGroup = node.getGroup();
+				
+				thisGroup.removeNode(this);
+				nodesGroup.removeNode(node);
+				thisGroup.addNode(node);
+				nodesGroup.addNode(this);
 			}
 		}
 		
@@ -99,82 +131,69 @@ public class GroupFormer{
 		 * @author CJR
 		 */
 		private class Link{
-			boolean considered; //links are marked as considered if the nodes are in the same group, if the result of a switch has been examined, or if we just finished switching these nodes
 			Node start;
 			Node end;
-			Link complement; //the link that goes in the other direction (start = end and end = start)
 			int value; // value is the compatibility strength between these two students - it is based on a variety of factors such as acceptance of invitation, languages known and tutorial number and is set when the Link is created
 			
-			public Link(Node start, Node end, Link complement){
+			public Link(Node start, Node end){
 				this.start = start;
 				this.end = end;
 				
-				if (complement == null){ //if we don't already have a complement link, we need to calculate the value of the link and then MAKE a complement link
-					if (end == null){ // if the student is null, we have a dummy node, and all nodes have compatibility 0 with dummy nodes
-						value = 0;
-					}
-					else{
-						//calculate the compatibility between these two students 
-						Student first = start.getStudent();
-						Student second = end.getStudent();
-						
-						//run through all the cases that add to or subtract from compatibility
-						if (first.getESL() == second.getESL())
-							value += SAME_ESL_WEIGHT;
-						
-						if (first.getPreferredRole() == second.getPreferredRole()){
-							value += SAME_PREFERRED_ROLE_WEIGHT;
-						}
-						
-						if (first.getTutorialNum(unitCode) == second.getTutorialNum(unitCode)){
-							value += SAME_TUTORIAL_WEIGHT;
-						}
-						
-						ArrayList<ProgrammingLanguage> intersection = new ArrayList<ProgrammingLanguage>();
-						HashSet<ProgrammingLanguage> union = new HashSet<ProgrammingLanguage>(); // provides the union of first and seconds languages
-						for (ProgrammingLanguage firstsLanguage : first.getLanguages()){
-							intersection.add(firstsLanguage);
-							for (ProgrammingLanguage secondsLanguage : second.getLanguages()){
-								intersection.add(secondsLanguage);
-								if (firstsLanguage == secondsLanguage){
-									value += SHARED_LANGUAGE_WEIGHT;
-									union.add(firstsLanguage);
+				if (start.getStudents() == null || end.getStudents() == null){ // if the student is null, we have a dummy node, and all nodes have compatibility 0 with dummy nodes
+					value = 0;
+				}
+				else{
+					//calculate the compatibility between these two nodes - to do this, it compares all students in the node to all students in the other node  
+					for (Student first : start.getStudents()){
+						for (Student second : end.getStudents()){
+							//run through all the cases that add to or subtract from compatibility
+							if (first.getESL() == second.getESL())
+								value += SAME_ESL_WEIGHT;
+							
+							if (first.getPreferredRole() == second.getPreferredRole()){
+								value += SAME_PREFERRED_ROLE_WEIGHT;
+							}
+							
+							if (first.getTutorialNum(unitCode) == second.getTutorialNum(unitCode)){
+								value += SAME_TUTORIAL_WEIGHT;
+							}
+							
+							ArrayList<ProgrammingLanguage> intersection = new ArrayList<ProgrammingLanguage>();
+							HashSet<ProgrammingLanguage> union = new HashSet<ProgrammingLanguage>(); // provides the union of first and seconds languages
+							for (ProgrammingLanguage firstsLanguage : first.getLanguages()){
+								intersection.add(firstsLanguage);
+								for (ProgrammingLanguage secondsLanguage : second.getLanguages()){
+									intersection.add(secondsLanguage);
+									if (firstsLanguage == secondsLanguage){
+										value += SHARED_LANGUAGE_WEIGHT;
+										union.add(firstsLanguage);
+									}
 								}
 							}
+							value += (PERCENTAGE_SHARED_LANGUAGE_WEIGHT * (intersection.size() / union.size()));
+							
+							if (first.getPreferredContact() != null && first.getPrefferedContact() == second.getPreferredContact()){
+								value += SAME_CONTACT_PREFERENCE_WEIGHT;	
+							}
+							
+							if (first.getStudyLevel() == second.getStudyLevel()){
+								value +=  SAME_STUDY_LEVEL_WEIGHT; 
+							}			
 						}
-						value += (PERCENTAGE_SHARED_LANGUAGE_WEIGHT * (intersection.size() / union.size()));
-						
-						if (first.getPreferredContact() != null && first.getPrefferedContact() == second.getPreferredContact()){
-							value += SAME_CONTACT_PREFERENCE_WEIGHT;	
-						}
-						
-						if (first.getStudyLevel() == second.getStudyLevel()){
-							value +=  SAME_STUDY_LEVEL_WEIGHT; 
-						}			
-					}					
-					//now create a link that goes the other direction - this new link will set this as its complement, and use the same value we just created
-					this.complement = new Link(end, start, this);
-				} else {
-					this.complement = complement;
-					this.value = complement.getValue();
+					}
 				}
-			}
-			public boolean considered(){
-				return considered;
-			}
-			
-			public void setConsidered(boolean considered){
-				this.considered = considered;
-			}
-			
-			public Link getComplement(){
-				return complement;
-			}
-			public boolean connects(Node a, Node b){
-				return (start == a && end == b) || (start == b || end == a);
+				//now create a link that goes the other direction - this new link will set this as its complement, and use the same value we just created
+				end.setLinkTo(start, this);
+				start.setLinkTo(end, this);
 			}
 			public int getValue(){
 				return value;
+			}
+			public Node getEnd() {
+				return end;
+			}
+			public Node getStart() {
+				return start;
 			}
 		}
 			
@@ -184,86 +203,178 @@ public class GroupFormer{
 			this.projectID = projectID;
 			Project project = dbHandler.getProject(projectID);
 			UnitOfStudy parent = project.getParent();
-			this.unitCode = unitCode;
+			this.studentList = parent.getStudents();
+			this.unitCode = parent.getUnitCode();
 			this.minTeamSize = project.getMinTeamSize();
 			this.maxTeamSize = project.getMaxTeamSize();
-			links = new Stack<Link>();
+			stackedLinks = new Stack<Link>();
+			allLinks = new ArrayList<Link>();
 			groups = new ArrayList<Group>();
 			
-			//get all accepted invitations
-			//make some starter 
-		
-			//build the data structure
-			List<Student> studentList = project.getParent().getStudents();
-			int numGroups = (studentList.size() / maxTeamSize) + (studentList.size() % maxTeamSize > 0? 1 : 0);
-			int numNodes = (numGroups * maxTeamSize); // there needs to be dummy nodes to fill the gaps, so the number of nodes >= the number of students to make all groups have maxTeamSize nodes 
-			Node[] nodeList = new Node[numNodes];
-			
-			for (int i = 0; i != (numGroups * maxTeamSize); i++){		
-				nodeList[i] = new Node((i < studentList.size()? studentList.get(i) : null));
-			}
-			
-			//every pairing has a unique link, so we can discard link where i==j (can't link to self) and i<j (Link(i,j) makes Link(j,i) so we only call the constructors for Link(i,j))
-			for (int i = 0; i < nodeList.length; ++i){ 
-				for (int j = i+1; j < nodeList.length; ++j){
-					Link newLink = new Link(nodeList[i], nodeList[j], null);
-					links.push(newLink);
-				}
-			}
-			
-			//now we can put nodes into groups
-			
-			
+			//data structure could be built here, but since that's quite a time consuming process I decided to do that after the thread is spawned
 		}
 		
 		
 		public void run() {
 			System.out.println("Starting group forming for " + projectID);
 			
-			//TODO: group forming algorithm runs here
-			//Link currentBestSwitch = null;
-				//while exists links that have not yet been considered:
-					//if nodes in same group, mark as considered and move on
-					//else calculate the profit that this switch would provide:
-						//for each other link:
-							//currentFirstScore = 0 -> find each node u in the same group as link.start, add value of Link(u, link.start) to currentFirstScore
-							//currentSecondScore = 0 -> find each node v in the same group as link.end, add value of Link(v, link.end) to currentSecondsScore
-							//resultantFirstScore = 0 -> find each node v in the same group as link.end, add value of Link(v, link.start) to resultantFirstScore
-							//resultantSecondScore = 0 -> find each node v in the same group as link.start, add value of Link(u, link.end) to resultantFirstScore
-							// calculate profit as (resultantFirstScore - currentFirstScore) + (resultantSecondScore - resultantFirstScore)
-							// if profit < 0 || profit < maxProfit, mark as Link(link.start, link.end) as considered and move on
-							// else, set currentBestSwitch as Link(link.start, link.end), mark as considered and move on
-						// <END CONDITION> if best switch = null, there were no links that provide a profit > 0, so we end the algorithm
-						// else
-							// perform the switch (link.start, link.end)
-							// set all links back to !considered except for the following (note that this keeps the algorithm running in the while loop)
-							//		- (link.start, link.end) (we know the switch gave profit, so switching back would be loss)
-							//		- all links (u, link.start) and (v, link.end) where u is in the same group as link.start or v is in the same group as link.end
+			//get all accepted invitations make some starter groups
+			initialGroups = new HashMap<Student, ArrayList<Student>>();
+			List<Invitation> acceptedInvites = dbHandler.getInvitations(projectID, true);
 			
+			int numGroups = (studentList.size() / maxTeamSize) + (studentList.size() % maxTeamSize > 0? 1 : 0); 
 			
-			//could be sped up if we had:
-			//	- we have a stack/queue for all links not yet considered, which we pop from until empty, then push to until we hit the end condition
-			//	- link(u,v) == link(v,u)
-			//	- we have a way to instantly access the set of links between a node and a group with some sort of mapping (node, group) -> ArrayList<Link>
-			//	-	HashMap<Link, Set<Link>> returns links between given links start and all nodes in link.end's group?
- 			//add the result to the database by using the setter methods
+			//for all accepted invitations, we form a node to force these students together (so if the algorithm switches the 
+			for (Invitation invite : acceptedInvites){
+				Student sender = invite.getSender();
+				Student recipient = invite.getRecipient();
 			
-//			HashSet<Node>[] finalGroups = (HashSet<Node>[]) groups.toArray();
-//			for (int i = 0; i != finalGroups.length; ++i){
-//				Team newTeam = new Team(projectID, projectID + " group " + i);
-//				for (Node studentNode : finalGroups[i]){ 
-//					studentNode.getStudent().joinTeam(newTeam.getID());
-//				}
-//			}
+				ArrayList<Student> sendersGroup;
+				ArrayList<Student> recipientsGroup;
+				if ((sendersGroup = initialGroups.get(sender)) == null){
+					if ((recipientsGroup = initialGroups.get(recipient)) == null){
+						studentList.remove(sender); // by removing the students from the list, we are marking them as already groups (
+						studentList.remove(recipient);
+						initialGroups.put(sender, new ArrayList<Student>());
+						initialGroups.put(recipient, sendersGroup);
+					}
+					else{
+						recipientsGroup.add(sender);
+						initialGroups.put(sender, recipientsGroup);
+						studentList.remove(sender);
+					}
+				}
+				else{
+					sendersGroup.add(recipient);
+					initialGroups.put(recipient, sendersGroup);
+					studentList.remove(recipient);
+				}
+			}
 			
-			//TODO: delete all invitations referencing this project
+			ArrayList<Node> nodeList = new ArrayList<Node>();
+
+			//now merge these students so that they are treated as one node (unable to be seperated)
+			for (ArrayList<Student> group : initialGroups.values()){
+				Node groupNode = new Node(group);
+				nodeList.add(groupNode);
+			}
+			
+			//with the remaining students we build one-student nodes and dummy nodes to fill the gaps
+			for (int i = 0; i != (numGroups * maxTeamSize); i++){
+				if (i < studentList.size()){
+					Student student = studentList.get(i);
+					ArrayList<Student> oneStudentList = new ArrayList<Student>();
+					oneStudentList.add(student);
+					Node studentNode = new Node(oneStudentList);
+					nodeList.add(studentNode);
+				}
+				else{
+					//for dummy nodes, we make a node with null students
+					nodeList.add(new Node(null));
+				}
+			}
+			
+			//every pairing has a unique link, so we can discard link where i==j (can't link to self) and i<j (Link(i,j) makes Link(j,i) so we only call the constructors for Link(i,j))
+			for (int i = 0; i < nodeList.size(); ++i){ 
+				for (int j = i+1; j < nodeList.size(); ++j){
+					Link newLink = new Link(nodeList.get(i), nodeList.get(j));
+					allLinks.add(newLink);
+					stackedLinks.push(newLink); //stackedLinks will empty, and so we need allLinks as well to fill it back up
+				}
+			}
+			
+			//now we can put nodes into groups
+			for (int i = 0; i != numGroups; i++){
+				Group newGroup = new Group();
+				for (int j = 0; j != maxTeamSize; j++){
+					newGroup.addNode(nodeList.get((i * maxTeamSize) + j));
+				}
+				groups.add(newGroup);
+			}
+			
+
+			//now we start the actual algorithm
+			boolean remainingOptions = true;
+			while (remainingOptions){
+				Link currentBestSwitch = null;
+				int currentBestSwitchScore = 0;
+				
+				while (!stackedLinks.isEmpty()){
+					Link currentLink = stackedLinks.pop();
+					Node start = currentLink.getStart();
+					Node end = currentLink.getEnd();
+					
+					int startGroupSizeAfterSwitch = start.getGroup().getCurrentSize() - start.getNumStudents() + end.getNumStudents();
+					int endGroupSizeAfterSwitch = end.getGroup().getCurrentSize() - end.getNumStudents() + start.getNumStudents();
+					
+					if (start.getGroup() == end.getGroup() || // we don't bother switching students in the same group
+						(startGroupSizeAfterSwitch < minTeamSize || startGroupSizeAfterSwitch > maxTeamSize) || // we also have to enforce the group sizes, so don't switch where it would break these constraints
+						(endGroupSizeAfterSwitch < minTeamSize || endGroupSizeAfterSwitch > maxTeamSize)){
+							continue;
+					}
+					
+					//if we reach this point, this link is a valid option, so we have to calculate the profit it would give
+					int currentStartScore = 0;
+					int currentEndScore = 0;
+					int resultantStartScore = 0;	
+					int resultantEndScore = 0;
+					
+					for (Node startsGroupMember : start.getGroup().getMembers()){
+						if (startsGroupMember != start){
+							currentStartScore += start.getLinkTo(startsGroupMember).getValue();
+							resultantEndScore += end.getLinkTo(startsGroupMember).getValue();
+						}
+					}
+					
+					for (Node endsGroupMember : end.getGroup().getMembers()){
+						if (endsGroupMember != end){
+							currentEndScore += end.getLinkTo(endsGroupMember).getValue();
+							resultantStartScore += start.getLinkTo(endsGroupMember).getValue();
+						}
+					}
+					
+					// find the switch that maximises the profit based on the equation below
+					int profit = ((resultantStartScore - currentStartScore) + (resultantEndScore - currentEndScore));
+					if (profit > 0 && profit > currentBestSwitchScore){
+						currentBestSwitch = currentLink;
+						currentBestSwitchScore = profit;
+					}
+				}
+				
+				//end condition! there were no switches that provided a positive profit
+				if (currentBestSwitch == null){
+					remainingOptions = false;
+				}
+				else{
+					//when we reach here, we've found the currentBestSwitch that maximises profit, so perform the switch and reset a
+					currentBestSwitch.getStart().switchGroup(currentBestSwitch.getEnd());
+					System.out.println("Increased profit of solution by " + currentBestSwitchScore);
+					
+					//now every link becomes a valid option again! (except for currentBestSwitch, because switching back makes now sense
+					for (Link link : allLinks){
+						if (link != currentBestSwitch){
+							stackedLinks.push(link);
+						}
+					}
+				}
+			}
+				
+			
+			for (int i = 0; i < groups.size(); i++){
+				Group group = groups.get(i);
+				Team newTeam = new Team(projectID, projectID + " group " + i);
+				for (Node node : group.getMembers()){ 
+					if (node.getStudents() != null){
+						for (Student student : node.getStudents()){
+							student.joinTeam(newTeam.getID());
+						}
+					}
+				}
+			}
 			
 			System.out.println("Group forming for " + projectID + " completed!");
 		}
 	}
-	
-	final static DatabaseHandler dbHandler = DatabaseHandler.getInstance();
-	
 	
 	/**
 	 * Creates a new <code>Thread</code> that runs the <code>GroupFormingAlgorithm</code>. The method does not return a value because it runs in parallel, and instead it writes the changes to the database where they can be retrieved.
