@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import friendzone.elec3609.model.*;
 
-import java.util.Date;
 
 import java.util.ArrayList;
 import java.util.List;
