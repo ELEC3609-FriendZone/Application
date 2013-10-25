@@ -239,63 +239,103 @@ public class MeetingsMaker {
 		
 		//Makes sure there is at least 5 times shown in the list
 		//Adds times with one person less
-//		if(topMeetingTimes.size() < 5)
-//		{
-//			if(team.getMembers().size() > 1)
-//			{
-//				for(int i=0; i<7; i++)
-//				{
-//					for(int j=0; j<12; j++)
-//					{
-//						int countSize = team.getMembers().size() - 1;
-//						if(availCount[i][j] == countSize)
-//						{
-//							ArrayList<Integer> timeSlot= new ArrayList<Integer>();
-//							//Store i and j in list where
-//							// index 0 = i
-//							// index 1 = j
-//							timeSlot.add(i);
-//							timeSlot.add(j);
-//							
-//							//Add the arraylist to the topMeetingTims array List
-//							topMeetingTimes.add(timeSlot);
-//						}
-//					}
-//				}
-//			}
-//		}
+		if(topMeetingTimes.size() < 5)
+		{
+			if(team.getMembers().size() > 1)
+			{
+				for(int i=0; i<7; i++)
+				{
+					for(int j=0; j<12; j++)
+					{
+						int countSize = team.getMembers().size() - 1;
+						if(availCount[i][j] == countSize)
+						{
+							ArrayList<Integer> timeSlot= new ArrayList<Integer>();
+							//Store i and j in list where
+							// index 0 = i
+							// index 1 = j
+							timeSlot.add(i);
+							timeSlot.add(j);
+							
+							//Add the arraylist to the topMeetingTims array List
+							topMeetingTimes.add(timeSlot);
+						}
+					}
+				}
+			}
+		}
 		
 		//Makes sure there is at least 5 times shown in the list
 		//Adds times with two person less
-//		if(topMeetingTimes.size() < 5)
-//		{
-//			if(team.getMembers().size() > 2)
-//			{
-//				for(int i=0; i<7; i++)
-//				{
-//					for(int j=0; j<12; j++)
-//					{
-//						int countSize = team.getMembers().size() - 2;
-//						if(availCount[i][j] == countSize)
-//						{
-//							ArrayList<Integer> timeSlot= new ArrayList<Integer>();
-//							//Store i and j in list where
-//							// index 0 = i
-//							// index 1 = j
-//							timeSlot.add(i);
-//							timeSlot.add(j);
-//							
-//							//Add the arraylist to the topMeetingTims array List
-//							topMeetingTimes.add(timeSlot);
-//						}
-//					}
-//				}
-//			}
-//		}
+		if(topMeetingTimes.size() < 5)
+		{
+			if(team.getMembers().size() > 2)
+			{
+				for(int i=0; i<7; i++)
+				{
+					for(int j=0; j<12; j++)
+					{
+						int countSize = team.getMembers().size() - 2;
+						if(availCount[i][j] == countSize)
+						{
+							ArrayList<Integer> timeSlot= new ArrayList<Integer>();
+							//Store i and j in list where
+							// index 0 = i
+							// index 1 = j
+							timeSlot.add(i);
+							timeSlot.add(j);
+							
+							//Add the arraylist to the topMeetingTims array List
+							topMeetingTimes.add(timeSlot);
+						}
+					}
+				}
+			}
+		}
 		
 		return topMeetingTimes;
 	}
 	
+	public String covertDay(int i)
+	{
+		String m ="";
+		String d ="";
+		
+		switch(i)
+		{
+		case '0':
+			m="10";
+			d="04";
+			break;
+		case '1':
+			m="10";
+			d="05";
+			break;
+		case '2':
+			m="10";
+			d="06";
+			break;
+		case '3':
+			m="10";
+			d="07";
+			break;
+		case '4':
+			m="10";
+			d="08";
+			break;
+		case '5':
+			m="10";
+			d="09";
+			break;
+		case '6':
+			m="10";
+			d="10";
+			break;
+		}
+		
+		String date = "2013-" + m + "-" + d;
+		return date;
+	}
 
 	
 }

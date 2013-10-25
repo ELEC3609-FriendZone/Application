@@ -1040,8 +1040,8 @@ public class DatabaseHandler{
 			stmt.setInt(1, teamID);
 			stmt.setTimestamp(2, start);
 			stmt.setTimestamp(3, end);
-			stmt.setInt(4, teamID);
-			stmt.setTimestamp(5, start);
+//			stmt.setInt(4, teamID);
+//			stmt.setTimestamp(5, start);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next())
 				id = rs.getInt(1);

@@ -44,9 +44,9 @@
 							<li class="right-panel">
 								<h1>Create a New Meeting</h1>
 								<h2>Member Availabilities:</h2>
-								<c:forEach items="${teamNames}" var="tname">
+								<c:forEach items="${teamID}" var="tid">
 									<ul>
-										<li>${tname}</li>
+										<li>Team ID: ${tid}</li>
 										<table>
 											<tr class="table-heading">
 												<td>Day</td>
@@ -132,9 +132,11 @@
 								<h2>Create Meeting</h2>
 								Choose Team:
 								<select name="teamChosen">
-									<c:forEach items="${teamNames}" var="option">
-										<option value="${option}"> ${option} </option>
-									</c:forEach>
+									<!--  c:forEach items="${teamNames}" var="option"-->
+										<c:forEach items ="${teamID}" var="ID">
+											<option value="${ID}"> ${ID} </option>
+										</c:forEach>
+									<!--/c:forEach-->
 								</select>
 								<br>
 								Meeting Location: <input type="text" name="location">

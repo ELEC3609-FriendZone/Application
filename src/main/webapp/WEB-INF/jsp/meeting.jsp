@@ -43,12 +43,42 @@
 						<ul>
 							<li class="right-panel">
 								<h1>Group Meetings</h1>
-								${team}<br>
-								${studentTeams} <br>
-								${meetingAttendees} <br>
-								${teamMembers} <br>
-								Meeting Location: ${meetingLocation}
-								
+								Time stamp format: YYYY-MM-DD HH:MM:SS.nanoseconds
+								<table>
+									<tr>
+										<td>ID:</td>
+										<c:forEach items="${meetingID}" var="id">
+											<td>${id}</td>
+										</c:forEach>
+										
+									</tr>
+									<tr>
+										<td>Start:</td>
+										<c:forEach items="${meetingStart}" var="start">
+											<td>${start}</td>
+										</c:forEach>
+									</tr>
+									<tr>
+										<td>End:</td>
+										<c:forEach items="${meetingEnd}" var="end">
+											<td>${end}</td>
+										</c:forEach>
+									</tr>
+									<tr>
+										<td>Location:</td>
+										<c:forEach items="${meetingLocation}" var="l">
+											
+											<c:choose>
+												<c:when test="${l== null}">
+													<td>Not Specified</td>
+												</c:when>
+												<c:otherwise>
+													<td>${l}</td>
+												</c:otherwise>
+											</c:choose>
+										</c:forEach>
+									</tr>
+								</table>
 							</li>
 						</ul>
 					</td>

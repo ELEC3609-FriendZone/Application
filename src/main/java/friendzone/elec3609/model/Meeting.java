@@ -62,4 +62,20 @@ public class Meeting {
 	public String getLocation(){
 		return location;
 	}
+	
+	public int getTeamID(){
+		return teamID;
+	}
+	
+	public int getID(){
+		return id;
+	}
+	
+	public Timestamp getStart(){
+		return start;
+	}
+	
+	public Timestamp getEnd(){
+		return end;
+	}
 }

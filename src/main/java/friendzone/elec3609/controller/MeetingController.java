@@ -1,13 +1,17 @@
 package friendzone.elec3609.controller;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
@@ -34,21 +38,28 @@ public class MeetingController {
 	@RequestMapping("/meeting")
 	public String getEnums(Map<String, Object> map){
 
+		
+		List<Meeting> meetings = student.getMeetings();
 
-		//dbHandler.addMeeting(1, );
-		//dbHandler.addMeeting(1, new java.sql.Timestamp(2013, 12, 10, 3, 50, 20, 1), new java.sql.Timestamp(2013, 12, 10, 4, 20, 20, 1));
-//		INSERT INTO meeting VALUES (1,1, timestamp '2013-09-27 23:00:00', timestamp '2013-09-27 23:30:00', 'School OF IT')
-//		map.put("studentTeams",student.getTeams());
-//		map.put("meetingAttendees", meeting.getAttendees());
-		//map.put("teamMembers", team.getMembers());
-//		map.put("meetingLocation", meeting.getLocation());
-		//map.put("team", dbHandler.getStudent(team.getMembers().get(0).getSID()).getTeams());
+		ArrayList<String> meetingID = new ArrayList<String>();
+		ArrayList<String> meetingStart = new ArrayList<String>();
+		ArrayList<String> meetingEnd = new ArrayList<String>();
+		ArrayList<String> meetingLocations = new ArrayList<String>();
+		for(Meeting m: meetings)
+		{
+			meetingLocations.add(m.getLocation());
+			meetingID.add(String.valueOf(m.getID()));
+			meetingStart.add(String.valueOf(m.getStart()));
+			meetingEnd.add(String.valueOf(m.getEnd()));
+		}
+		//map the meetings
+		map.put("meetingLocation", meetingLocations);
+		map.put("meetingID", meetingID);
+		map.put("meetingStart", meetingStart);
+		map.put("meetingEnd", meetingEnd);
 		map.put("teamID", team.getID());
 		map.put("teamName", team.getName());
-		//map.put("meetingLocation", dbHandler.getMeetings(team.getMembers().get(0).getSID()));
-		//map.put("meetingLocation", dbHandler.getMeetings("371830314").get(0).getLocation());
-		//map.put("team", dbHandler.getMeetings("371830314").get(0).getAttendees());
-		map.put("meetings", student.getMeetings());
+		map.put("meetings", meetings);
 		
 		return "meeting";
 	}
@@ -59,14 +70,14 @@ public class MeetingController {
 		//Get an arrayList<String> Of team names
 		List<Team> studentTeams = student.getTeams();
 		ArrayList<String> teamNames = new ArrayList<String>();
+		ArrayList<String> teamIDs = new ArrayList<String>();
 		for(Team t: studentTeams)
 		{
 			teamNames.add(t.getName());
+			teamIDs.add(String.valueOf(t.getID()));
 		}
 		
-		System.out.println("StudentAvailability:");
-		System.out.println(student.getAvailability());
-		
+		//the availability
 		boolean[][] avail = student.getAvailability();
 		List<String> availStrings = new ArrayList<String>();
 		for(int i=0; i<7; i++){
@@ -74,19 +85,10 @@ public class MeetingController {
 				availStrings.add(String.valueOf(avail[i][j]));
 			}
 		}
-		System.out.println("StudentAvailability:");
-		System.out.println(availStrings);
-		
 		
 		
 		MeetingsMaker mm = new MeetingsMaker();
 		int[][] ca = mm.countAvailability(team);
-//		System.out.println("LOOK HERE");
-//		System.out.println("LOOK HERE");
-//		System.out.println("LOOK HERE");
-		System.out.println("LOOK HERE ca:");
-		System.out.println(ca);
-		//If this works ^ YAY IT DOES
 		
 		//Converts the given 2d Boolean array into strings
 		//Corresponding to their respective days
@@ -109,7 +111,7 @@ public class MeetingController {
 			availSaturdayStrings.add(String.valueOf(ca[5][j]));
 			availSundayStrings.add(String.valueOf(ca[6][j]));
 		}
-		ArrayList<String>teamNames2 =teamNames;
+		//ArrayList<String>teamNames2 =teamNames;
 		//ArrayList<String>[][] members= mm.getMembers();
 		ArrayList<String> availMembers = mm.getAvailableMembers(0, 0, team);
 		map.put("availabilityMonday", availMondayStrings);
@@ -120,7 +122,7 @@ public class MeetingController {
 		map.put("availabilitySaturday", availSaturdayStrings);
 		map.put("availabilitySunday", availSundayStrings);
 		map.put("teamNames", teamNames);
-		map.put("teamNames2", teamNames);
+		map.put("teamID", teamIDs);
 		map.put("maxCount", mm.getMaxCount());
 		map.put("teamSize", team.getMembers().size());
 		//map.put("availMembers", );
@@ -128,9 +130,130 @@ public class MeetingController {
 	}
 	
 	@RequestMapping("/meeting/create")
-	public String makeMeeting(Map<String, Object> map){
+	public String makeMeeting(HttpServletRequest request, @ModelAttribute("student") Student student){
 		
+		int teamID = 1;
+		String meetinglocation = "";
+		String s ="";
+		int day= 0;
+		String date ="2013-09-27 22:00:00";
+		String endDate = "2013-09-27 23:00:00";
+		MeetingsMaker mm = new MeetingsMaker();
 		
+		//Sets form data
+		if(request.getParameterMap().containsKey("teamChosen"))
+		{
+			teamID = Integer.parseInt(request.getParameter("teamChosen"));
+			
+		}
+		if(request.getParameterMap().containsKey("location"))
+		{
+			meetinglocation = request.getParameter("location");
+		}
+		
+		for (int i=0; i<7; i++){
+		   for (int j=0; j < 12; j++){
+			   s = ("avail" + i + j);
+			   if(request.getParameterMap().containsKey(s))
+			   {
+				   //Gives the Date
+				   String m ="";
+					String d ="";
+					String time ="";
+					
+					switch(i)
+					{
+					case '0':
+						m="10";
+						d="04";
+						break;
+					case '1':
+						m="10";
+						d="05";
+						break;
+					case '2':
+						m="10";
+						d="06";
+						break;
+					case '3':
+						m="10";
+						d="07";
+						break;
+					case '4':
+						m="10";
+						d="08";
+						break;
+					case '5':
+						m="10";
+						d="09";
+						break;
+					case '6':
+						m="10";
+						d="10";
+						break;
+					}
+					
+					//Switch Case time
+					switch(j)
+					{
+					case 0:
+						time="08:00:00";
+						break;
+					case 1:
+						time="09:00:00";
+						break;
+					case 2:
+						time="10:00:00";
+						break;
+					case 3:
+						time="11:00:00";
+						break;
+					case 4:
+						time="12:00:00";
+						break;
+					case 5:
+						time="13:00:00";
+						break;
+					case 6:
+						time="14:00:00";
+						break;
+					case 7:
+						time="15:00:00";
+						break;
+					case 8:
+						time="16:00:00";;
+						break;
+					case 9:
+						time="17:00:00";
+						break;
+					case 10:
+						time="18:00:00";
+						break;
+					case 11:
+						time="19:00:00";
+						break;
+					}
+					System.out.println(m);
+					System.out.println(d);
+					System.out.println(time);
+					date = "2013-" + m + "-" + d + " " + time;
+					System.out.println("date:");
+					System.out.println(date);
+			   }
+//			   else
+//			   {
+//				   
+//			   }
+		   }
+		}
+		
+		//student
+		// Meeting(int id, int teamID, Timestamp start, Timestamp end, String location)
+		//new java.sql.Timestamp(2013, 12, 10, 4, 20, 20, 1
+		//Timestamp start = new java.sql.Timestamp()
+		new Meeting(teamID, Timestamp.valueOf(date), Timestamp.valueOf(endDate),meetinglocation);
+		//dbHandler.addMeeting(teamID,Timestamp.valueOf(date), Timestamp.valueOf(endDate));
+		//timestamp '2013-09-27 23:00:00'
 		return "redirect:/meeting/"; //redirect to main meeting page
 	}
 
