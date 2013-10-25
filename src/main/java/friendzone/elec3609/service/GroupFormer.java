@@ -49,7 +49,7 @@ public class GroupFormer{
 		
 		private class Group{
 			int currentSize; //refers to the number of students, not the number of nodes - a group could have 5 nodes, but all with more than one student!
-			HashSet<Node> nodes;
+			HashSet<Node> nodes = new HashSet<Node>();
 			
 			public void addNode(Node node){
 				if (node.getStudents() != null){
@@ -168,10 +168,11 @@ public class GroupFormer{
 										value += SHARED_LANGUAGE_WEIGHT;
 										union.add(firstsLanguage);
 									}
-								}
+								} 	
 							}
-							value += (PERCENTAGE_SHARED_LANGUAGE_WEIGHT * (intersection.size() / union.size()));
-							
+							if (union.size() != 0){
+								value += (PERCENTAGE_SHARED_LANGUAGE_WEIGHT * (intersection.size() / union.size()));
+							}
 							if (first.getPreferredContact() != null && first.getPrefferedContact() == second.getPreferredContact()){
 								value += SAME_CONTACT_PREFERENCE_WEIGHT;	
 							}
@@ -202,8 +203,15 @@ public class GroupFormer{
 			//set the local variables
 			this.projectID = projectID;
 			Project project = dbHandler.getProject(projectID);
+			if (project != null)
+				System.out.println("Starting group form for project " + project.getID());
 			UnitOfStudy parent = project.getParent();
+			if (parent != null)
+				System.out.println("Unit of study for the project is " + parent.getUnitCode());
 			this.studentList = parent.getStudents();
+			if (studentList != null){
+				System.out.println("There are " + studentList.size() + " students in that project to be put in teams");
+			}
 			this.unitCode = parent.getUnitCode();
 			this.minTeamSize = project.getMinTeamSize();
 			this.maxTeamSize = project.getMaxTeamSize();
