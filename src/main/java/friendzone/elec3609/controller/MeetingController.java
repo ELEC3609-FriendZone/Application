@@ -126,6 +126,11 @@ public class MeetingController {
 		map.put("maxCount", mm.getMaxCount());
 		map.put("teamSize", team.getMembers().size());
 		//map.put("availMembers", );
+		
+		// Header details 
+		map.put("firstname", student.getFirstName());
+		map.put("lastname", student.getLastName());
+		
 		return "newMeeting";
 	}
 	

@@ -7,56 +7,13 @@
 	{
 		margin: 0px;
 		padding: 0px;
-		background: #EFEDE0;
+		background: #f8f8f8;
+		/*background: #EFEDE0;*/
 		font-family: 'OpenSansBold', sans-serif;
 		font-size: 11pt;
 		font-weight: 400;
 		color: #7F7F7F;
 		text-align: "left";
-	}
-	
-	
-	h1, h2
-	{
-		margin: 0;
-		color: #393E38;
-	}
-	
-	h3
-	{
-		margin: 0; 
-		color: #393E38;
-		font-size: 10pt;
-		font-style: italic;
-	}
-	
-	h4
-	{
-		margin: 0; 
-		color: #E0A81D;
-		font-size: 15pt;
-		text-align: left;
-		margin-bottom: 1em;
-		margin-top: 1em;
-		margin-left: 1em;
-	}
-	
-	h5
-	{
-		margin: 0;
-		color: #b54322;
-		font-size: 12pt;
-	}
-	h6
-	{
-		text-decoration: none;
-        margin-right: 1em;
-        margine-left: 1em;
-        vertical-align: center;
-        font-family: 'OpenSansBold', sans-serif;
-		font-size: 11pt;
-		font-weight: 400;
-		color: #37a883;
 	}
 	p, ol, ul
 	{
@@ -84,21 +41,6 @@
 		margin-left: auto; 
 		margin-right: auto;
 	}
-	a
-	{
-        text-decoration: none;
-        margin-right: 1em;
-        margine-left: 1em;
-        vertical-align: center;
-        font-family: 'OpenSansBold', sans-serif;
-		font-size: 11pt;
-		font-weight: 400;
-		color: white;
-	}
-	a:active, a:hover
-	{
-		color: #37a883;
-	}
 	.container
 	{
 		margin: 0px auto;
@@ -118,6 +60,28 @@
 	{
 		text-align: right;
 		margin-right: 1em;
+	}
+/*********************************************************************************/
+/* Link Styles                                                                */
+/*********************************************************************************/
+a
+{
+	text-decoration: none;
+    margin-right: 1em;
+    margin-left: 1em;
+    vertical-align: center;
+    font-family: 'OpenSansBold', sans-serif;
+    font-size: 11pt;
+    font-weight: 400;
+    color: white;
+}
+	a:hover
+	{
+		color: #37a883;
+	}
+	a:active 
+	{
+		color: #37a883;
 	}
 
 /*********************************************************************************/
@@ -309,13 +273,13 @@
 	{
 		background: #ffffff;
 		border-radius: 2px;
-		box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-		width: 300px;
+		box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+		width: 250px;
 		height: 200px;
 		padding: 0.5em 1em 0.5em 1em;
-		margin-top: 50px;
+		margin-top: 25px;
 		margin-left: 25px;
-		margin-right: 25px;
+		margin-right: 10px;
 		display: inline-block;
 		list-style-type: none;
 	}
@@ -328,60 +292,44 @@
 		width: 700px;
 		/*height: 500px;*/
 		padding: 0.5em 1em 0.5em 1em;
-		margin-top: 50px;
-		margin-left: 25px;
+		margin-top: 25px;
+		margin-left: 10px;
 		margin-right: 25px;
 		display: inline-block;
 		list-style-type: none;
 	}
+	li.right-panel-white
+	{
+		background: #ffffff;
+		border-radius: 2px;
+		box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+		width: 700px;
+		/*height: 500px;*/
+		padding: 0.5em 1em 0.5em 1em;
+		display: inline-block;
+		list-style-type: none;
+	}
+	li.body-divider 
+	{
+		text-align: center;
+		border-bottom: 1px dotted #ccc;
+		margin-top: 2em;
+		margin-bottom: 2em;
+	}
 
 /*********************************************************************************/
-/* Social Icon Styles                                                            */
+/* ul styles                                                           */
 /*********************************************************************************/
 	
 	ul 
 	{
 		text-align: center;
 	}
-	
-	ul.contact
+	ul.preferences 
 	{
-		margin: 0;
-		padding: 2em 0em 0em 0em;
-		list-style: none;
+		text-align: left;
+		margin-bottom: 2em;
 	}
-	
-	ul.contact li
-	{
-		display: inline-block;
-		padding: 0em 0.30em;
-		font-size: 1.5em;
-	}
-	
-	ul.contact li span
-	{
-		display: none;
-		margin: 0;
-		padding: 0;
-	}
-	
-	ul.contact li a
-	{
-		color: #FFF;
-	}
-	
-	ul.contact li a:before
-	{
-		display: inline-block;
-		background: #333333;
-		width: 80px;
-		height: 80px;
-		line-height: 80px;
-		border-radius: 40px;
-		text-align: center;
-		color: #FFFFFF;
-	}
-	
 
 /*********************************************************************************/
 /* Button Style                                                                  */
@@ -417,7 +365,11 @@
 		font-size: 1em;
 		color: #FFF;
 	}
-	
+	.button-orange:hover, 
+	.button-green:hover
+	{
+		color: #272925;
+	}
 	.button:before
 	{
 		display: inline-block;
@@ -431,50 +383,87 @@
 		color: #272925;
 	}
 	
-	.button-small
+	.button-small1
 	{
-		padding: 0.9em 2em;
-		background: #8DCB89;
-		border-radius: 5px;
+		padding: 0.5em 1em 0.5em 1em;
+		background: #37a883;
+		border-radius: 2px;
 		line-height: 1.8em;
-		font-size: 1em;
+		font-size: 11pt;
+		text-decoration: none;
+		text-transform: uppercase;
 	}
-		
+	.button-small2
+	{
+		padding: 0.5em 1em 0.5em 1em;
+		background: #E0A81D;
+		border-radius: 2px;
+		line-height: 1.8em;
+		font-size: 11pt;
+		text-decoration: none;
+		text-transform: uppercase;
+	}
+	.button-small1:hover,
+	.button-small2:hover
+	{
+		color: #272925;
+	}
 /*********************************************************************************/
 /* Heading Titles                                                                */
 /*********************************************************************************/
-
-	.title
-	{
-		text-align: left;
-	}
 	
-	.title h2
+	h1
 	{
-		font-size: 2.8em;
-		color: rgba(255,255,255,0.9);
-		padding: 1em;
+		margin: 0;
+		color: #393E38;
 		text-align: center;
+		/*border-bottom: 1px dotted #ccc;*/
+		margin-bottom: 1em;
 		
 	}
 	
-	.title .byline
+	h2
 	{
-		letter-spacing: 0.15em;
-		text-transform: uppercase;
+		margin: 0;
+		color: #393E38;
+	}
+	
+	h3
+	{
+		margin: 0; 
+		color: #393E38;
+		font-size: 10pt;
+		font-style: italic;
+	}
+	
+	h4
+	{
+		margin: 0; 
+		color: #393E38;
+		/*color: #E0A81D;*/
+		font-size: 15pt;
+		text-align: left;
+		margin-bottom: 1em;
+		margin-top: 1em;
+		margin-left: 1em;
+	}
+	
+	h5
+	{
+		margin: 0;
+		color: #b54322;
+		font-size: 12pt;
+	}
+	h6
+	{
+		text-decoration: none;
+        margin-right: 1em;
+        margine-left: 1em;
+        vertical-align: center;
+        font-family: 'OpenSansBold', sans-serif;
+		font-size: 11pt;
 		font-weight: 400;
-		font-size: 1.1em;
-		color: #6F6F6F;
-	}
-	.orange
-	{
-		color: #E0A81D;
-	}
-	.title h3
-	{
-		font-size: 2.8em;
 		color: #37a883;
-		padding: 1em;
 	}
 
 /*********************************************************************************/
@@ -486,7 +475,7 @@
 		overflow: hidden;
 		padding: 1em 0em;
 		background: #228b9b;
-		height: 12px;
+		height: 25px;
 		text-align:left;
 	}
 
@@ -520,6 +509,15 @@ table
 	.table-unavilable
 	{
 	
+	}
+	.left-panel-table
+	{
+		width: 200;
+		word-wrap:break-word;
+	}
+	.table-heading
+	{
+		font-weight: 400;
 	}
 
 /*********************************************************************************/
@@ -639,31 +637,6 @@ table
 	}
 
 /*********************************************************************************/
-/* Welcome                                                                       */
-/*********************************************************************************/
-
-	#welcome
-	{
-		overflow: hidden;
-		padding: 8em 0em;
-		text-align: center;
-		color: rgba(255,255,255,0.3);
-	}
-	
-	#welcome .content
-	{
-		padding: 0em 8em;
-	}
-	
-	
-	
-	#welcome a,
-	#welcome strong
-	{
-		color: rgba(255,255,255,0.6);
-	}
-
-/*********************************************************************************/
 /* Page                                                                          */
 /*********************************************************************************/
 
@@ -696,112 +669,17 @@ table
 		text-align: center;
 	}
 
+	#footer-wrapper
+	{
+		background: white;
+		height: 100px;
+		padding: 1em, 1em, 1em, 1em
+		/*position:absolute;
+   		bottom:0;
+   		width:100%;*/
+	}
 	
 	#footer .title span
 	{
 		color: rgba(255,255,255,0.4);
 	}
-
-/*********************************************************************************/
-/* Copyright                                                                     */
-/*********************************************************************************/
-
-	#copyright
-	{
-		overflow: hidden;
-		padding: 5em 0em;
-		border-top: 1px solid rgba(255,255,255,0.08);
-	}
-	
-	#copyright p
-	{
-		letter-spacing: 0.20em;
-		text-align: center;
-		text-transform: uppercase;
-		font-size: 0.80em;
-		color: rgba(255,255,255,0.3);
-	}
-	
-	#copyright a
-	{
-		text-decoration: none;
-		color: rgba(255,255,255,0.6);
-	}
-
-/*********************************************************************************/
-/* Newsletter                                                                    */
-/*********************************************************************************/
-
-	#newsletter
-	{
-		overflow: hidden;
-		padding: 8em 0em;
-		background: #EDEDED;
-		text-align: center;
-	}
-	
-	#newsletter .title h2
-	{
-		color: rgba(0,0,0,0.8);
-	}
-	
-	#newsletter .content
-	{
-		width: 600px;
-		margin: 0px auto;
-	}
-	
-/*********************************************************************************/
-/* Portfolio                                                                     */
-/*********************************************************************************/
-
-	#portfolio
-	{
-	}
-	
-	#portfolio .box
-	{
-		text-align: center;
-		color: rgba(0,0,0,0.5);
-	}
-	
-	#portfolio h3
-	{
-		display: block;
-		padding-bottom: 1em;
-		text-transform: uppercase;
-		font-size: 1em;
-		color: rgba(0,0,0,0.6);
-	}
-
-	#portfolio .title
-	{
-		text-align: center;
-	}
-
-	#portfolio .title h2
-	{
-		color: rgba(0,0,0,0.8);
-	}
-
-	.column1,
-	.column2,
-	.column3,
-	.column4
-	{
-		width: 282px;
-	}
-	
-	.column1,
-	.column2,
-	.column3
-	{
-		float: left;
-		margin-right: 24px;
-	}
-	
-	.column4
-	{
-		float: right;
-	}
-	

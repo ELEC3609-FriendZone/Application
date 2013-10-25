@@ -96,9 +96,12 @@ public class AvailabilityController {
 		map.put("availabilitySaturday", availSaturdayStrings);
 		map.put("availabilitySunday", availSundayStrings);
 		
-		//return page		 
-
 		
+		// Header details 
+		map.put("firstname", student.getFirstName());
+		map.put("lastname", student.getLastName());
+				
+		//return page		 		
 		return "availability";
 		
 	}

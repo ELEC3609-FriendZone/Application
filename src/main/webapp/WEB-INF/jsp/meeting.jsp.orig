@@ -13,17 +13,12 @@
 			<tr>
 				<td class="left"> <a href ="/mainHome/"><img src="../images/title.png" alt="Friendzone"></a></td>
 				<td style="text-align: right;"> 
-					<a href="/subject/">Details</a>  
-<<<<<<< HEAD
-					<a href="/meeting/new">New Meeting</a> 
-					<a href="/meeting/">View Meeting</a> 
-					<a href=""> My Availability</a> 
-=======
-					<a href="/meeting/">New Meeting</a> 
-					<a href="">View Meeting</a> 
-					<a href="/availability"> My Availability</a> 
->>>>>>> cfcb95ddc87ff57d76409793188507acb31b83fc
-					<a href="/subject/">Chat</a>
+					<a href="/availability"> My Availability</a>
+					<a href="/meeting/">View Meetings</a> 
+					<a href="/meeting/new/">New Meeting</a>  
+					<a href="/subject/">Chat</a>	
+					<a href="/profile/" class="button-small1"> ${Firstname} ${Lastname}</a>
+					<a href="/logout/" class="button-small2"> Log out</a>
 				</td>
 			</tr>
 		</table>
@@ -48,23 +43,61 @@
 					<td style="vertical-align: top">
 						<ul>
 							<li class="right-panel">
-<<<<<<< HEAD
-								<h1>Meeting Page</h1>
-								${team}<br>
-=======
 								<h1>Group Meetings</h1>
->>>>>>> cfcb95ddc87ff57d76409793188507acb31b83fc
+<<<<<<< HEAD
+								Time stamp format: YYYY-MM-DD HH:MM:SS.nanoseconds
+								<table>
+									<tr>
+										<td>ID:</td>
+										<c:forEach items="${meetingID}" var="id">
+											<td>${id}</td>
+										</c:forEach>
+										
+									</tr>
+									<tr>
+										<td>Start:</td>
+										<c:forEach items="${meetingStart}" var="start">
+											<td>${start}</td>
+										</c:forEach>
+									</tr>
+									<tr>
+										<td>End:</td>
+										<c:forEach items="${meetingEnd}" var="end">
+											<td>${end}</td>
+										</c:forEach>
+									</tr>
+									<tr>
+										<td>Location:</td>
+										<c:forEach items="${meetingLocation}" var="l">
+											
+											<c:choose>
+												<c:when test="${l== null}">
+													<td>Not Specified</td>
+												</c:when>
+												<c:otherwise>
+													<td>${l}</td>
+												</c:otherwise>
+											</c:choose>
+										</c:forEach>
+									</tr>
+								</table>
+=======
+								${team}<br>
 								${studentTeams} <br>
 								${meetingAttendees} <br>
 								${teamMembers} <br>
 								Meeting Location: ${meetingLocation}
-								
+>>>>>>> 0306b388915387bb031c09873f3e6171ed054f0d
 							</li>
 						</ul>
 					</td>
 				</tr>
 			</tbody>
 			</table>	
+	</div>
+	<!-- Footer -->
+	<div>
+		<jsp:include page="footer.jsp" />
 	</div>
 </body>
 </html>

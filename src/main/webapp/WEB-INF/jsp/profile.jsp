@@ -14,6 +14,7 @@
 				<td style="text-align: right;"> 
 					<div class="links">
 						<a href="/profile/edit/">Edit</a>
+						<a href="/logout/" class="button-small2"> Log out</a>
 					</div>
 				</td>
 			</tr>
@@ -31,7 +32,7 @@
 						<ul class="left">
 							<li class="left-panel">
 								<h4>Details</h4>
-								<table id="detail-table">
+								<table class="left-panel-table">
 									<tr>
 										<td><b>Unikey: </b></td>
 										<td>${unikey}</td>
@@ -53,26 +54,26 @@
 						</ul>
 					</td>
 					<td style="vertical-align: top">
-						<ul class="left">
+						<ul>
 							<li class="right-panel">
 								<h1>Preferences</h1>
-								<table id="preferences-table">
+								<table id="preferences-table" class="left" style="vertical-align: top">
 									<tr>
-										<td><h5>Study Level:</h5></td>
+										<td style="vertical-align: top"><h5>Study Level:</h5></td>
 										<td>
-											<ul>${studyLevels}</ul>
+											<ul class="preferences">${studyLevels}</ul>
 										</td>
 									</tr>
 									<tr>
-										<td><h5>Role:</h5></td>
+										<td style="vertical-align: top"><h5>Role:</h5></td>
 										<td>
-											<ul>${preferredRole}</ul>
+											<ul class="preferences">${preferredRole}</ul>
 										</td>
 									</tr>
 									<tr>
-										<td><h5>Languages</h5></td>
-										<td>
-											<ul>
+										<td style="vertical-align: top"><h5>Languages</h5></td>
+										<td style="vertical-align: top">
+											<ul class="preferences">
 												<c:forEach items="${languages}" var="language">
 													<li>${language}</li>
 												</c:forEach>
@@ -80,18 +81,18 @@
 										</td>
 									</tr>
 									<tr>
-										<td><h5>Social Media</h5></td>
+										<td style="vertical-align: top"><h5>Social Media</h5></td>
 										<td>
-											<ul>
+											<ul class="preferences">
 												<li>${firstSocialMedia}</li>
 												<li>${secondSocialMedia}</li>
 											</ul>
 										</td>
 									</tr>
 									<tr>
-										<td><h5>English as a second Language?</h5></td>
+										<td style="vertical-align: top"><h5>English as a second Language?</h5></td>
 										<td>
-											<ul>
+											<ul class="preferences">
 												<c:choose>
 													<c:when test="${ESL == true}"> Yes </c:when>
 													<c:otherwise> No </c:otherwise>
@@ -100,18 +101,20 @@
 										</td>
 									</tr>
 									<tr>
-										<td><h5>Experience</h5></td>
-										<td>
-											<ul>${experience}</ul>
-										</td>
+										<td style="vertical-align: top"><h5>Experience</h5></td>
+										<td><ul class="preferences">${experience}</ul></td>
 									</tr>
 								</table>
 							</li>
+							<li class="body-divider"></li>
 						</ul>
 					</td>
 				</tr>
 			</tbody>
 		</table>
+	</div>
+	<div>
+		<jsp:include page="footer.jsp" />
 	</div>
 </body>
 </html>

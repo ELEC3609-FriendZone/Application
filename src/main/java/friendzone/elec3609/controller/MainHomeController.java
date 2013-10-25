@@ -86,6 +86,10 @@ public class MainHomeController {
 		//	PROJECT
 		//form action=post name="id" value = projects.get(0).get(0).getId()> group 1
 		model.addAttribute("student", student);
+		
+		// Header details 
+		map.put("firstname", student.getFirstName());
+		map.put("lastname", student.getLastName());
 		return "mainHome";
 	}
 
