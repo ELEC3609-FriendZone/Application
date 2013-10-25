@@ -625,7 +625,7 @@ public class DatabaseHandler{
 				projectStatement.setInt(1, projectID);
 				ResultSet projectRs = projectStatement.executeQuery();
 				if (projectRs.next()){
-					matchingProject = new Project(projectID, projectRs.getString("UOS"), projectRs.getDate("DEADLINE"), projectRs.getInt("MIN_TEAM_SIZE"), projectRs.getInt("MAX_TEAM_SIZE"));
+					matchingProject = new Project(projectID, projectRs.getString("UOS_ID"), projectRs.getDate("DEADLINE"), projectRs.getInt("MIN_TEAM_SIZE"), projectRs.getInt("MAX_TEAM_SIZE"));
 					if (projectMap.get(projectID) == null){
 						projectMap.put(projectID, matchingProject);
 					}
@@ -741,7 +741,6 @@ public class DatabaseHandler{
 				}
 				matchingAdmin = adminMap.get(staffID);
 			}
-				
 		}
 		catch (SQLException e){
 			e.printStackTrace();
@@ -1707,7 +1706,7 @@ public class DatabaseHandler{
 			stmt.setString(1, unitCode);
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()){
-				String sid = rs.getString(0);
+				String sid = rs.getString(1);
 				Student matchingStudent= getStudent(sid);
 				unitsStudents.add(matchingStudent);
 			}
